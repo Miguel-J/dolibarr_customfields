@@ -1,0 +1,3 @@
+Just copy the htdocs folder inside your dolibarr folder (overwrite dolibarr/htdocs folder).
+
+Then in Configuration>Modules menu, you can activate and configure your CustomFields.
