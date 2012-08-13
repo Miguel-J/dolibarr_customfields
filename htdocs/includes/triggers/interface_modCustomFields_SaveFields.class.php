@@ -16,10 +16,10 @@
  */
 
 /**
- *      \file       htdocs/includes/triggers/interface_modCustomFields_SaveFields.class.php
+ *      \file       htdocs/customfields/triggers/interface_modCustomFields_SaveFields.class.php
  *      \ingroup    core
  *      \brief      Core triggers file for CustomFields module. Triggers actions for the customfields module. Necessary for actions to be comitted.
- *		\version	$Id: interface_modCustomFields_SaveFields.class.php, v1.1.0
+ *		\version	$Id: interface_modCustomFields_SaveFields.class.php, v1.2.2
  */
 
 
@@ -96,6 +96,12 @@ class InterfaceSaveFields
         // Put here code you want to execute when a Dolibarr business events occurs.
         // Data and type of action are stored into $object and $action
 
+	foreach ($_POST as $key=>$value) { // Generic way to fill all the fields to the object (particularly useful for triggers and customfields) - NECESSARY to get the fields' values
+	    if (!isset($object->$key)) { // Appending only: only add the property to the object if this property is not only defined
+		$object->$key = $value;
+	    }
+	}
+
         // Products and services
         if($action == 'PRODUCT_CREATE') {
             dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
@@ -144,7 +150,7 @@ class InterfaceSaveFields
             return $this->run_trigger($action,$object,$user,$langs,$conf);
         }
 
-        // Bills
+        // Bills - Invoices
         elseif ($action == 'BILL_CREATE') {
             dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 
@@ -176,7 +182,7 @@ class InterfaceSaveFields
 
 
         /********************************** GENERIC CUSTOMFIELDS ACTION TRIGGERS **********************************/
-        // Description: to avoid duplicating code in triggers, here are a few generic dummy customfields triggers, they are never triggered by any module but here you can use them to recursively activate them (eg: you get a BILL_CREATE trigger, just call run_trigger() with $action=CUSTOMFIELDS_CREATE and pass on the other arguments you received and you're done)
+        // Description: to avoid duplicating code in triggers, here are a few generic dummy customfields triggers, they are never triggered by any module but here you can use them recursively to activate them (eg: you get a BILL_CREATE trigger, just call run_trigger() with $action=CUSTOMFIELDS_CREATE and pass on the other arguments you received and you're done)
 
         elseif ($action == 'CUSTOMFIELDS_CREATE') { // Create a record
             dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
@@ -201,7 +207,7 @@ class InterfaceSaveFields
         /* DELETION is automatically managed by the SGBD (sql) thank's to the constraints
         elseif ($action == 'CUSTOMFIELDS_DELETE') {
         }*/
-        elseif ($action == 'CUSTOMFIELDS_MODIFY') { // Modify a record (UNUSED because automatically managed by the customfields lib, this function here is just for example or possible future use, but now it's not used)
+        elseif ($action == 'CUSTOMFIELDS_MODIFY') { // Modify a record (UNUSED because automatically managed by the customfields lib AND by the SQL constraints/triggers/check, this function here is just for example or possible future use, but now it's not used)
             dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 
             // Vars
@@ -291,6 +297,41 @@ class InterfaceSaveFields
 
             return 1;
         }
+	else { // Generic trigger
+	    include(DOL_DOCUMENT_ROOT."/customfields/conf/conf_customfields.lib.php");
+
+	    // Generic trigger based on the trigger array
+	    if (preg_match('/^('.implode('|',array_keys($triggersarray)).')$/i', $action, $matches) ) { // if the current action is on a supported trigger action
+		dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+
+		$object->currentmodule = $triggersarray[strtolower($matches[1])]; // find the right module from the triggersarray (key_trigger=>value_module)
+
+		preg_match('/^(.*)_((CREATE|PREBUILDDOC|CLONE).*)$/i', $action, $matches);
+		$action = 'CUSTOMFIELDS_'.$matches[2]; // forge the right customfields trigger
+		return $this->run_trigger($action,$object,$user,$langs,$conf);
+	    }
+
+	    // Generic trigger based on contexts and module's name
+	    $patternsarray = array();
+	    foreach ($modulesarray as $context => $module) { // we create a pattern for regexp with contexts and modules names mixed
+		$patternsarray[] = addslashes($module);
+		$patternsarray[] = $context;
+	    }
+	    $patterns_flattened = implode('|',$patternsarray); // we flatten the patterns array in a single regexp OR pattern
+	    if (preg_match('/^('.$patterns_flattened.')_((CREATE|PREBUILDDOC|CLONE).*)$/i', $action, $matches) ) { // if the current action is on a supported module or context, and the action is supported (for the moment only CREATE, PREBUILDDOC and CLONE)
+		$triggername = $matches[1]; // module's name
+		$triggeraction = $matches[2]; // action name (create, modify, delete, clone, builddoc, prebuilddoc, etc.)
+		dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
+
+		$action = 'CUSTOMFIELDS_'.$triggeraction;
+		if ($this->in_arrayi($triggername, $modulesarray)) { // Either we have a value (module) that matched, or a key (context)
+		    $object->currentmodule = strtolower($triggername); // value (module) matched
+		} else {
+		    $object->currentmodule = $modulesarray[strtolower($triggername)]; // key (context) matched
+		}
+		return $this->run_trigger($action,$object,$user,$langs,$conf);
+	    }
+	}
 
 	return 0;
     }

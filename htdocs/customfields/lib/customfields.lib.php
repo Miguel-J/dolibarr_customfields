@@ -17,10 +17,10 @@
  */
 
 /**
- *	\file       htdocs/lib/customfields.lib.php
+ *	\file       htdocs/customfields/lib/customfields.lib.php
  *	\brief      Printing library for the customfields module, very generic and useful (but no core database managing functions, they are in customfields.class.php)
  *	\ingroup    customfields
- *	\version    $Id: customfields.lib.php, v1.1.0
+ *	\version    $Id: customfields.lib.php, v1.2.4
  */
 
 /**
@@ -72,7 +72,7 @@ function customfields_admin_prepare_head($modulesarray, $currentmodule = null)
  *      @param      $currentmodule      the current module we are in (facture, propal, etc.)
  *      @return     void        returns nothing because this is a procedure : it just does what we want
  */
-function customfields_print_creation_form($currentmodule) {
+function customfields_print_creation_form($currentmodule, $id = null) {
     global $db, $langs;
 
     // Init and main vars
@@ -81,10 +81,20 @@ function customfields_print_creation_form($currentmodule) {
 
     if ($customfields->probeCustomFields()) { // ... and if the table for this module exists, we show the custom fields
         $fields = $customfields->fetchAllCustomFields();
+        if (isset($id)) $datas = $customfields->fetch($id); // fetching the record - the values of the customfields for this id (if it exists)
         foreach ($fields as $field) {
             $name = $field->column_name;
             print '<tr><td>'.$customfields->findLabel($name).'</td><td colspan="2">';
-            print $customfields->ShowInputField($field, GETPOST($customfields->varprefix.$name));
+            $value = ''; // by default the value of this property is empty
+            $name = $field->column_name; // the name of the customfield (which is the property of the record)
+            $postvalue = GETPOST($customfields->varprefix.$name);
+            if ( !empty ($postvalue) ) {
+                $value = $postvalue;
+            } elseif (isset($datas->$name)) {
+                // Default values from database record
+                $value = $datas->$name; // if the property exists (the record is not empty), then we fill in this value
+            }
+            print $customfields->ShowInputField($field, $value);
             print '</td></tr>';
         }
     }
@@ -106,7 +116,7 @@ function customfields_print_main_form($currentmodule, $object, $action, $user, $
     $customfields = new CustomFields($db, $currentmodule);
 
     if ($customfields->probeCustomFields()) { // ... and if the table for this module exists, we show the custom fields
-        print '<table class="border" width="100%">';
+        //print '<table class="border" width="100%">';
 
         // == Fetching customfields
         $fields = $customfields->fetchAllCustomFields(); // fetching the customfields list
@@ -145,7 +155,7 @@ function customfields_print_main_form($currentmodule, $object, $action, $user, $
 
             // == Print the record
 
-            print '<tr><td width="20%">';
+            print '<tr><td>';
             print $customfields->findLabel($name);
             // checking the user's rights for edition
             if (!empty($rights)) { // if a list of rights have been specified, we check the rights for creation/edition for each one
@@ -163,7 +173,7 @@ function customfields_print_main_form($currentmodule, $object, $action, $user, $
             // print the edit button only if authorized
             if (!($action == 'editcustomfields' && GETPOST('field') == $name) && !(isset($objet->brouillon) and $object->brouillon == false) && $rightok) print '<span align="right"><a href="'.$_SERVER["PHP_SELF"].'?'.$idvar.'='.$object->id.'&amp;action=editcustomfields&amp;field='.$field->column_name.'">'.img_edit("default",1).'</a></td>';
             print '</td>';
-            print '<td>';
+            print '<td colspan="3">';
             // print the editing form...
             if ($action == 'editcustomfields' && GETPOST('field') == $name) {
                 print $customfields->showInputForm($field, $value, $_SERVER["PHP_SELF"].'?'.$idvar.'='.$object->id);
@@ -173,7 +183,7 @@ function customfields_print_main_form($currentmodule, $object, $action, $user, $
             print '</td></tr>';
         }
 
-        print '</table><br>';
+        //print '</table><br>';
     }
 }
 

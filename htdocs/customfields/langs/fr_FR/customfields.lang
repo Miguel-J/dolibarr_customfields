@@ -1,4 +1,4 @@
-﻿# Dolibarr language file - fr_FR - customfields standard labels
+# Dolibarr language file - fr_FR - customfields standard labels
 CHARSET= UTF-8
 
 #### ADMIN CONFIG INTERFACE ####
@@ -10,6 +10,7 @@ CustomFieldsSetup= Interface de configuration des champs personnalisés
 facture= Facture
 propal= Proposition commerciale
 product= Produits/Services
+commande= Commandes client
 
 # Table headers
 Fieldname= Nom du champ
