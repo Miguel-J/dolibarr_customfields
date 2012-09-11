@@ -1,9 +1,9 @@
 =================================================
 *				CUSTOMFIELDS MODULE				*
 *			by Stephen Larroque (lrq3000)		*
-*				version	1.2.8					*
+*				version	2.9 (branch v2)			*
 *			for Dolibarr >= 3.2.0				*
-*			release date 2011/10/29				*
+*			release date 2012/09/11				*
 *			last update (see on github)			*
 =================================================
 
@@ -16,12 +16,11 @@ CustomFields has been made with the intention of being as portable, flexible, mo
 ===== DOWNLOAD =====
 
 To download the latest release, please check the github:
+Branch v1 (for Dolibarr v3.1.x):
+https://github.com/lrq3000/dolibarr_customfields/tree/3.1
 
-https://github.com/lrq3000/dolibarr/tree/develop2
-
-And also the Dolibarr github:
-
-https://github.com/Dolibarr/dolibarr
+Branch v2
+https://github.com/lrq3000/dolibarr_customfields/tree/3.2
 
 ===== CONTACT =====
 
@@ -90,12 +89,138 @@ Eg: if you want to link to the Dolibarr's users, select Constraint "llx_users". 
 ===== WHAT IT CANT DO =====
 What this module can NOT do (yet):
 - add custom fields in invoices products lines (custom data per product), but may be added in the future.
+note: this feature is available in the V3 branch of CustomFields.
 
 ===== INSTALL =====
 
 Just as any Dolibarr's module, just unzip the contents of this package inside your dolibarr's folder (you should be asked to overwrite some files if done right).
 
 ATTENTION: you need a MySQL database with INNODB. With MySQL >= 5.5, INNODB is default, for MySQL < 5.5 it is MyISAM so you'll have to manually switch to InnoDB. PostgreSQL MAY be supported, we just didn't try yet.
+
+===== HOW TO CREATE CUSTOM FIELDS =====
+
+Simply go to the module's admin panel of Dolibarr, there you just have to activate CustomFields and you can then access its admin page.
+
+From the CustomField's admin page, you can create, edit and delete your custom fields by just clicking and typing. No need to code anything. Just select the tab corresponding to the module you want to add custom fields to, and create your custom fields by following the on-screen indications.
+
+As soon as custom fields are created, they will be shown to the user and be editable in the corresponding module's datasheet.
+
+===== HOW TO USE MY CUSTOMFIELDS IN MY PDF OR ODT DOCUMENT =====
+
+== PDF
+
+* First you have to load the data:
+
+// Init and main vars
+include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
+$customfields = new CustomFields($this->db, $object->table_element);
+// Fetching custom fields records
+$fields = $customfields->fetch($object->id);
+
+* Then you can access the field's value:
+
+$fields->variable_name
+by default (with the default varprefix of "cf_")
+$fields->cf_mycustomfield
+
+* To print it with FPDF (the default PDF generation library):
+
+$pdf->MultiCell(0,3, $fields->cf_mycustomfield, 0, 'L'); // printing the customfield
+
+* To print it with beautified formatting (eg: for constained fields or truefalsebox):
+ 
+// Getting the beautifully formatted value of the field
+$myvalue = $customfields->simpleprintFieldPDF('mycustomfield', $fields->cf_mycustomfield);
+ 
+// Printing the field
+$pdf->MultiCell(0,3, $myvalue, 0, 'L');
+
+// old way to do it:
+// $fieldstruct = $customfields->fetchAllCustomFields();
+// $customfields->printFieldPDF($fieldstruct->cf_mycustomfield, $fields->cf_mycustomfield);
+
+* And if you want to print the multilanguage label of this field :
+$mylabel = $customfields->findLabel("mycustomfield", $outputlangs); // where $outputlangs is the language the PDF should be outputted to
+
+== ODT
+
+To use it in an ODT, it is even easier !
+Just use the shown variable name in the configuration page as a tag.
+
+Eg: for a customfield named user_ref, you will get the variable name cf_user_ref. In your ODT, just type {cf_user_ref} and you will get the value of this field!
+
+What's more exciting is that it fully supports constrained fields, so that if you have a constraint, it will automatically fetch all the linked values of the referenced tables and you will be able to use them with tags!
+
+Eg: let's take the same customfield as the previous example and say it is constained to the llx_users table. If you type {cf_user_ref} you will only get the id of the user, but maybe you'd prefer to get its firstname, lastname and phone number. You can access all the values of the llx_users table just like any tags. You just have to type {cf_user_ref_name} {cf_user_ref_firstname} {cf_user_ref_user_mobile}
+As you can see, you just need to append '_' and the name of the column you want to access to show the corresponding value! Pretty easy heh?
+
+===== HOW TO MANUALLY FETCH CUSTOMFIELDS IN MY OWN CODE AND MODULES =====
+
+One of the main features of the CustomFields module is that it offers a generic way to access, add, edit and view custom fields from your own code. You can easily develop your own modules accepting user's inputs based on CustomFields.
+
+First, you necessarily have to instanciate the CustomFields class:
+		// Init and main vars
+		include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
+		$customfields = new CustomFields($this->db, $currentmodule); // where $currentmodule is the current module, you can replace it by '' if you just want to use printing functions and fetchAny.
+
+Secondly, you have the fetch the records:
+		$records = $customfields->fetchAll();
+
+Thirdly, you can now print all your records this way:
+		if (!is_null($records)) { // verify that we have at least one result
+			foreach ($records as $record) { // in our list of records we walk each record
+					foreach ($record as $label => $value) { // for each record, we extract the label and the value
+							print $label.' has value: '.$value; // Simple printing, with no beautify nor multilingual support
+							print $customfields->findLabel($customfields->varprefix.$label).' has value: '.$customfields->simpleprintField($label, $value); // Full printing method with multilingual and beautified printing of the values. Note: We need to add the varprefix for the label to be found.  For printField, we need to provide the meta-informations of the current field to print the value from, depending on these meta-informations the function will choose the right presentation.
+					}
+			}
+		}
+
+Full final code:
+		// Init and main vars
+		include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
+		$customfields = new CustomFields($this->db, $currentmodule); // where $currentmodule is the current module, you can replace it by '' if you just want to use printing functions and fetchAny.
+		// Fetch all records
+		$records = $customfields->fetchAll();
+		// Walk and print the records
+		if (!is_null($records)) { // verify that we have at least one result
+			foreach ($records as $record) { // in our list of records we walk each record
+					foreach ($record as $label => $value) { // for each record, we extract the label and the value
+							print $label.' has value: '.$value; // Simple printing, with no beautify nor multilingual support
+							print $customfields->findLabel($customfields->varprefix.$label).' has value: '.$customfields->simpleprintField($label, $value); // Full printing method with multilingual and beautified printing of the values. Note: We need to add the varprefix for the label to be found.  For printField, we need to provide the meta-informations of the current field to print the value from, depending on these meta-informations the function will choose the right presentation.
+					}
+			}
+		}
+Done.
+
+Now, if you want to fetch only a particular record:
+		$record = $customfields->fetch($id); // Where id is of course the id of the record to fetch.
+
+		foreach ($record as $label => $value) { // for each record, we extract the label and the value
+				print $label.' has value: '.$value; // Simple printing, with no beautify nor multilingual support
+				print $customfields->findLabel($customfields->varprefix.$label).' has value: '.$customfields->simpleprintField($label, $value); // Full printing method with multilingual and beautified printing of the values. Note: We need to add the varprefix for the label to be found.  For printField, we need to provide the meta-informations of the current field to print the value from, depending on these meta-informations the function will choose the right presentation.
+		}
+
+----
+
+Just for your information (and in case you crawl some of the old parts of the code of this module), here is the old way to do it, with the very same results and performances (just as many sql requests):
+
+Same 1st and 2nd steps as above.
+
+(optionnal: if you want to use the generic beautified printing functions for the values, else if you want to manage the printing by yourselves you can skip this step)
+Thirdly, we fetch the custom fields definitions, because we need the meta-data associated to the custom fields structure to properly print the values (particularly important for constrained fields, for the other types it's less important)
+		$fields = $customfields->fetchAllCustomFields();
+
+Fourthly, you can now walk on the $records array to get all the records values. For this purpose, the CustomFields provides some functions to print the label with multilingual support as well as for the values:
+		foreach ($records as $record) { // in our list of records we walk each record
+			foreach ($fields as $field) { // for each record, we walk each field, but we walk in the order of the $fields array so that we can easily pass on the current field's meta informations
+				$label = $field->column_name;
+				$value = $record->$label;
+				print $label.' has value: '.$value; // Simple printing, with no beautify nor multilingual support
+				print $customfields->findLabel($customfields->varprefix.$label).' has value: '.$customfields->printField($field, $value); // Full printing method with multilingual and beautified printing of the values. Note: We need to add the varprefix for the label to be found.  For printField, we need to provide the meta-informations of the current field to print the value from, depending on these meta-informations the function will choose the right presentation.
+			}
+		}
+
 
 ===== HOW TO ADD THE SUPPORT OF A NEW MODULE =====
 
@@ -418,118 +543,6 @@ everything is handled in the hooks and triggers classes of CustomFields.
 == Commands module support
 everything is handled in the hooks class of CustomFields and config file.
 
-===== HOW TO USE MY CUSTOMFIELDS IN MY PDF OR ODT DOCUMENT =====
-
-== PDF
-
-Nothing is easier ! You can directly access them like any other standard property of the module's object.
-
-* To access the field's value:
-
-$object->variable_name
-by default (with the default varprefix of "cf_")
-$object->cf_mycustomfield
-
-* To print it with FPDF (the default PDF generation library):
-
-$pdf->MultiCell(0,3, $object->cf_monchamp, 0, 'L'); // printing the customfield
-
-* To print it with beautified formatting (eg: for constained fields or truefalsebox):
-
-// Init and main vars
-include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
-$customfields = new CustomFields($this->db, '');
- 
-// Getting the beautifully formatted value of the field
-$myvalue = $customfields->simpleprintFieldPDF('mycustomfield', $object->cf_mycustomfield);
- 
-// Printing the field
-$pdf->MultiCell(0,3, $myvalue, 0, 'L');
-
-// old way to do it:
-// $customfields->printFieldPDF($object->customfields->variable_name, $object->variable_name);
-
-* And if you want to print the multilanguage label of this field :
-$mylabel = $customfields->findLabel("mycustomfield", $outputlangs); // where $outputlangs is the language the PDF should be outputted to
-
-== ODT
-
-To use it in an ODT, it is even easier !
-Just use the shown variable name in the configuration page as a tag.
-
-Eg: for a customfield named user_ref, you will get the variable name cf_user_ref. In your ODT, just type {cf_user_ref} and you will get the value of this field!
-
-What's more exciting is that it fully supports constrained fields, so that if you have a constraint, it will automatically fetch all the linked values of the referenced tables and you will be able to use them with tags!
-
-Eg: let's take the same customfield as the previous example and say it is constained to the llx_users table. If you type {cf_user_ref} you will only get the id of the user, but maybe you'd prefer to get its firstname, lastname and phone number. You can access all the values of the llx_users table just like any tags. You just have to type {cf_user_ref_name} {cf_user_ref_firstname} {cf_user_ref_user_mobile}
-As you can see, you just need to append '_' and the name of the column you want to access to show the corresponding value! Pretty easy heh?
-
-===== HOW TO MANUALLY FETCH CUSTOMFIELDS IN MY OWN CODE AND MODULES =====
-
-One of the main features of the CustomFields module is that it offers a generic way to access, add, edit and view custom fields from your own code. You can easily develop your own modules accepting user's inputs based on CustomFields.
-
-First, you necessarily have to instanciate the CustomFields class:
-		// Init and main vars
-		include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
-		$customfields = new CustomFields($this->db, $currentmodule); // where $currentmodule is the current module, you can replace it by '' if you just want to use printing functions and fetchAny.
-
-Secondly, you have the fetch the records:
-		$records = $customfields->fetchAll();
-
-Thirdly, you can now print all your records this way:
-		if (!is_null($records)) { // verify that we have at least one result
-			foreach ($records as $record) { // in our list of records we walk each record
-					foreach ($record as $label => $value) { // for each record, we extract the label and the value
-							print $label.' has value: '.$value; // Simple printing, with no beautify nor multilingual support
-							print $customfields->findLabel($customfields->varprefix.$label).' has value: '.$customfields->simpleprintField($label, $value); // Full printing method with multilingual and beautified printing of the values. Note: We need to add the varprefix for the label to be found.  For printField, we need to provide the meta-informations of the current field to print the value from, depending on these meta-informations the function will choose the right presentation.
-					}
-			}
-		}
-
-Full final code:
-		// Init and main vars
-		include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
-		$customfields = new CustomFields($this->db, $currentmodule); // where $currentmodule is the current module, you can replace it by '' if you just want to use printing functions and fetchAny.
-		// Fetch all records
-		$records = $customfields->fetchAll();
-		// Walk and print the records
-		if (!is_null($records)) { // verify that we have at least one result
-			foreach ($records as $record) { // in our list of records we walk each record
-					foreach ($record as $label => $value) { // for each record, we extract the label and the value
-							print $label.' has value: '.$value; // Simple printing, with no beautify nor multilingual support
-							print $customfields->findLabel($customfields->varprefix.$label).' has value: '.$customfields->simpleprintField($label, $value); // Full printing method with multilingual and beautified printing of the values. Note: We need to add the varprefix for the label to be found.  For printField, we need to provide the meta-informations of the current field to print the value from, depending on these meta-informations the function will choose the right presentation.
-					}
-			}
-		}
-Done.
-
-Now, if you want to fetch only a particular record:
-		$record = $customfields->fetch($id); // Where id is of course the id of the record to fetch.
-
-		foreach ($record as $label => $value) { // for each record, we extract the label and the value
-				print $label.' has value: '.$value; // Simple printing, with no beautify nor multilingual support
-				print $customfields->findLabel($customfields->varprefix.$label).' has value: '.$customfields->simpleprintField($label, $value); // Full printing method with multilingual and beautified printing of the values. Note: We need to add the varprefix for the label to be found.  For printField, we need to provide the meta-informations of the current field to print the value from, depending on these meta-informations the function will choose the right presentation.
-		}
-
-----
-
-Just for your information (and in case you crawl some of the old parts of the code of this module), here is the old way to do it, with the very same results and performances (just as many sql requests):
-
-Same 1st and 2nd steps as above.
-
-(optionnal: if you want to use the generic beautified printing functions for the values, else if you want to manage the printing by yourselves you can skip this step)
-Thirdly, we fetch the custom fields definitions, because we need the meta-data associated to the custom fields structure to properly print the values (particularly important for constrained fields, for the other types it's less important)
-		$fields = $customfields->fetchAllCustomFields();
-
-Fourthly, you can now walk on the $records array to get all the records values. For this purpose, the CustomFields provides some functions to print the label with multilingual support as well as for the values:
-		foreach ($records as $record) { // in our list of records we walk each record
-			foreach ($fields as $field) { // for each record, we walk each field, but we walk in the order of the $fields array so that we can easily pass on the current field's meta informations
-				$label = $field->column_name;
-				$value = $record->$label;
-				print $label.' has value: '.$value; // Simple printing, with no beautify nor multilingual support
-				print $customfields->findLabel($customfields->varprefix.$label).' has value: '.$customfields->printField($field, $value); // Full printing method with multilingual and beautified printing of the values. Note: We need to add the varprefix for the label to be found.  For printField, we need to provide the meta-informations of the current field to print the value from, depending on these meta-informations the function will choose the right presentation.
-			}
-		}
 
 ===== TROUBLESHOOTING =====
 

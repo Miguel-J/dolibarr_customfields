@@ -37,15 +37,16 @@ class ActionsCustomFields // extends CommonObject
      *  @param      action             current action (if set). Generally create or edit or null
      *  @return       void
      */
-    function customfields_print_forms($printtype, $parameters, $object, $action) {
+    function customfields_print_forms($printtype, $parameters, $object, $action = null) {
         global $conf, $user;
-        // CustomFields : print fields at creation
+         // CustomFields : print fields at creation and edition (will prepare the data for the printing library in lib folder)
         if ($conf->global->MAIN_MODULE_CUSTOMFIELDS) { // if the customfields module is activated...
             if (!is_object($parameters)) $parameters = (object)$parameters; // fix for a bug of $parameters which is not always an object (sometimes it's an array)
 
             // Initializing variables
             $idvar = 'id'; // default value
             $rights = null; // default value
+            if (!isset($action)) $action = GETPOST('action'); // Get action var if it was not set
 
             // Preparing the CustomFields print arguments
             if ($parameters->context == 'invoicecard' or $object->table_element == 'facture') { // for invoices

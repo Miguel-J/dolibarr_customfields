@@ -24,7 +24,14 @@
  */
 
 // Include the config file (only used for $varprefix at this moment, so this class is pretty much self contained and independant)
-include_once(DOL_DOCUMENT_ROOT."/customfields/conf/conf_customfields.lib.php");
+include(DOL_DOCUMENT_ROOT."/customfields/conf/conf_customfields.lib.php");
+
+// Loading the translation class if it's not yet loaded (or with another name) - DO NOT EDIT!
+if (! is_object($langs))
+{
+    include_once(DOL_DOCUMENT_ROOT."/core/class/translate.class.php");
+    $langs=new Translate(DOL_DOCUMENT_ROOT."/customfields/langs/",$conf);
+}
 
 // Put here all includes required by your class file
 $langs->load('customfields@customfields'); // customfields standard language support
@@ -94,7 +101,7 @@ class CustomFields // extends CommonObject
 
 	/**
 	 *      Fetch a record (or all records) from the database (meaning an instance of the custom fields, the values if you prefer)
-	 *      @param	   id				id of the record to find (NOT rowid but fk_moduleid) - can be left empty if you want to fetch all the records
+	 *      @param	   id				id of the record to find (NOT customfields rowid but fk_moduleid, which is the same as the module's rowid) - can be left empty if you want to fetch all the records
 	 *      @param      notrigger	    0=launch triggers after, 1=disable triggers
 	 *      @return     int/null/obj/obj[]        	<0 if KO, null if no record is found, a record if only one is found, an array of records if OK
 	 */
@@ -250,7 +257,8 @@ class CustomFields // extends CommonObject
 		if (empty($fields)) return null;
 
 		// Forging the SQL statement
-		$sqlfields = '';
+		$sqlfields = array();
+                $sqlvalues = array();
 		foreach ($fields as $field) {
 			$key = $this->varprefix.$field->column_name;
 			if (!isset($object->$key)) {
@@ -263,19 +271,28 @@ class CustomFields // extends CommonObject
 		       }
 
 			if ($object->$key) { // Only insert/update this field if it was submitted
-				if ($sqlfields != '') { $sqlfields.=','; }
-				$sqlfields.=$field->column_name."='".$this->escape($object->$key)."'";
+                                // Note: we separate fields and values because depending on whether we UPDATE or INSERT the record, the format is not the same (INSERT: values and fields are separated, UPDATE: both are submitted at the same place)
+                                array_push($sqlfields, $field->column_name);
+                                array_push($sqlvalues, "'".$this->escape($object->$key)."'"); // escape and single-quote values (even if they are not strings, the database will automatically correct that depending on the column_type)
 			}
 		}
-		if ($sqlfields != '') { $sqlfields.=','; } // in the case that all fields are empty, this one can be the only one submitted, so we have to put the comma only if it's not alone (or else sql syntax error)
-		$sqlfields.="fk_".$this->module."=".$object->id; // we add the object id (filtered by fetchAllCustomFields)
 
+                // we add the object id (filtered by fetchAllCustomFields)
+                array_push($sqlfields, "fk_".$this->module);
+                array_push($sqlvalues, $object->id);
+
+                // fetch the record (to check whether it already exists or not)
 		$result = $this->fetch($object->id);
 
 		if (!empty($result) and count($result) > 0) { // if the record already exists for this facture id, we update it
-			$sql = "UPDATE ".$this->moduletable." SET ".$sqlfields." WHERE fk_".$this->module."=".$object->id;
+                        // Compact and format all the fields and values in the correct sql syntax (eg: field='value')
+                        $sqlfieldsandvalues = array();
+                        for($i=0;$i<count($sqlfields);$i++) {
+                            array_push($sqlfieldsandvalues, $sqlfields[$i].'='.$sqlvalues[$i]);
+                        }
+			$sql = "UPDATE ".$this->moduletable." SET ".implode(',', $sqlfieldsandvalues)." WHERE fk_".$this->module."=".$object->id;
 		} else { // else we insert a new record
-			$sql = "INSERT INTO ".$this->moduletable." SET ".$sqlfields;
+			$sql = "INSERT INTO ".$this->moduletable." (".implode(',',$sqlfields).") VALUES (".implode(',',$sqlvalues).")";
 		}
 
 		// Trigger or not?
@@ -286,7 +303,7 @@ class CustomFields // extends CommonObject
 		}
 
 		// Executing the SQL statement
-		$rtncode = $this->executeSQL($sql, 'createOrUpdateRecord_CustomFields',$trigger);
+		$rtncode = $this->executeSQL($sql,__FUNCTION__.'_CustomFields',$trigger);
 
 		$this->id = $this->db->last_insert_id($this->moduletable);
 
@@ -1256,6 +1273,8 @@ class CustomFields // extends CommonObject
 		if (!is_string($fieldname)) {
 			return -1;
 		} else {
+                        $fieldname = $this->stripPrefix($fieldname); // strip the prefix if detected at the beginning
+
 			if (!isset($this->fields->$fieldname)) {
 				$field = $this->fetchCustomField($fieldname, true);
 			} else {
@@ -1277,6 +1296,8 @@ class CustomFields // extends CommonObject
 		if (!is_string($fieldname)) {
 			return -1;
 		} else {
+                        $fieldname = $this->stripPrefix($fieldname); // strip the prefix if detected at the beginning
+
 			if (!isset($this->fields->$fieldname)) {
 				$field = $this->fetchCustomField($fieldname, true);
 			} else {
@@ -1299,6 +1320,8 @@ class CustomFields // extends CommonObject
 			$outputlangs = $langs;
 		}
 
+                $fieldname = $this->stripPrefix($fieldname); // strip the prefix if detected at the beginning
+
 		if ($outputlangs->trans($this->varprefix.$fieldname) != $this->varprefix.$fieldname) { // if we find a label for a code in the format : cf_something
 		    return $outputlangs->trans($this->varprefix.$fieldname);
 		} elseif ($outputlangs->trans($fieldname) != $fieldname) { // if we find a label for a code in the format : something
@@ -1317,6 +1340,15 @@ class CustomFields // extends CommonObject
 
 		return $fieldname;
 	}
+
+        // Function to strip CustomField's prefix (varprefix and fields_prefix).
+        // It is mainly used as a way to easily detect both 'cf_myfield' and 'myfield' and translate them the same way.
+        function stripPrefix($fieldname) {
+            preg_match('/^'.addslashes($this->varprefix).'/', $fieldname, $matchs); // detect with regex if the prefix is prepended at the beginning of the field's name
+            if (count($matchs) > 0) $fieldname = substr($fieldname, strlen($this->varprefix)); // strip the prefix if prefix detected
+
+            return $fieldname;
+        }
 
 }
 ?>

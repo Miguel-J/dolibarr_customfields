@@ -22,15 +22,15 @@
  *	\version    $Id: customfields.php, v1.2.7
  */
 
-$langs->load('customfields@customfields'); // customfields standard language support
-$langs->load('customfields-user@customfields'); // customfields language support for user's values (like enum, fields names, etc..)
-
 // Loading the translation class if it's not yet loaded (or with another name) - DO NOT EDIT!
 if (! is_object($langs))
 {
     include_once(DOL_DOCUMENT_ROOT."/core/class/translate.class.php");
-    $langs=new Translate("",$conf);
+    $langs=new Translate(DOL_DOCUMENT_ROOT."/customfields/langs/",$conf);
 }
+
+$langs->load('customfields@customfields'); // customfields standard language support
+$langs->load('customfields-user@customfields'); // customfields language support for user's values (like enum, fields names, etc..)
 
 // **** EXPANSION VARIABLES ****
 // Here you can edit the values to expand the functionnalities of CustomFields (it will try to automatically manage the changes, if not you can add special cases by yourselves, please refer to the Readme-CF.txt)

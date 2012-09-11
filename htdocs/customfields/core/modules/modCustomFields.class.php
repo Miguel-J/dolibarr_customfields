@@ -34,11 +34,11 @@ class modCustomFields extends DolibarrModules
 	 *   \brief      Constructor. Define names, constants, directories, boxes, permissions
 	 *   \param      DB      Database handler
 	 */
-	function modCustomFields($DB)
+	function __construct($db)
 	{
         global $langs,$conf;
 
-        $this->db = $DB;
+        $this->db = $db;
 
 		// Id for module (must be unique).
 		// Use here a free id (See in Home -> System information -> Dolibarr for list of used modules id).

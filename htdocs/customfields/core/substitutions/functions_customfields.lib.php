@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2011   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2012   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,8 +41,10 @@ function generic_tag_filling(&$substitutionarray, $object) {
    }
 }
 
-function customfields_completesubstitutionarray(&$substitutionarray,$langs,$object) {
+function customfields_completesubstitutionarray(&$substitutionarray,$outputlangs,$object) {
    global $conf,$db;
+
+   if (empty($object)) return; // check that this function is called with an $object for substitution in ODTs (else it may be called for emails and create a bug)
 
    // OPTIONAL : Add generic support for any $object property
    generic_tag_filling($substitutionarray, $object); // must be done before so that we can replace specific values after
@@ -50,17 +52,25 @@ function customfields_completesubstitutionarray(&$substitutionarray,$langs,$obje
     // Adding customfields properties of the $object
     // CustomFields
     if ($conf->global->MAIN_MODULE_CUSTOMFIELDS) { // if the customfields module is activated...
+            // Init and main vars
             include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
-            $customfields = new CustomFields($db, '');
-            foreach ($object->customfields as $field) {
+            $customfields = new CustomFields($db, $object->table_element);
+
+            // Fetching custom fields records
+            $fields = $customfields->fetch($object->id);
+
+            $fieldstruct = $customfields->fetchAllCustomFields();
+            if (!isset($fields)) return null;
+
+            foreach ($fieldstruct as $field) {
                     $name = $customfields->varprefix.$field->column_name; // name of the property (this is one customfield)
                     $translatedname = $customfields->findLabelPDF($field->column_name, $outputlangs); // label of the customfield
-                    $value = $customfields->printFieldPDF($field, $object->$name, $outputlangs); // value (cleaned and properly formatted) of the customfield
+                    $value = $customfields->printFieldPDF($field, $fields->{$field->column_name}, $outputlangs); // value (cleaned and properly formatted) of the customfield
                     $substitutionarray[$name] = $value; // adding this value to an odt variable (format: {cf_customfield} by default if varprefix is default)
 
                     // if the customfield has a constraint, we fetch all the datas from this constraint in the referenced table
                     if (!empty($field->referenced_table_name)) {
-                            $record = $customfields->fetchAny('*', $field->referenced_table_name, $field->referenced_column_name."='".$object->$name."'"); // we fetch the record in the referencd table
+                            $record = $customfields->fetchAny('*', $field->referenced_table_name, $field->referenced_column_name."='".$fields->{$field->column_name}."'"); // we fetch the record in the referencd table
 
                             if (!empty($record)) {
                                     foreach ($record as $column_name => $value) { // for each record, we add the value to an odt variable
@@ -70,5 +80,7 @@ function customfields_completesubstitutionarray(&$substitutionarray,$langs,$obje
                     }
             }
     }
+
+    return 0;
 
 }

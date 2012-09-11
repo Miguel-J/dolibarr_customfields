@@ -16,10 +16,10 @@
  */
 
 /**
- *      \file       htdocs/customfields/triggers/interface_modCustomFields_SaveFields.class.php
+ *      \file       htdocs/customfields/core/triggers/interface_50_modCustomFields_SaveFields.class.php
  *      \ingroup    core
  *      \brief      Core triggers file for CustomFields module. Triggers actions for the customfields module. Necessary for actions to be comitted.
- *		\version	$Id: interface_modCustomFields_SaveFields.class.php, v1.2.6
+ *		\version	$Id: interface_50_modCustomFields_SaveFields.class.php, v1.2.6
  */
 
 
@@ -250,6 +250,7 @@ class InterfaceSaveFields
         elseif ($action == 'CUSTOMFIELDS_PREBUILDDOC') {
             dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 
+            /* DEPRECATED - please don't use this method anymore, it may produce weird errors
             // Vars
             $currentmodule = $object->currentmodule;
 
@@ -293,7 +294,7 @@ class InterfaceSaveFields
 
                     }
                  */
-            }
+            //}
 
             return 1;
         }
@@ -324,7 +325,7 @@ class InterfaceSaveFields
 		dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
 
 		$action = 'CUSTOMFIELDS_'.$triggeraction;
-		if ($this->in_arrayi($triggername, $modulesarray)) { // Either we have a value (module) that matched, or a key (context)
+		if (in_array($triggername, $modulesarray)) { // Either we have a value (module) that matched, or a key (context)
 		    $object->currentmodule = strtolower($triggername); // value (module) matched
 		} else {
 		    $object->currentmodule = $modulesarray[strtolower($triggername)]; // key (context) matched
@@ -336,12 +337,14 @@ class InterfaceSaveFields
 	return 0;
     }
 
+    /*
     function in_arrayi($needle, $haystack) {
 	for($h = 0 ; $h < count($haystack) ; $h++) {
 	    $haystack[$h] = strtolower($haystack[$h]);
 	}
 	return in_array(strtolower($needle),$haystack);
     }
+    */
 
 }
 ?>

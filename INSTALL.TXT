@@ -1,3 +1,20 @@
+== FIRST-TIME INSTALL ==
+
 Just copy the htdocs folder inside your dolibarr folder (overwrite dolibarr/htdocs folder).
 
 Then in Configuration>Modules menu, you can activate and configure your CustomFields.
+
+NOTE: you should DISABLE then RENABLE the module if already enabled (this allow to refresh the CustomFields hooks informations).
+
+== UPDATE ==
+
+If you already had an earlier version of CustomFields installed, you should first delete all CustomFields files.
+
+1- Delete all previous files: Simply search from /htdocs/ for all files containing "customfields" in the name and delete them.
+WARNING: this will also delete your language files. You can backup them prior to updating (they reside in /htdocs/customfields/langs/ folder), and then recopy them back when you finish the update.
+
+2- Proceed to the same procedure as for a first time install (copy the files inside the archive, then disable/renable the module).
+
+== MORE INFORMATIONS ==
+
+You can read the README-CF.txt file that resides inside /htdocs/customfields/ folder for more informations on the usage of the module.
