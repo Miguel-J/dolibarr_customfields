@@ -1,0 +1,136 @@
+<?php
+/* Copyright (C) 2012   Stephen Larroque <lrq3000@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * at your option any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+
+/**** PART OF CUSTOMFIELDS MODULE FOR DOLIBARR
+ * Description: here you can overload a few functions of CustomFields to do your own stuff, mainly the printing and the management of the fields.
+ *
+ * Guidelines:
+ * You can use and modify any variable, CustomFields will then use them afterwards (except for 'full' functions which completely overload CustomFields, so that you must take care of everything on your own).
+ *
+ * To access the database using Dolibarr's core functions, you can use:
+ * global $db;
+ * then you can: $db->query('SELECT * FROM table');
+ *
+ * You also can use CustomFields functions:
+ * $customfields->fetchAny('*', 'table');
+ * which is the equivalent of the command above.
+ *
+ * You can also access a variety of other things via globals, like:
+ * $conf - contain all Dolibarr's config
+ * $user - current user's loggued (can access his rights to check security)
+ * $langs - current language of the user (for internationalization)
+ *
+ * Lastly, you can access all GET and POST variables using:
+ * $myvar = GETPOST('myvar');
+ *
+ * Usage:
+ * Simply put, almost all functions are procedures: you don't have to return anything, just modify the variables you want, and then CustomFields will continue where it left.
+ * Exceptions are the 'full' functions (there's a 'full' in the name): these functions will stop CustomFields from processing the rest, and you have to do the rest, namely printing (because CustomFields won't print anything if you use 'full' functions, it just stops and leave you with the keys of the house).
+ *
+ * There are for the moment 8 possible overloading 'event' functions:
+ * editview: in datasheet, when editing a customfield, you can modify the value and any other variable, and then CustomFields will continue the processing and will try to manage the best it can (mainly by showing a proper HTML form with inputs and buttons, and the right html input for the right type of data).
+ * editviewfull: in datasheet, CustomFields stops processing and you do the rest (you then have to properly print an HTML form).
+ * view: in datasheet, when just printing a customfield on the datasheet, you can modify the values and then CustomFields will continue the processing and printing of the form.
+ * viewfull: in datasheet, when printing a customfield on the datasheet, CF stops and you do the rest of the printing (pretty simple, it's mainly just text or HTML).
+ * create: in creation page, you can change the value(s) that will be available in a customfield, and then CustomFields will continue the processing/printing.
+ * createfull: in creation page, CF stops and you do the rest of the processing/printing.
+ * save: at edition (on datasheet), you can change the values that will be stored in the database, and then CF will commit them (you don't have to, just change the values).
+ * savefull: at edition (on datasheet), CF stops the processing and you do the rest of the commit to the database (WARNING: CF will not store the data, you have to do it!)
+ * BONUS: if you want to change values saving at creation and stop CF to do the processing and commit, you can use a TRIGGER in the customfield's trigger file (eg: FACTURE_CREATE, and then you can filter which field you want to process specifically, as soon as you do a return this will stop CF to process the fields at creation).
+ *
+ * Format:
+ * All overloading functions must be named with the following convention:
+ * customfields_field_$event_$module_$fieldname
+ *
+ * For example, for the module invoice (facture in Dolibarr, see conf_customfields.lib.php) and a field named 'myfield' and you want to overload the 'editview' event, you can use:
+ * customfields_field_editview_facture_myfield
+ *
+ * A list of modules can be found in conf_customfields.lib.php in the $modulesarray variable.
+ *
+ */
+
+
+
+/*
+function customfields_field_create_mymodule_myfield (&$currentmodule, &$object, &$parameters, &$action, &$id, &$customfields, &$field, &$name, &$value) {
+    global $db; // allow to access database functions
+    // do your SQL stuff here
+}
+
+
+function customfields_field_createfull_mymodule_myfield (&$currentmodule, &$object, &$parameters, &$action, &$id, &$customfields, &$field, &$name, &$value) {
+    global $db; // allow to access database functions
+    // do your SQL stuff here
+}
+
+function customfields_field_editview_mymodule_myfield (&$currentmodule, &$object, &$parameters, &$action, &$user, &$idvar, &$rightok, &$customfields, &$field, &$name, &$value) {
+    global $db; // allow to access database functions
+
+    // do your SQL stuff here
+
+    $myarray = array(
+          array('id'=>0, 'value'=>''),
+          array('id'=>1, 'value'=>'test1'),
+          array('id'=>2, 'value'=>'test2', 'selected'=>true),
+          array('id'=>3, 'value'=>'test3'),
+          array('id'=>4, 'value'=>'test4'),
+          );
+
+    $value = $myarray; // just return an array of the format above
+}
+
+function customfields_field_editviewfull_mymodule_myfield (&$currentmodule, &$object, &$parameters, &$action, &$user, &$idvar, &$rightok, &$customfields, &$field, &$name, &$value) {
+    global $db; // allow to access database functions
+    // do your SQL stuff here
+}
+
+function customfields_field_view_mymodule_myfield (&$currentmodule, &$object, &$parameters, &$action, &$user, &$idvar, &$rightok, &$customfields, &$field, &$name, &$value) {
+    global $db; // allow to access database functions
+    // do your SQL stuff here
+}
+
+function customfields_field_viewfull_mymodule_myfield (&$currentmodule, &$object, &$parameters, &$action, &$user, &$idvar, &$rightok, &$customfields, &$field, &$name, &$value) {
+    global $db;
+    // do your SQL things here
+
+    $myarray = array(
+          array(0, ''),
+          array(1, 'test1'),
+          array(2, 'test2'),
+          array(3, 'test3'),
+          array(4, 'test4'),
+          );
+
+    print $myarray[$value][1];
+}
+
+function customfields_field_save_mymodule_myfield (&$currentmodule, &$object, &$parameters, &$action, &$user, &$idvar, &$rightok, &$customfields, &$field, &$name, &$value, &$newrecord) {
+    global $db; // allow to access database functions
+    // do your SQL stuff here
+}
+
+function customfields_field_savefull_mymodule_myfield (&$currentmodule, &$object, &$parameters, &$action, &$user, &$idvar, &$rightok, &$customfields, &$field, &$name, &$value, &$newrecord) {
+    global $db; // allow to access database functions
+    // do your SQL stuff here
+}
+
+*/
+
+
+?>

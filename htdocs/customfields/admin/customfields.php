@@ -1,10 +1,10 @@
 <?php
-/* Copyright (C) 2012   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2012   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * at your option any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,7 +28,8 @@ if (! $res && file_exists(dirname(__FILE__)."/../../main.inc.php")) $res=@includ
 if (! $res && file_exists(dirname(__FILE__)."/../../../main.inc.php")) $res=@include(dirname(__FILE__)."/../../../main.inc.php");	// for level2 directory
 if (! $res) die("Include of main fails");
 
-require(dirname(__FILE__).'/../conf/conf_customfields.lib.php');
+require_once(dirname(__FILE__).'/../conf/conf_customfields.lib.php');
+require_once(dirname(__FILE__).'/../conf/conf_customfields_func.lib.php');
 require_once(dirname(__FILE__).'/../class/customfields.class.php');
 require_once(dirname(__FILE__).'/../lib/customfields_printforms.lib.php');
 require_once(DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php');
@@ -40,14 +41,17 @@ accessforbidden();
 // **** MAIN VARS ****
 // -- Getting the current active module
 if (!(GETPOST("module"))) {
-    $currentmodule = reset($modulesarray); // reset($array) gets the first value of the array, use key() to get the first key
+    $currentmodule = $modulesarray[0]['table_element']; // DEPRECATED: reset($modulesarray) - reset($array) gets the first value of the array, use key() to get the first key
 } else {
-    if (in_array(GETPOST("module"), $modulesarray)) { // protection to avoid sql injection (can only request referenced modules)
+    if (in_array(GETPOST("module"), array_values_recursive('table_element', $modulesarray))) { // protection to avoid sql injection (can only request referenced modules)
         $currentmodule = GETPOST("module");
     } else {
-        $currentmodule = $modulesarray[0];
+        $currentmodule = $modulesarray[0]['table_element'];
     }
 }
+
+$tabembedded = null;
+if (GETPOST("tabembedded")) $tabembedded = '&tabembedded=1';
 
 $action = GETPOST("action");
 
@@ -59,15 +63,15 @@ $customfields = new CustomFields($db, $currentmodule);
 // **** ACTIONS ****
 if ($action == "set")
 {
-    Header("Location: customfields.php"); // TODO: what's this????
+    Header("Location: customfields.php");
     exit;
 }
 
 // Initialization of the module's customfields (we create the customfields table for this module)
 if ($action == 'init') {
     $rtncode = $customfields->initCustomFields();
-    if ($rtncode > 0 and !count($customfields->errors)) { // If no error, we refresh the page
-        Header("Location: ".$_SERVER["PHP_SELF"]."?module=".$currentmodule);
+    if ($rtncode > 0) { // If no error, we refresh the page
+        Header("Location: ".$_SERVER["PHP_SELF"]."?module=".$currentmodule.$tabembedded);
         exit();
     } else { // else we print the errors
         $error++;
@@ -100,8 +104,8 @@ if ($action == 'add' or $action == 'update') {
                     $result=$customfields->updateCustomField($_POST['fieldid'], $_POST['field'],$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql']);
                 }
                 // Error ?
-                if ($result > 0 and !count($customfields->errors)) { // If no error, we refresh the page
-                    Header("Location: ".$_SERVER["PHP_SELF"]."?module=".$currentmodule);
+                if ($result > 0) { // If no error, we refresh the page
+                    Header("Location: ".$_SERVER["PHP_SELF"]."?module=".$currentmodule.$tabembedded);
                     exit();
                 } else { // else we show the error
                     $error++;
@@ -121,21 +125,12 @@ if ($action == 'add' or $action == 'update') {
     }
 }
 
-// Confirmation form to delete a field
-$form = new Form($db);
-if ($action == 'delete')
-{
-    $field = $customfields->fetchFieldStruct($_GET["fieldid"]);
-    $text=$langs->trans('ConfirmDeleteCustomField').' '.$field->column_name."<br />".$langs->trans('CautionDataLostForever');
-    $formconfirm=$form->formconfirm($_SERVER["PHP_SELF"]."?fieldid=".$_GET["fieldid"]."&module=".$currentmodule,$langs->trans('DeleteCustomField'),$text,'confirm_delete',null,'no',1);
-}
-
 // Deleting a field
-if ($action == 'confirm_delete') {
+if ($action == 'delete') {
     if(isset($_GET["fieldid"])) {
         $result=$customfields->deleteCustomField($_GET["fieldid"]);
-        if ($result >= 0 and !count($customfields->errors)) {
-            Header("Location: ".$_SERVER["PHP_SELF"]."?module=".$currentmodule);
+        if ($result >= 0) {
+            Header("Location: ".$_SERVER["PHP_SELF"]."?module=".$currentmodule.$tabembedded);
             exit();
         } else {
             $mesg=$customfields->error;
@@ -143,30 +138,7 @@ if ($action == 'confirm_delete') {
     } else {
         $error++;
         $langs->load("errors");
-        $mesg=$langs->trans("ErrorNoFieldSelected",$langs->transnoentities("AttributeCode"));
-    }
-}
-
-// Moving customfields action (changing the order)
-if ($action == 'move' and !empty($_GET['offset']) and is_numeric($_GET['offset'])) {
-    if(isset($_GET["fieldid"])) {
-        $offset = $_GET['offset'];
-        $fieldid = $_GET["fieldid"];
-
-        $extra = new stdClass();
-        $field = $customfields->fetchFieldStruct($_GET["fieldid"]);
-        if (!isset($field->extra->position)) {
-            $extra->position = $field->ordinal_position + $offset;
-        } else {
-            $extra->position = $field->extra->position + $offset;
-        }
-        $result = $customfields->setExtra($fieldid, $extra);
-
-        if ($result < 0 or count($customfields->errors) > 0) $mesg=$customfields->error;
-    } else {
-        $error++;
-        $langs->load("errors");
-        $mesg=$langs->trans("ErrorNoFieldSelected",$langs->transnoentities("AttributeCode"));
+        $mesg=$langs->trans("ErrorFieldCanNotContainSpecialCharacters",$langs->transnoentities("AttributeCode"));
     }
 }
 
@@ -181,15 +153,36 @@ llxHeader('',$langs->trans("CustomFieldsSetup"));
 
 $linkback='<a href="'.DOL_URL_ROOT.'/admin/modules.php">'.$langs->trans("BackToModuleList").'</a>';
 
+// print title
 print_fiche_titre($langs->trans("CustomFieldsSetup"),$linkback,'setup');
 
-dol_fiche_head();
-print($langs->trans('Description').":<br />".$langs->trans("CustomFieldsLongDescriptionWithAd"));
-dol_fiche_end();
+// print long description (to help first time users and provide with a link to the wiki, kind of a contextual help) - but only if it's the customfields admin page
+if (!$tabembedded) {
+    dol_fiche_head();
+    print($langs->trans('Description').":<br />".$langs->trans("CustomFieldsLongDescription"));
+    dol_fiche_end();
+}
 
-if (isset($formconfirm)) print $formconfirm;
+// extract current module's config in CustomFields
+$modarr = array_extract_recursive(array('table_element'=>$currentmodule), $modulesarray);
+$modarr = $modarr[0]; // extract the first result
+// extract the tab function if one is defined (so that CustomFields can be embedded into the admin panel of another module - optional, only for ergonomics)
+if ( isset($modarr['tabs']) and isset($modarr['tabs']['function']) and isset($modarr['tabs']['lib']) ) {
+    include_once($modarr['tabs']['lib']);
+    $admintabfunc = $modarr['tabs']['function'];
+} else {
+    $admintabfunc = null;
+}
 
-$head = customfields_admin_prepare_head($modulesarray, $currentmodule); // draw modules tabs
+// print the tabs
+if ($tabembedded and !empty($admintabfunc) and function_exists($admintabfunc)) {
+    // if embedded into another module's admin panel, we draw the original tabs of this module
+    $head = $admintabfunc(null);
+    dol_fiche_head($head, 'customfields', $langs->trans($currentmodule), 0, 'user');
+} else {
+    // else, we are in CustomFields admin panel, and we print all tabs (one tab for each module that is supported by CustomFields)
+    $head = customfields_admin_prepare_head($modulesarray, $currentmodule); // draw modules tabs
+}
 
 // Print error messages that can be returned by various functions
 if (function_exists('setEventMessage')) {
@@ -199,11 +192,11 @@ if (function_exists('setEventMessage')) {
 }
 
 // Probing if the customfields table exists for this module
-$tableexists = $customfields->probeTable();
+$tableexists = $customfields->probeCustomFields();
 
 // if the table for this module is not created, we ask user if he wants to create it
 if (!$tableexists) {
-    print $langs->trans('The customfields table for this module is not yet created! Please create the table before creating fields.<br />Do you want to create it now?');
+    print $langs->trans("TableDoesNotExist");
     print "<br /><center><a class=\"butAction\" href=\"".$_SERVER["PHP_SELF"]."?module=".$currentmodule."&action=init\">".$langs->trans("CreateTable")."</a></center>";
     dol_fiche_end();
 
@@ -230,7 +223,13 @@ if (!$tableexists) {
 
     if ($fieldsarray < 0) { // error
         $error++;
-        $customfields->printErrors();
+        $mesg=$customfields->error;
+        // Print error messages
+        if (function_exists('setEventMessage')) {
+            setEventMessage($mesg, 'errors'); // New way since Dolibarr v3.3
+        } else {
+            dol_htmloutput_errors($mesg); // Old way to print error messages
+        }
     } else {
         // generated rows of the table
         $i = 0; // used to alternate background color
@@ -248,12 +247,9 @@ if (!$tableexists) {
                     print $customfields->varprefix.$obj->column_name;
                     print '</td>';
                     print '<td align="center">';
-                    print '<a href="'.$_SERVER["PHP_SELF"].'?module='.$currentmodule.$tabembedded.'&action=move&offset=-1&fieldid='.$obj->ordinal_position.'">'.img_up().'</a>';
-                    print '<a href="'.$_SERVER["PHP_SELF"].'?module='.$currentmodule.$tabembedded.'&action=move&offset=1&fieldid='.$obj->ordinal_position.'">'.img_down().'</a>';
+                    print '<a href="'.$_SERVER["PHP_SELF"].'?module='.$currentmodule.$tabembedded.'&action=edit&fieldid='.$obj->ordinal_position.'">'.img_edit().'</a>';
                     print '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                    print '<a href="'.$_SERVER["PHP_SELF"].'?module='.$currentmodule.'&action=edit&fieldid='.$obj->ordinal_position.'">'.img_edit().'</a>';
-                    print '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                    print '<a href="'.$_SERVER["PHP_SELF"].'?module='.$currentmodule.'&action=delete&fieldid='.$obj->ordinal_position.'">'.img_delete().'</a>';
+                    print '<a href="'.$_SERVER["PHP_SELF"].'?module='.$currentmodule.$tabembedded.'&action=delete&fieldid='.$obj->ordinal_position.'">'.img_delete().'</a>';
                     print '</td>';
                     print '</tr>';
                     $i++;
@@ -284,7 +280,7 @@ if (!$tableexists) {
     if ($action != 'create')
     {
         print '<div class="tabsAction">';
-        print "<a class=\"butAction\" href=\"".$_SERVER["PHP_SELF"]."?module=".$currentmodule."&action=create\">".$langs->trans("NewField")."</a>";
+        print "<a class=\"butAction\" href=\"".$_SERVER["PHP_SELF"]."?module=".$currentmodule.$tabembedded."&action=create\">".$langs->trans("NewField")."</a>";
         print "</div>";
     }
 }
@@ -310,6 +306,7 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
     print '<form action="'.$_SERVER["PHP_SELF"].'" method="post">';
     print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
     print '<input type="hidden" name="module" value="'.$currentmodule.'">';
+    print '<input type="hidden" name="tabembedded" value="'.$tabembedded.'">';
     print '<table summary="listofattributes" class="border" width="100%">';
 
     if ($action == 'create') {
@@ -327,8 +324,11 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
         $field_constraint = GETPOST('constraint');
         $field_customtype = GETPOST('customtype');
         $checked = '';
-        if ($action=='create') $checked = "checked=checked"; //  By default a field can be null (necessary to have the field either possibly null or to have a default value if the user add a new field while he already saved an invoice/propal/whatever with custom fields, these already saved records must know what to set by default for the new column)
-        if (count($_POST["nulloption"]) == 1) $checked = "checked=checked"; // if the user created the custom field but there was an error submitting it, we must be able to reload the settings so that the user can fix the problem and resubmit
+        if (empty($_POST)) {
+            $checked = "checked=checked"; //  By default a field can be null (necessary to have the field either possibly null or to have a default value if the user add a new field while he already saved an invoice/propal/whatever with custom fields, these already saved records must know what to set by default for the new column)
+        } elseif (count($_POST["nulloption"]) == 1) {
+            $checked = "checked=checked"; // if the user created the custom field but there was an error submitting it, we must be able to reload the settings so that the user can fix the problem and resubmit
+        }
     } elseif ($action == 'edit') {
         if (GETPOST('field')) $field_name = GETPOST('field'); else $field_name = $fieldobj->column_name;
         if (GETPOST('type')) $field_type = GETPOST('type'); else $field_type = $fieldobj->data_type;
@@ -337,7 +337,7 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
             $field_type = 'other';
         }
         if (GETPOST('size')) $field_size = GETPOST('size'); else $field_size = $fieldobj->size;
-        if (count($_POST["nulloption"]) == 1) $checked = "checked=checked"; else $checked = '';
+        if (count($_POST["nulloption"]) == 1) $checked = "checked=checked"; else $checked = (strtolower($fieldobj->is_nullable) == 'yes' ? "checked=checked" : '');
         if (GETPOST('defaultvalue')) $field_defaultvalue = GETPOST('defaultvalue'); else $field_defaultvalue = $fieldobj->column_default;
         if (GETPOST('constraint')) $field_constraint = GETPOST('constraint'); else $field_constraint = $fieldobj->referenced_table_name;
     }
@@ -360,11 +360,11 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
     print '<br>'.$langs->trans('Other').' ('.$langs->trans('CustomSQL').'): <input type="text" name="customtype" size="10" value="'.$field_customtype.'">';
     print '</td></tr>';
     // Size
-    print '<tr><td class="fieldrequired required">'.$langs->trans("Size").' '.$langs->trans("or").' '.$langs->trans("EnumValues").' ('.$langs->trans("SizeDesc").')<br />'.$langs->trans("SizeNote").'</td><td><input type="text" name="size" size="10" value="'.$field_size.'"></td></tr>';
+    print '<tr><td class="field">'.$langs->trans("Size").', '.$langs->trans("or").' '.$langs->trans("EnumValues").' ('.$langs->trans("SizeDesc").')<br />'.$langs->trans("SizeNote").'</td><td><input type="text" name="size" size="10" value="'.$field_size.'"></td></tr>';
     // Null?
-    print '<tr><td class="fieldrequired required">'.$langs->trans("CanBeNull?").'</td><td><input type="checkbox" name="nulloption[]" value="true" '.$checked.'></td></tr>';
+    print '<tr><td class="field">'.$langs->trans("CanBeNull?").'</td><td><input type="checkbox" name="nulloption[]" value="true" '.$checked.'></td></tr>';
     // Default value
-    print '<tr><td class="field">'.$langs->trans("DefaultValue").' ('.$langs->trans("RequiredIfFieldCannotBeNull").')</td><td class="valeur"><input type="text" name="defaultvalue" size="10" value="'.$field_defaultvalue.'"></td></tr>';
+    print '<tr><td class="field">'.$langs->trans("DefaultValue").'</td><td class="valeur"><input type="text" name="defaultvalue" size="10" value="'.$field_defaultvalue.'"></td></tr>';
 
     // SQL constraints
     print '<tr><td class="field">'.$langs->trans("Constraint").'</td><td class="valeur">';

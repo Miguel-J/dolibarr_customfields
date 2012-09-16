@@ -6,17 +6,43 @@ CHARSET= UTF-8
 # Main title
 CustomFieldsSetup= CustomFields Setup
 
+# Embedded tab
+CustomFields= CustomFields
+
 # Description (on admin's modules list)
 Module8500Desc= Tool to add custom fields
+Module8501Desc= Append a PDF page listing all customfields in any produced PDF (for dev purposes)
 
 # Long Description (to help user on first time usage)
-CustomFieldsLongDescriptionWithAd= This is the free version of the CustomFields module. A <a href="http://www.customfields.org" target="_blank">Pro version with much more features, speed and tabs is available here.</a><br /><br />This module allows you to easily add and manage your own custom fields, and then use them in PDF and ODT documents, or in any other way you want.<br /><br />Here you can add your own fields in various modules of Dolibarr: click on the tab that corresponds to the module you want, and then click the button New Field in the bottom right hand corner of this page, and fill the required data. As soon as the field is created, it will appear and be editable on the module's datasheet page.<br />If you want to manage a field, you can edit it by clicking the little icon at the right, or delete it with the delete icon.<br /><br />For more informations, you can read the provided <a href="../README-CF.txt" target="_blank">README-CF.txt</a>, or take a <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields" target="_blank">look on the wiki</a> (only for CustomFields pro, but most technical details are the same for both versions). You can also <a href="http://www.dolibarr.org/forum/511-creation-of-a-new-module/18877-release-customfields-module" target="_blank">ask the forum</a>.<br /><br />If you want more features, you can <a href="http://www.customfields.org" target="_blank">upgrade to the CustomFields Pro version (www.customfields.org)</a> at anytime and keep your custom fields and data intact, the update is automatic and transparent.
+CustomFieldsLongDescription= This module allows you to easily add and manage your own custom fields, and then use them in PDF and ODT documents, or in any other way you want.<br /><br />Here you can add your own fields in various modules of Dolibarr: click on the tab that corresponds to the module you want, and then click the button New Field in the bottom right hand corner of this page, and fill the required data. As soon as the field is created, it will appear and be editable on the module's datasheet page.<br />If you want to manage a field, you can edit it by clicking the little icon at the right, or delete it with the delete icon.<br />To use your field in your PDF, call the customfields_fill_object($object) function and then use $object->cf_variable to access the customfield's value (see the Variable column below). With ODT, simply use {cf_variable}.<br /><br />There is much more you can do with CustomFields, please <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields" target="_blank">read the wiki page</a> for more info.
+
+# Error messages
+TableDoesNotExist= The customfields table for this module is not yet created! Please create the table before creating fields.<br />Do you want to create it now?
 
 # Modules tabs
-facture= Invoices
+facture= Customer Invoices
 propal= Commercial proposals
 product= Products/Services
 commande= Customer orders
+societe= Third party
+socpeople= Contacts
+commande_fournisseur= Supplier orders
+facture_fourn= Supplier invoices
+adherent= Members
+actioncomm= Agenda
+projet= Projects
+projet_task= Tasks
+contrat= Contracts
+fichinter= Interventions
+don= Donations
+deplacement= Expenses
+tva= Tax payment
+expedition= Shipments
+facturedet= Line customer invoices
+propaldet= Line commercial proposals
+commandedet= Line customer orders
+commande_fournisseurdet=  Line supplier orders
+facture_fourn_det= Line supplier invoices
 
 # Table headers
 Fieldname= Field Name
@@ -24,6 +50,7 @@ Datatype= Data Type
 Variable= Variable
 
 # Buttons
+CreateTable= Create Table
 NewField= New Field
 
 # Attributes labels
@@ -55,14 +82,8 @@ True= True
 False= False
 
 # Attributes descriptions and notes
-RequiredIfFieldCannotBeNull=required if field cannot be null
 SizeDesc=eg: 256 for a varchar, or "firstval","secondval","thirdval" WITH the quotes and commas for an enum/selectbox
 SizeNote=Note: required for DropdownBox type, otherwise can generally be left empty.
 CustomSQLDefinitionDesc=custom definition of the field to be appended after the above
 CustomSQLDesc=to be triggered after the creation/edition of the field
-
-# Confirm forms
-ConfirmDeleteCustomField=Do you really want to delete the following custom field: 
-CautionDataLostForever=CAUTION: all datas stored in this custom field will be lost forever!
-DeleteCustomField=Delete a custom field
 ##### COMMENT #####

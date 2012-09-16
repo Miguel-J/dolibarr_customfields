@@ -5,3 +5,5 @@ CHARSET= UTF-8
 
 # Format:
 # cf_fieldname=label
+
+cf_ref_client=Ma réf client

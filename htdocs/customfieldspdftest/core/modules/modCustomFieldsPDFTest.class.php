@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2011-2012   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2012   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,18 +16,18 @@
  */
 
 /**
- *	\file       htdocs/customfields/core/modules/modCustomFields.class.php
+ *	\file       htdocs/includes/modules/modCustomFieldsPDFTest.class.php
  * 	\defgroup   customfields     Module CustomFields
- *     \brief      Dolibarr's module definition file for CustomFields (meta-informations file)
+ *     \brief      Dolibarr's module definition file for CustomFieldsPDFTest (meta-informations file) - CustomFieldsPDFTest is just a test module that allows the dev implementing CustomFields in a production environment to print a PDF page with all customfields (this will be appended to all PDF files as an added page)
  */
 include_once(DOL_DOCUMENT_ROOT ."/core/modules/DolibarrModules.class.php");
 
 
 /**
  * 		\class      modCustomFields
- *     	\brief      Dolibarr's module definition file for CustomFields (meta-informations file)
+ *     	\brief      Dolibarr's module definition file for CustomFieldsPDFTest (meta-informations file)
  */
-class modCustomFields extends DolibarrModules
+class modCustomFieldsPDFTest extends DolibarrModules
 {
 	/**
 	 *   \brief      Constructor. Define names, constants, directories, boxes, permissions
@@ -41,9 +41,9 @@ class modCustomFields extends DolibarrModules
 
 		// Id for module (must be unique).
 		// Use here a free id (See in Home -> System information -> Dolibarr for list of used modules id).
-		$this->numero = 8500;
+		$this->numero = 8501;
 		// Key text used to identify module (for permissions, menus, etc...)
-		$this->rights_class = 'customfields';
+		$this->rights_class = 'customfieldspdftest';
 
 		// Family can be 'crm','financial','hr','projects','products','ecm','technic','other'
 		// It is used to group modules in module setup page
@@ -51,7 +51,7 @@ class modCustomFields extends DolibarrModules
 		// Module label (no space allowed), used if translation string 'ModuleXXXName' not found (where XXX is value of numeric property 'numero' of module)
 		$this->name = preg_replace('/^mod/i','',get_class($this));
 		// Module description, used if translation string 'ModuleXXXDesc' not found (where XXX is value of numeric property 'numero' of module)
-		$this->description = "Tool to add custom fields";
+		$this->description = "Append a PDF page listing all customfields in any produced PDF (for dev purposes)";
 		// Possible values for version are: 'development', 'experimental', 'dolibarr' or version
 		$this->version = 'dolibarr';
 		// Key used in llx_const table to save module status enabled/disabled (where MYMODULE is value of property name of module in uppercase)
@@ -63,11 +63,8 @@ class modCustomFields extends DolibarrModules
 		// If file is in module/img directory under name object_pictovalue.png, use this->picto='pictovalue@module'
 		$this->picto='generic';
 
-                // Define all module parts (triggers, hooks, login, substitutions for ODT and emails, menus, etc...) (0=disable,1=enable, for hooks: list of hooks)
-                include(dirname(__FILE__).'/../../conf/conf_customfields.lib.php');
-                include_once(dirname(__FILE__).'/../../conf/conf_customfields_func.lib.php');
-                $this->module_parts = array('triggers' => 1, 'substitutions' => 1,
-                                            'hooks'=>array_merge(array_flip(array_flip(array_values_recursive('context', $modulesarray)))) ); // double array_flip() + array_merge() = array_unique but is way faster
+                // Defined all module parts (triggers, login, substitutions, menus, etc...) (0=disable,1=enable)
+                $this->module_parts = array('triggers' => 1, 'substitutions' => 1, 'hooks'=>array('pdfgeneration', 'ordersuppliercard'));
                 //$this->module_parts = array('triggers' => 1,
                 //              'login' => 0,
                 //              'substitutions' => 0,
@@ -84,25 +81,24 @@ class modCustomFields extends DolibarrModules
 		//$this->style_sheet = '/mymodule/mymodule.css.php';
 
 		// Config pages. Put here list of php page names stored in admin directory used to setup module.
-		$this->config_page_url = array("customfields.php@customfields");
+		$this->config_page_url = null;
 
 		// Dependencies
 		$this->depends = array();		// List of modules id that must be enabled if this module is enabled
 		$this->requiredby = array();	// List of modules id to disable if this one is disabled
 		$this->phpmin = array(5,0);					// Minimum version of PHP required by module
 		$this->need_dolibarr_version = array(3,1);	// Minimum version of Dolibarr required by module
-		$this->langfiles = array("customfields@customfields", "customfields-user@customfields");
+		$this->langfiles = array("customfields@customfields");
 
 		// Constants
 		// List of particular constants to add when module is enabled (key, 'chaine', value, desc, visible, 'current' or 'allentities', deleteonunactive)
-                // Note: other variables in this file also adds constants, by being processed into Dolibarr functions (eg: $this->module_parts)
 		// Example: $this->const=array(0=>array('MYMODULE_MYNEWCONST1','chaine','myvalue','This is a constant to add',1),
 		//                             1=>array('MYMODULE_MYNEWCONST2','chaine','myvalue','This is another constant to add',0) );
 		//                             2=>array('MAIN_MODULE_MYMODULE_NEEDSMARTY','chaine',1,'Constant to say module need smarty',1)
-
-                /* DEPRACATED: now managed inside $this->module_parts('hooks'=>array('context1', 'context2'));
+                $this->const = array();
+                /*
 		$this->const = array(
-				     0=>array('MAIN_MODULE_CUSTOMFIELDS_HOOKS', 'chaine', implode(':', array_values_recursive('context', $modulesarray)), 'Hooks list for managing printing functions of the CustomFields module', 0, 'current', 1),
+				     0=>array('MAIN_MODULE_CUSTOMFIELDSPDFTEST_HOOKS', 'chaine', 'pdfgeneration', 'PDF generation hook to print a listing of CustomFields in PDF (dev purposes)', 0, 'current', 1),
 				     );
                 */
 
@@ -126,22 +122,7 @@ class modCustomFields extends DolibarrModules
 		// 'group'            to add a tab in group view
 		// 'contact'          to add a tab in contact view
 		// 'categories_x'	  to add a tab in category view (replace 'x' by type of category (0=product, 1=supplier, 2=customer, 3=member)
-                $this->tabs = array();
-                // Special for CustomFields: automatically add tabs in admin panels of Dolibarr's modules following the specifications in config (this allows to configure customfields directly from invoices, or products, etc... instead of having to go to the CustomFields admin panel and search the right tab to configure the right module -> better ergonomics, but not necessary)
-                foreach($modulesarray as $mod) { // for each module
-                    if (isset($mod['tabs'])) { // if the tabs parameter has been specified
-                        // We then proceed onto adding a tab for this module admin interface
-                        if (isset($mod['tabs']['tabname'])) $tabname = $mod['tabs']['tabname']; else $tabname = 'customfields';
-                        if (isset($mod['tabs']['tabtitle'])) $tabtitle = $mod['tabs']['tabtitle']; else $tabtitle = 'CustomFields';
-                        array_push($this->tabs, implode(':', array($mod['tabs']['objecttype'], '+'.$tabname, $tabtitle, 'customfields@customfields', '$user->admin', '/customfields/admin/customfields.php?module='.$mod['table_element'].'&tabembedded=1')));
-                    }
-                }
-
-        /*
-        $this->tabs = array('member_admin:+customfields:ExtraFields:@customfields:/customfields/admin/customfields.php?module=adherent&tabembedded=1',
-                                            'product_admin:+customfields:ExtraFields:@customfields:/customfields/admin/customfields.php?module=product&tabembedded=1'
-                            );
-        */
+        $this->tabs = array();
 
         // Dictionnaries
         $this->dictionnaries=array();
@@ -275,8 +256,6 @@ class modCustomFields extends DolibarrModules
 	 */
 	function remove()
 	{
-		$sql = array("DELETE FROM ".MAIN_DB_PREFIX."const WHERE name like '%_customfields';");
-
 		return $this->_remove($sql);
 	}
 
@@ -290,7 +269,7 @@ class modCustomFields extends DolibarrModules
 	 */
 	function load_tables()
 	{
-		return $this->_load_tables('/customfields/sql/');
+		return $this->_load_tables();
 	}
 }
 

@@ -1,10 +1,10 @@
 <?php
-/* Copyright (C) 2012   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2012   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * at your option any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -34,20 +34,76 @@ $langs->load('customfields-user@customfields'); // customfields language support
 // **** EXPANSION VARIABLES ****
 // Here you can edit the values to expand the functionnalities of CustomFields (it will try to automatically manage the changes, if not you can add special cases by yourselves, please refer to the Readme-CF.txt)
 
-$cfversion = '2.15'; // version of this module, useful for other modules to discriminate what version of CustomFields you are using (may be useful in case of newer features that are necessary for other modules to properly run)
-
 $fieldsprefix = 'cf_'; // prefix that will be prepended to the variable name of a field for accessing the field's values
+$svsdelimiter = '_'; // separator for Smart Value Substitution for Constrained Fields (a constrained field will try to find similar column names in the referenced table, and you can specify several column names when using this separator)
 
-// $modulesarray contains the modules support and their associated contexts : keys = contexts and values = table_element (the name of the module in the database like llx_product, product is the table_element)
-$modulesarray = array("invoicecard"=>"facture",
-                                            "propalcard"=>"propal",
-                                            "productcard"=>"product",
-                                            "ordercard"=>"commande",
+// $modulesarray contains the modules support and their associated contexts : contexts, table_element (= main module's name, the name of the module in the database like llx_product, product is the table_element), idvar
+// There are also a lot of other parameters, like (non-exhaustive list): context, table_element, idvar, rights, tabs=>array(objecttype, function, lib, tabname, tabtitle)
+// Note: table_element is the main identifier for a module (this is the basis of CustomFields and of most of Dolibarr's code), while context is only used for hooks (actions_customfields.class.php).
+// Note2: most of the keys follows the nomenclatura of Dolibarr, so if you do a search, you should find a similar usage of those keys in various Dolibarr core modules.
+$modulesarray = array( array('context'=>'invoicecard', 'table_element'=>'facture', 'idvar'=>'facid', 'rights'=>array('$user->rights->facture->creer')), // Client Invoice
+                                            array('context'=>'propalcard', 'table_element'=>'propal', 'rights'=>array('$user->rights->propal->creer')), // Client Propale //TODO: use propale for Dolibarr < 3.3
+                                            array('context'=>'productcard', 'table_element'=>'product', 'tabs'=>array('objecttype'=>'product_admin', 'function'=>'product_admin_prepare_head', 'lib'=>DOL_DOCUMENT_ROOT.'/core/lib/product.lib.php')), // Products and Services (nb: rights are managed in CF hook (actions) class, because the rights are different depending on whether it's a product or service, and it depends on another variable)
+
+                                            array('context'=>'ordercard', 'table_element'=>'commande', 'rights'=>array('$user->rights->commande->creer')), // Clients orders
+                                            array('context'=>'thirdpartycard', 'table_element'=>'societe', 'idvar'=>'socid', 'rights'=>array('$user->rights->societe->creer'), 'tabs'=>array('objecttype'=>'company_admin', 'function'=>'societe_admin_prepare_head', 'lib'=>DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php')), // Tiers / Society
+                                            array('context'=>'contactcard', 'table_element'=>'socpeople', 'rights'=>array('$user->rights->societe->contact->creer')), // Contact
+
+                                            array('context'=>'ordersuppliercard', 'table_element'=>'commande_fournisseur', 'rights'=>array('$user->rights->fournisseur->commande->creer')), // Supplier orders
+                                            array('context'=>'invoicesuppliercard', 'table_element'=>'facture_fourn', 'idvar'=>'facid', 'rights'=>array('$user->rights->fournisseur->facture->creer')), // Supplier invoices
+                                            array('context'=>'membercard', 'table_element'=>'adherent', 'idvar'=>'rowid', 'rights'=>array('$user->rights->adherent->creer'), 'tabs'=>array('objecttype'=>'member_admin', 'function'=>'member_admin_prepare_head', 'lib'=>DOL_DOCUMENT_ROOT.'/core/lib/member.lib.php')), // Members / Adherents
+                                            array('context'=>'actioncard', 'table_element'=>'actioncomm', 'rights'=>array('$user->rights->agenda->allactions->create')), // Agenda
+                                            array('context'=>'projectcard', 'table_element'=>'projet', 'rights'=>array('$user->rights->projet->all->creer')), // Project
+                                            array('context'=>'projecttaskcard', 'table_element'=>'projet_task', 'rights'=>array('$user->rights->projet->all->creer')), // Project Task
+                                            array('context'=>'contractcard', 'table_element'=>'contrat', 'rights'=>array('$user->rights->contrat->creer')), // Contract
+                                            array('context'=>'interventioncard', 'table_element'=>'fichinter', 'rights'=>array('$user->rights->ficheinter->creer')), // Interventions
+                                            array('context'=>'doncard', 'table_element'=>'don', 'idvar'=>'rowid', 'rights'=>array('$user->rights->don->creer')), // Dons
+                                            array('context'=>'tripsandexpensescard', 'table_element'=>'deplacement', 'rights'=>array('$user->rights->deplacement->creer')), // Trips and Expenses
+                                            array('context'=>'taxvatcard', 'table_element'=>'tva', 'rights'=>array('$user->rights->tax->charges->creer')), // Trips and Expenses
+                                            array('context'=>'expeditioncard', 'table_element'=>'expedition', 'rights'=>array('$user->rights->expedition->creer')), // Expeditions (sendings)
+
+
+                                            // LINES!
+                                            array('context'=>'invoicecard', 'table_element'=>'facturedet', 'rights'=>array('$user->rights->facture->creer')), // Client Invoice Lines
+                                            array('context'=>'propalcard', 'table_element'=>'propaldet', 'rights'=>array('$user->rights->propale->creer')), // Client Propale Lines
+                                            array('context'=>'ordercard', 'table_element'=>'commandedet', 'rights'=>array('$user->rights->commande->creer')), // Clients orders lines
+                                            array('context'=>'ordersuppliercard', 'table_element'=>'commande_fournisseurdet', 'rights'=>array('$user->rights->fournisseur->commande->creer')), // Supplier orders lines
+                                            array('context'=>'invoicesuppliercard', 'table_element'=>'facture_fourn_det', 'idvar'=>'facid', 'rights'=>array('$user->rights->fournisseur->facture->creer')), // Supplier invoices lines
+                                            //array('context'=>'expeditioncard', 'table_element'=>'expeditiondet', 'rights'=>array('$user->rights->expedition->creer')), // Expeditions (sendings) lines
                                             ); // Edit me to add the support of another module - NOTE: Lowercase only!
 
 // Triggers to attach to commit actions
-$triggersarray = array("order_create"=>"commande",
-                                            "order_prebuilddoc"=>"commande",
+// Format: key=>value = triggername=>table_element (same table_element as in $modulesarray)
+// TODO: move this to the $modulesarray variable (but would need to make a specific function to search and retrieve triggers)
+$triggersarray = array('order_create'=>'commande',
+                                            'order_prebuilddoc'=>'commande',
+                                            'company_create'=>'societe',
+                                            'contact_create'=>'socpeople',
+                                            //'order_supplier_create'=>'commande_fournisseur', // special case, we don't need it for the moment because suppliers orders are immediately created (no create page), so we only need to be able to edit fields, no need for this create trigger (this may change in a future version of Dolibarr)
+                                            'bill_supplier_create'=>'facture_fourn',
+                                            'member_create'=>'adherent',
+                                            'action_create'=>'actioncomm',
+                                            'project_create'=>'projet',
+                                            'task_create'=>'projet_task',
+                                            'contract_create'=>'contrat',
+                                            'ficheinter_create'=>'fichinter',
+                                            'don_create'=>'don',
+                                            'deplacement_create'=>'deplacement',
+                                            'shipping_create'=>'expedition',
+                                            'tva_addpayment'=>'tva',
+
+                                            // LINES
+                                            'linebill_insert'=>'facturedet', // Invoice line creation
+                                            'linebill_update'=>'facturedet', // Invoice line update
+                                            'linepropal_insert'=>'propaldet', // Propale line creation
+                                            'linepropal_update'=>'propaldet', // Propale line update
+                                            'lineorder_insert'=>'commandedet', // Client order line creation
+                                            'lineorder_update'=>'commandedet', // Client order line update
+                                            'lineorder_supplier_create'=>'commande_fournisseurdet', // Supplier orders lines creation
+                                            'lineorder_supplier_update'=>'commande_fournisseurdet', // Supplier orders lines update
+                                            'linebill_supplier_update'=>'facture_fourn_det', // Supplier invoices lines creation/update
+                                            'linebill_supplier_create'=>'facture_fourn_det', // UNUSED: Supplier invoices lines creation (doesn't exist yet, but in case it does in the future)
+
                                             ); // Edit me to add the support of actions of another module - NOTE: Lowercase only!
 
 // Native SQL data types natively supported by CustomFields

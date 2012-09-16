@@ -10,13 +10,10 @@ NOTE: you should DISABLE then RENABLE the module if already enabled (this allow 
 
 If you already had an earlier version of CustomFields installed, you should first delete all CustomFields files.
 
-1- Backup your CustomFields folder (/htdocs/customfields) and also your whole database. Making a backup of these two things is easy, fast and will ensure that you can completely go back in case you encounter a problem.
- 
-2- Delete all previous files: Simply search from /htdocs/ for all files containing "customfields" in the name and delete them.
+1- Delete all previous files: Simply search from /htdocs/ for all files containing "customfields" in the name and delete them.
 WARNING: this will also delete your language files. You can backup them prior to updating (they reside in /htdocs/customfields/langs/ folder), and then recopy them back when you finish the update.
-WARNING2: Be careful not to overwrite your overloading functions file if you have modified it! The file resides inside /htdocs/customfields/fields/customfields_fields_extend.lib.php
 
-3- Proceed to the same procedure as for a first time install (copy the files inside the archive, then disable/renable the module).
+2- Proceed to the same procedure as for a first time install (copy the files inside the archive, then disable/renable the module).
 
 == MORE INFORMATIONS ==
 

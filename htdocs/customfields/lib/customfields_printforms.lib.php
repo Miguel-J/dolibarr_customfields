@@ -1,10 +1,10 @@
 <?php
-/* Copyright (C) 2012 Stephen Larroque  <lrq3000@gmail.com>
+/* Copyright (C) 2011-2012   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * at your option any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,14 +13,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
- * or see http://www.gnu.org/
  */
 
 /**
  *	\file       htdocs/customfields/lib/customfields_printforms.lib.php
  *	\brief      Printing library for the customfields module, very generic and useful (but no core database managing functions, they are in customfields.class.php)
  *	\ingroup    customfields
- *	\version    $Id: customfields_printforms.lib.php, v1.2.4
  */
 
 /**
@@ -40,9 +38,10 @@ function customfields_admin_prepare_head($modulesarray, $currentmodule = null)
 
     // preparing the tabs
     foreach ($modulesarray as $module) {
-        if ($currentmodule == $module) { $currentmoduleindex = $h;} // detecting the index of the current tab
-        $head[$h][0] = $_SERVER["PHP_SELF"].'?module='.$module;
-        $head[$h][1] = $langs->trans($module);
+        $modulename = $module['table_element'];
+        if ($currentmodule == $modulename) { $currentmoduleindex = $h;} // detecting the index of the current tab
+        $head[$h][0] = $_SERVER["PHP_SELF"].'?module='.$modulename;
+        $head[$h][1] = $langs->trans($modulename);
         $head[$h][2] = 'general';
         $h++;
     }
@@ -50,8 +49,8 @@ function customfields_admin_prepare_head($modulesarray, $currentmodule = null)
     /*
      // detecting the index of the current tab
      // almost identical to the code above , but this one is less logical since we here detect the index in the $modulesarray when we need the index in $h array. Concretely, we get the same result in the end, but this is not the right method here.
-    if (in_array($currentmodule, $modulesarray)) {
-        $currentmoduleindex = array_search($currentmodule, $modulesarray);
+    if (in_array($currentmodule, $modulesarray['table_element'])) {
+        $currentmoduleindex = array_search($currentmodule, $modulesarray['table_element']);
     } else {
         $currentmoduleindex = 0;
     }
@@ -61,30 +60,41 @@ function customfields_admin_prepare_head($modulesarray, $currentmodule = null)
     // Entries must be declared in modules descriptor with line
     // $this->tabs = array('entity:+tabname:Title:@mymodule:/mymodule/mypage.php?id=__ID__');   to add new tab
     // $this->tabs = array('entity:-tabname:Title:@mymodule:/mymodule/mypage.php?id=__ID__');   to remove a tab
-    //complete_head_from_modules($conf,$langs,$object,$head,$h,'customfields_admin');
-    dol_fiche_head($head, $active="$currentmoduleindex", $title='', $notab=0, $picto=''); // draw the tabs
+    complete_head_from_modules($conf,$langs,null,$head,$h,'customfields_admin');
+    complete_head_from_modules($conf,$langs,null,$head,$h,'customfields_admin', 'remove');
+    $head = dol_fiche_head($head, $active="$currentmoduleindex", $title='', $notab=0, $picto=''); // draw the tabs
 
     return $head;
 }
 
 /**
  *      Print the customfields at the creation form of any table based module
+ *      Description: show create form: all customfields are editable at once (fields can either have empty values which is default, or fetch the values of a record in the database if this form is used to edit instead of creating)
  *      @param      $currentmodule      the current module we are in (facture, propal, etc.)
- *      @return     void        returns nothing because this is a procedure : it just does what we want
+ *      @param      $parameters             various parameters of the calling module (usually passed by the hookmanager)
+ *      @param      $action                         action string name (passed by hookmanager) - UNUSED
+ *      @param      $id                             id of the record (normally we are here to create it, but in some cases like copy or edit product lines or others, the id may already exists, so we fetch and show it)
+ *      @return     void        returns nothing because this is a procedure : it just does what we want (print a field)
  */
-function customfields_print_creation_form($currentmodule, $id = null) {
+function customfields_print_creation_form($currentmodule, $object = null, $parameters = null, $action = null, $id = null) {
     global $db, $langs;
 
     // Init and main vars
     include_once(dirname(__FILE__).'/../class/customfields.class.php');
+    include_once(dirname(__FILE__).'/../fields/customfields_fields_extend.lib.php'); // to allow user's function overloading (eg: at printing, at edition, etc..)
     $customfields = new CustomFields($db, $currentmodule);
 
-    if ($customfields->probeTable()) { // ... and if the table for this module exists, we show the custom fields
+    if ($customfields->probeCustomFields()) { // ... and if the table for this module exists, we show the custom fields
         $fields = $customfields->fetchAllFieldsStruct();
         if (isset($id)) $datas = $customfields->fetch($id); // fetching the record - the values of the customfields for this id (if it exists)
         foreach ($fields as $field) {
             $name = $field->column_name;
-            print '<tr><td>'.$customfields->findLabel($name).'</td><td colspan="2">';
+            print '<tr><td>'.$customfields->findLabel($name).'</td>';
+            if(isset($parameters->context)) {
+                print '<td '.$parameters->context.'>';
+            } else {
+                print '<td colspan="2">';
+            }
             $value = ''; // by default the value of this property is empty
             $name = $field->column_name; // the name of the customfield (which is the property of the record)
             $postvalue = GETPOST($customfields->varprefix.$name);
@@ -94,34 +104,58 @@ function customfields_print_creation_form($currentmodule, $id = null) {
                 // Default values from database record
                 $value = $datas->$name; // if the property exists (the record is not empty), then we fill in this value
             }
-            print $customfields->ShowInputField($field, $value);
+
+            // Calling custom user's functions
+            $customfunc_create = 'customfields_field_create_'.$currentmodule.'_'.$field->column_name;
+            $customfunc_createfull = 'customfields_field_createfull_'.$currentmodule.'_'.$field->column_name;
+
+            if (function_exists($customfunc_createfull)) { // a full function just does everything, CF just stop processing the field here
+                $customfunc_createfull($currentmodule, $object, $parameters, $action, $id, $customfields, $field, $name, $value);
+            } else {
+                if (function_exists($customfunc_create)) { // here the function may modify any parameter it wants (by referencing the values with a pointer like &$values), and then CF will continue to process the printing of the HTML field with these modified variables
+                    $customfunc_create($currentmodule, $object, $parameters, $action, $id, $customfields, $field, $name, $value);
+                }
+                print $customfields->ShowInputField($field, $value);
+            }
             print '</td></tr>';
         }
     }
 }
 
 /**
- *      Print the customfields at the main form of any table based module (with editable fields)
+ *      Print the customfields at the main datasheet form of any table based module (with editable fields)
+ *      Description: show datasheet form: either the customfields aren't edited and we just show their values and an edit button, either we are editing ONE customfield at a time
  *      @param      currentmodule      the current module we are in (facture, propal, etc.)
- *      @param      idvar                       the name of the POST or GET variable containing the id of the object
  *      @param      object                     the object containing the required informations (if we are in facture's module, it will be the facture object, if we are in propal it will be the propal object etc..)
+ *      @param      parameters          various parameters from the originating module (usually passed by hookmanager)
+ *      @param      action                     action name string (usually passed by hookmanager, but also preprocessed by CustomField's action_customfields.class.php)
+ *      @param      user                        current user object, containing all his datas (mainly used to manage rights - to check if he's authorized to edit anything in this module)
+ *      @param      idvar                       the name of the POST or GET variable containing the id of the object
+ *      @param      rights                     path to the rights defining authorization for this module (in the form: $user->rights->something->create)
  *      @return     void        returns nothing because this is a procedure : it just does what we want
  */
-function customfields_print_datasheet_form($currentmodule, $object, $action, $user, $idvar = 'id', $rights = null) {
+function customfields_print_datasheet_form($currentmodule, $object, $parameters, $action, $user, $idvar = 'id', $rights = null) {
     global $db, $langs, $conf;
 
     // Init and main vars
     include_once(dirname(__FILE__).'/../class/customfields.class.php');
+    include_once(dirname(__FILE__).'/../fields/customfields_fields_extend.lib.php'); // to allow user's function overloading (eg: at printing, at edition, etc..)
     include_once(DOL_DOCUMENT_ROOT.'/core/lib/functions.lib.php'); // for images img_edit()
     $customfields = new CustomFields($db, $currentmodule);
 
-    if ($customfields->probeTable()) { // ... and if the table for this module exists, we show the custom fields
+    if ($customfields->probeCustomFields()) { // ... and if the table for this module exists, we show the custom fields
         //print '<table class="border" width="100%">';
+
+        if (!empty($object->rowid)) {
+            $objid = $object->rowid;
+        } else {
+            $objid = $object->id;
+        }
 
         // == Fetching customfields
         $fields = $customfields->fetchAllFieldsStruct(); // fetching the customfields list
-        $datas = $customfields->fetch($object->id); // fetching the record - the values of the customfields for this id (if it exists)
-        $datas->id = $object->id; // in case the record does not yet exist for this id, we at least set the id property of the datas object (useful for the update later on)
+        $datas = $customfields->fetch($objid); // fetching the record - the values of the customfields for this id (if it exists)
+        $datas->id = $objid; // in case the record does not yet exist for this id, we at least set the id property of the datas object (useful for the update later on)
 
         // == Checking rights
         // checking the user's rights for edition for all current module's customfields
@@ -130,11 +164,15 @@ function customfields_print_datasheet_form($currentmodule, $object, $action, $us
             if (!is_array($rights)) { $rights = array($rights); } // convert to an arrray if we were supplied a string
             // for each right, we will check if it exists, and if true, if the current user has ALL the required right (if one necessary right isn't possessed, then the user will be refused edition)
             foreach ($rights as $moduleright) {
-                if (!isset($user->rights->$moduleright->creer)) { // if the specified right does NOT exist or is not set (either because the user does NOT have it which makes Dolibarr NOT specify the right, or either this means the dev implementing CF has specified a right that does not exist)
+                //print("isset: ".isset($moduleright)." val: $moduleright\n"); // debugline
+                eval("\$misset = isset($moduleright);"); // assign to $misset the boolean value if $moduleright exists
+                if (!$misset) { // if the specified right does NOT exist (this means the dev implementing CF is probably doing something wrong)
                     $rightok = false; // no good, no access
                     break;
                 } else { // if the right exists
-                    if (!$user->rights->$moduleright->creer) { // and if the current user does NOT possess it (set to false, but in practice Dolibarr does not set unpermitted rights to false, but rather it doesn't set them at all)
+                    eval("\$mval = $moduleright;"); // assign the value of the right pointed by $moduleright
+                    //print('mval: '.$mval); // debugline
+                    if (!$mval) { // and if the current user does NOT possess it
                         $rightok = false; // then the user does not meet the necessary privileges to edit this customfield, then we skip
                         break;
                     }
@@ -144,9 +182,8 @@ function customfields_print_datasheet_form($currentmodule, $object, $action, $us
             $rightok = $user->rights->$currentmodule->creer;
         }
 
-         // == Printing/Editing custom fields
+        // == Printing/Editing custom fields
         if (isset($fields)) { // only if at least one customfield exists (there's a special case where a record may exist because there existed customfields, but all customfields were deleted, and thus the records still exist with a rowid and fk_module columns set, but with nothing else. In this case, we skip.)
-
             foreach ($fields as $field) { // for each customfields, we will print/save the edits
 
                 // == Default values from database record
@@ -160,41 +197,84 @@ function customfields_print_datasheet_form($currentmodule, $object, $action, $us
 
                     // Forging the new record
                     $newrecord->$name = $_POST[$customfields->varprefix.$name]; // we create a new record object with the field and the id
-                    $newrecord->id = $object->id;
+                    $newrecord->id = $objid;
 
                     // Insert/update the record into the database by trigger
-                    //$customfields->update($newrecord); // update or create the record in the database (will check automatically) - this does the same as the trigger below, but the trigger is more consistent with the rest (we need to use triggers for creation)
+                    /* UPDATE CUSTOMFIELD DIRECTLY
+                    // Note: the generic fill is necessary for some fields like date fields, where 3 more fields are created (day, month, year) to hold values separately, and this is needed to correctly save the field into the database
+                    foreach ($_POST as $key=>$value) { // Generic way to fill all the fields to the object (particularly useful for triggers and customfields) - NECESSARY to get the fields' values
+                        if (!isset($newrecord->$key)) { // Appending only: only add the property to the object if this property is not only defined
+                            $newrecord->$key = $value;
+                        }
+                    }
+                    $customfields->update($newrecord); // update or create the record in the database (will check automatically) - this does the same as the trigger below, but the trigger is more consistent with the rest (we need to use triggers for creation)
+                    */
                     include_once(DOL_DOCUMENT_ROOT . "/core/class/interfaces.class.php");
                     $interface=new Interfaces($db);
                     $newrecord->currentmodule = $currentmodule; // very important to pass the module as a property of the object
                     $result=$interface->run_triggers('CUSTOMFIELDS_MODIFY',$newrecord,$user,$langs,$conf);
 
-                    // Updating the loaded record object
-                    // deprecated, see below
-                    // $datas->$name = $_POST[$customfields->varprefix.$name]; // we update the loaded record to the new value so that it gets printed asap
-                    //$value = $datas->$name;
-                    // Reloading the field from the database (we need to fetch from the database because there can be some not null fields with default values, and if we are creating the record, these will be filled it, and we have no way to know it when updating the database, so we need to fetch the record again)
-                    $datas = $customfields->fetch($object->id); // fetching the record - the values of the customfields for this id (if it exists)
-                    $value = $datas->$name;
+
+                    // Calling custom functions prior to submitting the data to the database
+                    $customfunc_save = 'customfields_field_save_'.$currentmodule.'_'.$field->column_name;
+                    $customfunc_savefull = 'customfields_field_savefull_'.$currentmodule.'_'.$field->column_name;
+
+                    if (function_exists($customfunc_savefull)) { // here one can STOP CustomFields processing, and one can then do the processing by oneself
+                        $customfunc_savefull($currentmodule, $object, $parameters, $action, $user, $idvar, $rightok, $customfields, $field, $name, $value, $newrecord);
+                    } else { // here the user can just modify the values and the field and then CustomFields will save them into the database
+                        if (function_exists($customfunc_save)) $customfunc_save($currentmodule, $object, $parameters, $action, $user, $idvar, $rightok, $customfields, $field, $name, $value, $newrecord);
+                        // Updating the loaded record object
+                        // deprecated, see below
+                        // $datas->$name = $_POST[$customfields->varprefix.$name]; // we update the loaded record to the new value so that it gets printed asap
+                        //$value = $datas->$name;
+                        // Reloading the field from the database (we need to fetch from the database because there can be some not null fields with default values, and if we are creating the record, these will be filled it, and we have no way to know it when updating the database, so we need to fetch the record again)
+                        $datas = $customfields->fetch($objid); // fetching the record - the values of the customfields for this id (if it exists)
+                        $value = $datas->$name;
+                    }
                 }
 
                 // == Print the record
-
                 print '<tr><td>';
+                // print the customfield's label
                 print $customfields->findLabel($name);
                 // print the edit button only if authorized
-                if (!($action == 'editcustomfields' && GETPOST('field') == $name) && !(isset($objet->brouillon) and $object->brouillon == false) && $rightok) print '<span align="right"><a href="'.$_SERVER["PHP_SELF"].'?'.$idvar.'='.$object->id.'&amp;action=editcustomfields&amp;field='.$field->column_name.'">'.img_edit("default",1).'</a></td>';
+                if (!($action == 'editcustomfields' && GETPOST('field') == $name) && !(isset($objet->brouillon) and $object->brouillon == false) && $rightok) print '<span align="right"><a href="'.$_SERVER["PHP_SELF"].'?'.$idvar.'='.$objid.'&amp;action=editcustomfields&amp;field='.$field->column_name.'">'.img_edit("default",1).'</a></td>';
                 print '</td>';
-                print '<td colspan="3">';
+                if (isset($parameters->colspan)) { // sometimes the colspan is provided in $parameters, we use it if available
+                    print '<td '.$parameters->colspan.'>';
+                } else { // if not, by default it's generally a colspan=3
+                    print '<td colspan="3">';
+                }
                 // print the editing form...
-                if ($action == 'editcustomfields' && GETPOST('field') == $name) {
-                    print $customfields->showInputForm($field, $value, $_SERVER["PHP_SELF"].'?'.$idvar.'='.$object->id);
-                } else { // ... or print the field's value
-                    print $customfields->printField($field, $value);
+                if ($action == 'editcustomfields' && GETPOST('field') == $name && $rightok) {
+
+                    // Calling custom user's functions
+                    $customfunc_edit = 'customfields_field_editview_'.$currentmodule.'_'.$field->column_name;
+                    $customfunc_editviewfull = 'customfields_field_editviewfull_'.$currentmodule.'_'.$field->column_name;
+
+                    if (function_exists($customfunc_editviewfull)) {
+                        $customfunc_editviewfull($currentmodule, $object, $parameters, $action, $user, $idvar, $rightok, $customfields, $field, $name, $value);
+                    } else {
+                        if (function_exists($customfunc_edit)) $customfunc_edit($currentmodule, $object, $parameters, $action, $user, $idvar, $rightok, $customfields, $field, $name, $value);
+                        // Print the customfield edit form
+                        print $customfields->showInputForm($objid, $field, $value, $idvar, $_SERVER["PHP_SELF"].'?'.$idvar.'='.$objid); // note: we also submit the ID as a GET variable, so that the user can just refresh the page and it will correctly show the right page (else the URL will be something like 'fiche.php' instead of 'fiche.php?id=xx')
+                    }
+                } else { // ... or print the customfield's value
+                    // Calling custom user's functions
+                    $customfunc_view = 'customfields_field_view_'.$currentmodule.'_'.$field->column_name;
+                    $customfunc_viewfull = 'customfields_field_viewfull_'.$currentmodule.'_'.$field->column_name;
+
+                    if (function_exists($customfunc_viewfull)) { // a full function just does everything, CF just stop processing the field here
+                        $customfunc_viewfull($currentmodule, $object, $parameters, $action, $user, $idvar, $rightok, $customfields, $field, $name, $value);
+                    } else {
+                        // here the function may modify any parameter it wants (by referencing the values with a pointer like &$values), and then CF will continue to process the printing of the HTML field with these modified variables
+                        if (function_exists($customfunc_view)) $customfunc_view($currentmodule, $object, $parameters, $action, $user, $idvar, $rightok, $customfields, $field, $name, $value);
+                        // else if these functions do not exist, CF will just do everything as it's used to do
+                        print $customfields->printField($field, $value);
+                    }
                 }
                 print '</td></tr>';
             }
-
         }
 
         //print '</table><br>';

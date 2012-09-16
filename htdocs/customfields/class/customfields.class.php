@@ -1,10 +1,10 @@
 <?php
-/* Copyright (C) 2012   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2012   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * at your option any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,10 +22,23 @@
  *		\author		Stephen Larroque
  */
 
-// Include JSON library for PHP <= 5.2 (used to define json_decode() and json_encode() for PHP4)
-if( !function_exists('json_decode') or !function_exists('json_encode') ) include_once(dirname(__FILE__).'/ext/JSON.php');
-// Include PHP4 object model compatibility library (TODO: may not work! Please check before, eg: will probably need to declare every var that is used, because this is currently not the case (but how to declare all SQL fields???))
-include_once(dirname(__FILE__).'/ext/php4compat.php');
+/* DEV NOTES FOR PROFILING FUNCTIONS
+  To profile functions calls and classes instanciations easily, you can use the following code:
+
+  $then = microtime(true); // do not forget the parameter set to true! (else you will get inconsistent and even negative times)
+  func(); // replace this by the function you want to profile
+  $now = microtime(true);
+  echo sprintf("Elapsed:  %f", $now-$then);
+
+  Also you can use these two commands to profile memory usage:
+  getmemoryusage()
+  getpeakmemory_usage()
+
+  One last advice: most of the time spent by functions are generally in SQL querying the database, so the better place to start optimizing would be by optimizing SQL queries first, then the number of calls to functions that do SQL queries (caching etc...), but the author tried his best to really optimize all these aspects (but one can always do better ;) ).
+*/
+
+// Include the config file (only used for $varprefix at this moment, so this class is pretty much self contained and independent - except for triggers and translation, but these are NOT necessary for CustomFields management, only for printing fields more nicely and for logs)
+include(dirname(__FILE__).'/../conf/conf_customfields.lib.php');
 
 // Loading the translation class if it's not yet loaded (or with another name) - DO NOT EDIT!
 if (! is_object($langs))
@@ -34,56 +47,23 @@ if (! is_object($langs))
     $langs=new Translate(dirname(__FILE__).'/../langs/',$conf);
 }
 
-// Put here all includes required by your class file
 $langs->load('customfields@customfields'); // customfields standard language support
 $langs->load('customfields-user@customfields'); // customfields language support for user's values (like enum, fields names, etc..)
-
-function customfields_cmp_obj($a, $b)
-{
-    if (isset($a->extra->position)) {
-        $apos = $a->extra->position;
-    } elseif (isset($a->ordinal_position)) {
-        $apos = $a->ordinal_position;
-    } else {
-        return 0;
-    }
-    if (isset($b->extra->position)) {
-        $bpos = $b->extra->position;
-    } elseif (isset($b->ordinal_position)) {
-        $bpos = $b->ordinal_position;
-    } else {
-        return 0;
-    }
-    // In case we have a draw (same position)
-    if ($apos == $bpos) {
-        // Give the advantage to extra options before ordinal_position
-        if (isset($a->extra->position) and !isset($b->extra->position)) {
-            return +1;
-        } elseif (!isset($a->extra->position) and isset($b->extra->position)) {
-            return -1;
-        // if either both are extra options or both are ordinal_position, then it's really a draw
-        } else {
-            return 0;
-        }
-    }
-    // In case there's a difference, we return first the lesser one (logic...)
-    return ($apos > $bpos) ? +1 : -1;
-}
 
 /**
  *      \class      customfields
  *      \brief      Core class for the CustomFields module, all critical functions reside here
  */
-class CustomFields extends compatClass4 // extends CommonObject
+class CustomFields // extends CommonObject
 {
 	var $db;							//!< To store db handler
 	var $error;							//!< To return error code (or message)
 	var $errors=array();				//!< To return several error codes (or messages)
 	//var $element='customfields';			//!< Id that identify managed objects
 	//var $table_element='customfields';	//!< Name of table without prefix where object is stored
-        var $dbtype; // type of the database, will be used to use the right function to issue sql requests
 
 	var $varprefix = 'cf_'; // prefix that will be prepended to the variables names for accessing the fields values
+        var $svsdelimiter = '_'; // separator for Smart Value Substitution for Constrained Fields (a constrained field will try to find similar column names in the referenced table, and you can specify several column names when using this separator)
 
 	var $id;
 
@@ -95,16 +75,13 @@ class CustomFields extends compatClass4 // extends CommonObject
      */
     function __construct($db, $currentmodule)
     {
-        // Include the config file (only used for $varprefix at this moment, so this class is pretty much self contained and independent - except for triggers and translation, but these are NOT necessary for CustomFields management, only for printing fields more nicely and for logs)
-        include(dirname(__FILE__).'/../conf/conf_customfields.lib.php');
-
 	$this->db = $db;
 	$this->module = $currentmodule;
 	$this->moduletable = MAIN_DB_PREFIX.$this->module."_customfields";
-        $this->extratable = MAIN_DB_PREFIX."customfields_extraoptions";
-        $this->dbtype = $db->type; // or $conf->db->type
 
+	global $fieldsprefix, $svsdelimiter;
 	if (!empty($fieldsprefix)) $this->varprefix = $fieldsprefix;
+        if (!empty($svsdelimiter)) $this->svsdelimiter = $svsdelimiter;
 
 	return 1;
     }
@@ -138,41 +115,11 @@ class CustomFields extends compatClass4 // extends CommonObject
         /**
          *      Return an object with only lowercase column_names (otherwise, on some OSes like Unix, mysql functions may return uppercase or mixed case column_name)
          *      Note: similar to mysql_fetch_object, but always return lowercase column_name for every items
-         *      @param      $res        Mysql/Mysqli/PGsql/SQlite/MSsql resource
+         *      @param      $res        Mysql resource
          *      @return       $obj         Object containing one row
          */
-        function fetch_object($res, $class_name=null, $params=null) {
-            // get the record as an object
-            if ($this->dbtype === 'mysql') {
-                if (isset($class_name) and isset($params)) {
-                    $row = mysql_fetch_object($res, $class_name, $params);
-                } elseif (isset($class_name)) {
-                    $row = mysql_fetch_object($res, $class_name);
-                } else {
-                    $row = mysql_fetch_object($res);
-                }
-            } elseif($this->dbtype === 'mysqli') {
-                if (isset($class_name) and isset($params)) {
-                    $row = mysqli_fetch_object($res, $class_name, $params);
-                } elseif (isset($class_name)) {
-                    $row = mysqli_fetch_object($res, $class_name);
-                } else {
-                    $row = mysqli_fetch_object($res);
-                }
-            } elseif($this->dbtype === 'mssql') {
-                $row = mssql_fetch_object($res);
-            } elseif($this->dbtype === 'sqlite') {
-                $row = $res->fetch(PDO::FETCH_OBJ);
-            } elseif($this->dbtype === 'pgsql') {
-                if (isset($class_name) and isset($params)) {
-                    $row = pg_fetch_object($res, null, $class_name, $params);
-                } elseif (isset($class_name)) {
-                    $row = pg_fetch_object($res, null, $class_name);
-                } else {
-                    $row = pg_fetch_object($res);
-                }
-            }
-            //$row = $this->fetch_object($res); // get the record as an object [DEPRECATED]
+        function fetch_object($res) {
+            $row = $this->db->fetch_object($res); // get the record as an object
             $obj = array_change_key_case((array)$row, CASE_LOWER); // change column_name case to lowercase
             $obj = (object)$obj; // cast back as an object
             return $obj; // return the object
@@ -188,16 +135,18 @@ class CustomFields extends compatClass4 // extends CommonObject
 	 */
 	function fetch($id=null, $notrigger=0)
 	{
+                /* DEPRECATED: not needed anymore, Dolibarr now accepts SELECT * (before the star wasn't tolerated)
 		// Get all the columns (custom fields), primary field included (that's why there's the true)
-		$fields = $this->fetchAllFieldsStruct(true);
+		//$fields = $this->fetchAllFieldsStruct(true);
 
 		// Forging the SQL statement - we set all the column_name to fetch (because Dolibarr wants to avoid SELECT *, so we must name the columns we fetch)
 		foreach ($fields as $field) {
 			$keys[] = $field->column_name;
 		}
 		$sqlfields = implode(',',$keys);
+                */
 
-		$sql = "SELECT ".$sqlfields." FROM ".$this->moduletable;
+		$sql = "SELECT * FROM ".$this->moduletable;
 
                 if (is_array($id)) {
 
@@ -273,7 +222,7 @@ class CustomFields extends compatClass4 // extends CommonObject
 	 *      @param	table		table where to fetch from
 	 *      @param	where		where clause (format: column='value'). Can put several where clause separated by AND or OR
 	 *      @param	orderby	order by clause
-	 *      @return     int or object or array of objects         	<0 if KO, object if one record found, array of objects if several records found
+	 *      @return     int or array of objects         	<0 if KO, array of objects if one or several records found (for more consistency, even if only one record is found, an array is returned)
 	 */
 	function fetchAny($columns, $table, $where='', $orderby='', $limitby='', $notrigger=0)
 	{
@@ -305,14 +254,16 @@ class CustomFields extends compatClass4 // extends CommonObject
 		} else { // else we fill the record
 			$num = $this->db->num_rows($resql); // number of results returned (number of records)
 			// Several records returned = array() of objects
-			if ($num > 1) {
+			if ($num >= 1) {
 				$record = array();
 				for ($i=0;$i < $num;$i++) {
 					$record[] = $this->fetch_object($resql);
 				}
 			// Only one record returned = one object
+                        /*
 			} elseif ($num == 1) {
 				$record = $this->fetch_object($resql);
+                        */
 			// No record returned = null
 			} else {
 				$record = null;
@@ -328,69 +279,93 @@ class CustomFields extends compatClass4 // extends CommonObject
 
 	/**
 	 *      Insert/update a record in the database (meaning an instance of the custom fields, the values if you prefer)
-	 *      @param	   object				Object containing all the form inputs to be processed to the database (so it mus contain the custom fields)
+	 *      @param	   object				Object containing all the form inputs to be processed to the database (so it must contain the custom fields)
 	 *      @param      notrigger	    0=launch triggers after, 1=disable triggers
 	 *      @return     int         	<0 if KO, >0 if OK
 	 */
 	function create($object, $notrigger=0)
 	{
-		// Get all the columns (custom fields)
-		$fields = $this->fetchAllFieldsStruct();
+            // Get all the columns (custom fields)
+            $fields = $this->fetchAllFieldsStruct();
 
-		if (empty($fields)) return null;
+            if (empty($fields)) return null; // if the customfields table for this module exists but there's no field at all, we just quit
 
-		// Forging the SQL statement
-		$sqlfields = array();
-                $sqlvalues = array();
-		foreach ($fields as $field) {
-			$key = $this->varprefix.$field->column_name;
-			if (!isset($object->$key)) {
-				$key = $field->column_name;
-			}
+            // Forging the SQL statement
+            $sqlfields = array();
+            $sqlvalues = array();
+            foreach ($fields as $field) {
+                // Get the right key to access the field in the $object
+                $key = $this->varprefix.$field->column_name; // either it's in the format 'cf_myfield' (with prefix)
+                if (!isset($object->$key)) { // either it's in the format 'myfield' (without prefix)
+                        $key = $field->column_name;
+                }
 
-			//We need to fetch the correct value when we update a date field
-			if($field->data_type == 'date') {
-				$object->$key = $this->db->idate(dol_mktime(0, 0, 0, $object->{$key.'month'}, $object->{$key.'day'}, $object->{$key.'year'}));
-		       }
+                if (isset($object->$key) and // Only insert/update this field if it was submitted...
+                    !(strlen($object->$key) == 0 and strtolower($field->is_nullable) != 'yes')) { // ... and if the value is null (totally empty), we insert/update the field only if the field accepts null values (this is a special feature of CustomFields, because SQL accepts null values even for non-nullable sql fields by setting an empty value - either '' or 0 - here CustomFields will keep the old value)
+                    // Note: we separate fields and values because depending on whether we UPDATE or INSERT the record, the format is not the same (INSERT: values and fields are separated, UPDATE: both are submitted at the same place)
 
-			if ($object->$key) { // Only insert/update this field if it was submitted
-                                // Note: we separate fields and values because depending on whether we UPDATE or INSERT the record, the format is not the same (INSERT: values and fields are separated, UPDATE: both are submitted at the same place)
-                                array_push($sqlfields, $field->column_name);
-                                array_push($sqlvalues, "'".$this->escape($object->$key)."'"); // escape and single-quote values (even if they are not strings, the database will automatically correct that depending on the column_type)
-			}
-		}
+                    // Insert field's column_name
+                    array_push($sqlfields, $field->column_name);
 
-                // we add the object id (filtered by fetchAllFieldsStruct)
-                array_push($sqlfields, "fk_".$this->module);
-                array_push($sqlvalues, $object->id);
+                    // Insert field's value
+                    if (strlen($object->$key) == 0) {
+                        array_push($sqlvalues, "NULL"); // special case: if the value supplied is an empty string (even 0 returns 1 length), then we put this as NULL without quotes (else, it will supply a field with '' which can be rejected even on nullable sql fields)
+                   } else {
+                        //We need to fetch the correct value when we update a date field
+                        if($field->data_type == 'date') {
+                            // Fetch day, month and year
+                            if (isset($object->{$key.'day'}) and isset($object->{$key.'month'}) and isset($object->{$key.'year'})) { // for date fields, Dolibarr will produce 3 more associated POST fields: myfielddate, myfieldmonth and myfieldyear
+                                $dateday = $object->{$key.'day'};
+                                $datemonth = $object->{$key.'month'};
+                                $dateyear = $object->{$key.'year'};
+                            } else { // else if they are not submitted (or if they weren't assigned inside $object), we try to split the date into 3 values
+                                list($dateday, $datemonth, $dateyear) = explode('/',$object->$key);
+                            }
+                            // Format the correct timestamp from the date for the database
+                            $object->$key = $this->db->idate(dol_mktime(0, 0, 0, $datemonth, $dateday, $dateyear));
+                       }
 
-                // fetch the record (to check whether it already exists or not)
-		$result = $this->fetch($object->id);
+                        array_push($sqlvalues, "'".$this->escape($object->$key)."'"); // escape and single-quote values (even if they are not strings, the database will automatically correct that depending on the column_type)
+                   }
+                }
+            }
 
-		if (!empty($result) and count($result) > 0) { // if the record already exists for this facture id, we update it
-                        // Compact and format all the fields and values in the correct sql syntax (eg: field='value')
-                        $sqlfieldsandvalues = array();
-                        for($i=0;$i<count($sqlfields);$i++) {
-                            array_push($sqlfieldsandvalues, $sqlfields[$i].'='.$sqlvalues[$i]);
-                        }
-			$sql = "UPDATE ".$this->moduletable." SET ".implode(',', $sqlfieldsandvalues)." WHERE fk_".$this->module."=".$object->id;
-		} else { // else we insert a new record
-			$sql = "INSERT INTO ".$this->moduletable." (".implode(',',$sqlfields).") VALUES (".implode(',',$sqlvalues).")";
-		}
+            // we add the object id (filtered by fetchAllFieldsStruct)
+            if (!empty($object->rowid)) {
+                $objid = $object->rowid;
+            } else {
+                $objid = $object->id;
+            }
+            array_push($sqlfields, "fk_".$this->module);
+            array_push($sqlvalues, $objid);
 
-		// Trigger or not?
-		if ($notrigger) {
-			$trigger = null;
-		} else {
-			$trigger = strtoupper($this->module).'_CUSTOMFIELD_CREATEUPDATERECORD';
-		}
+            // fetch the record (to check whether it already exists or not)
+            $result = $this->fetch($objid);
 
-		// Executing the SQL statement
-		$rtncode = $this->executeSQL($sql,__FUNCTION__.'_CustomFields',$trigger);
+            if (!empty($result) and count($result) > 0) { // if the record already exists for this facture id, we update it
+                    // Compact and format all the fields and values in the correct sql syntax (eg: field='value')
+                    $sqlfieldsandvalues = array();
+                    for($i=0;$i<count($sqlfields);$i++) {
+                        array_push($sqlfieldsandvalues, $sqlfields[$i].'='.$sqlvalues[$i]);
+                    }
+                    $sql = "UPDATE ".$this->moduletable." SET ".implode(',', $sqlfieldsandvalues)." WHERE fk_".$this->module."=".$objid;
+            } else { // else we insert a new record
+                    $sql = "INSERT INTO ".$this->moduletable." (".implode(',',$sqlfields).") VALUES (".implode(',',$sqlvalues).")";
+            }
 
-		$this->id = $this->db->last_insert_id($this->moduletable);
+            // Trigger or not?
+            if ($notrigger) {
+                    $trigger = null;
+            } else {
+                    $trigger = strtoupper($this->module).'_CUSTOMFIELD_CREATEUPDATERECORD';
+            }
 
-		return $rtncode;
+            // Executing the SQL statement
+            $rtncode = $this->executeSQL($sql,__FUNCTION__.'_CustomFields',$trigger);
+
+            $this->id = $this->db->last_insert_id($this->moduletable);
+
+            return $rtncode;
 	}
 
 
@@ -468,9 +443,7 @@ class CustomFields extends compatClass4 // extends CommonObject
 	    return $matches[1];
        }
 
-	/*	Execute a unique SQL statement, add it to the logfile and add an event trigger (or not)
-         *	Note: just like mysql_query(), we can only issue one sql statement per call. It should be possible to issue multiple queries at once with an explode(';', $sqlqueries) but it would imply security issues with the semicolon, and would require a specific escape function.
-         *	Note2: another way to issue multiple sql statement is to pass flag 65536 as mysql_connect's 5 parameter (client_flags), but it still raises the same security concerns.
+	/*	Execute an SQL statement, add it to the logfile and add an event trigger (or not)
 	 *
 	 *
 	 *	@return -1 if error, object of the request if OK
@@ -604,123 +577,101 @@ class CustomFields extends compatClass4 // extends CommonObject
 	}
 
 	/**
-	 *      Initialize the extraoptions table for CustomFields (for _ALL_ modules) - which is used to store extra options that cannot be stored inside a relational model database.
+	 *      Check if the table exists
 	 *
+	 *	@return	< 0 if KO, false if false, true if OK
 	 *
-	 *	@return -1 if KO, 1 if OK
 	 */
-	function initExtraTable($notrigger = 0) {
+	function probeCustomFields($notrigger = 0) {
+
 		// Forging the SQL statement
-		$sql = "CREATE TABLE ".$this->extratable."(
-                table_name varchar(64),
-		column_name varchar(64), -- we need to use the column_name because the ordinal_position is automatically rearranged for all columns when a field is deleted, and we can't know it (unless we put a trigger or a foreign keys, but the goal here is to not rely on referential integrity because we want to be able to simulate it), thus it's better to use column_name, but be careful with the size limit!
-                extraoptions blob, -- better use a blob than a text, because: 1- text is deprecated in a lot of DBMS, blob has no encoding, so that it won't interfer with the JSON encoding when using UTF-8 characters
-                PRIMARY KEY (table_name, column_name)
-		);";
+		$sql = "SELECT 1
+		FROM INFORMATION_SCHEMA.TABLES
+		WHERE TABLE_TYPE='BASE TABLE'
+		AND TABLE_SCHEMA='".$this->db->database_name."'
+		AND TABLE_NAME='".$this->moduletable."';";
 
 		// Trigger or not?
 		if ($notrigger) {
 			$trigger = null;
 		} else {
-			$trigger = 'EXTRATABLE_CUSTOMFIELD_INITTABLE';
+			$trigger = strtoupper($this->module).'_CUSTOMFIELD_PROBETABLE';
 		}
 
 		// Executing the SQL statement
-		$rtncode = $this->executeSQL($sql,__FUNCTION__.'_CustomFields',$trigger);
+		$resql = $this->executeSQL($sql,__FUNCTION__.'_CustomFields',$trigger);
 
-		// Good or bad returncode ?
-		if ($rtncode < 0) {
-			return $rtncode; // bad
-		} else {
-			return 1; // good
-		}
-	}
-
-        /**
-	 *      Check if the extra options (where all extra options that cannot be stored in a relational database) table exists
-	 *
-	 *	@return	< 0 if KO, false if does not exist, true if it does
-	 *
-	 */
-	function probeTableExtra($notrigger = 0) {
-            return $this->probeTable($this->extratable, $notrigger);
-        }
-
-	/**
-	 *      Check if the table exists
-	 *
-	 *	@return	< 0 if KO, false if it doesn't exist, true if it does
-	 *
-	 */
-	function probeTable($table=null, $notrigger = 0) {
-
-            if (!isset($table)) $table = $this->moduletable;
-
-            // Forging the SQL statement
-            $sql = "SELECT 1
-            FROM INFORMATION_SCHEMA.TABLES
-            WHERE TABLE_TYPE='BASE TABLE'
-            AND TABLE_SCHEMA='".$this->db->database_name."'
-            AND TABLE_NAME='".$table."';";
-
-            // Trigger or not?
-            if ($notrigger) {
-                    $trigger = null;
-            } else {
-                    $trigger = strtoupper($this->module).'_CUSTOMFIELD_PROBETABLE';
-            }
-
-            // Executing the SQL statement
-            $resql = $this->executeSQL($sql,__FUNCTION__.'_CustomFields',$trigger);
-
-            // Forging the result
-            if ($resql < 0) { // if an error happened when executing the sql command, we return -1
-                    return $resql;
-            } else { // else we check the result
-                    if ($this->db->num_rows($resql) > 0) { // if there is a result, then we return true (the table exists)
-                            return true;
-                    } else { // else it doesn't
-                            return false;
-                    }
-            }
-	}
-
-	/**
-	*    Fetch the field sql definition for a particular field or for all fields from the database (not the records! See fetch and fetchAll to fetch records) and return it as an array or as a single object, and populate the CustomFields class $fields property
-	*    @param    id          			id of the field (ordinal_position of the sql column) OR string column_name of the field
-	*    @param    nohide				defines if the system fields (primary field and foreign key) must be hidden in the fetched results
-	*    @return     int/null/obj/obj[]         <0 if KO, null if no field found, one field object if only one field could be found, an array of fields objects if OK
-	*/
-       function fetchFieldStruct($id=null, $nohide=false, $notrigger=0) {
-
-		// Forging the SQL statement
-		$whereaddendum = '';
-                $whereextraaddendum = '';
-		if (isset($id)) {
-			if (is_numeric($id) and $id > 0) { // if we supplied an id, we fetch only this one record
-                            $whereaddendum .= " AND c.ordinal_position = ".$id;
-			} elseif (is_string($id) and !empty($id)) {
-                            $whereaddendum .= " AND c.column_name = '".$id."'";
+		// Forging the result
+		if ($resql < 0) { // if an error happened when executing the sql command, we return -1
+			return $resql;
+		} else { // else we check the result
+			if ($this->db->num_rows($resql) > 0) { // if there is a result, then we return true (the table exists)
+				return true;
+			} else { // else it doesn't
+				return false;
 			}
 		}
+	}
 
-		if (!$nohide) {
-			$whereaddendum .= " AND c.column_name != 'rowid' AND c.column_name != 'fk_".$this->module."'";
+	/**
+	*    Fetch the field sql definition for a particular field or for all fields from the database (not the records! See fetch and fetchAll to fetch records) and return it as an array or as a single object, and populate the CustomFields class $fields property (or any other path specified in $cachepath)
+	*    Also update a local cache of fields structure to accelerate further accesses.
+	*    Note: fields structure are by default cached, and you can potentially cache any table's fields structure. Anyway, this function won't use the cache (only update it) because this function can also be called when the database structure has changed and we want to fetch the new structure. BUT it still caches the retrieved fields structure, so it can then be called elsewhere in the code (eg: simplePrintField() and checkIfFieldExists() )
+	*    @param    $id          			int/string - id of the field (ordinal_position of the sql column) OR string column_name of the field
+	*    @param    $nohide			false/true - defines if the two system fields (primary field and foreign key) must be hidden in the fetched results
+	*    @param    $table                           null/string - null to fetch the customfields structure for the current module, or can be set to any table if you want to get the structure of another table's fields
+	*    @param    $cachepath                null/false/string - enable caching of the fields structure inside this instance of CustomFields object. false: disable caching; null (default): default path ($this->fields->custom_field_column_name); string: a path can be specified to replace the default cache path (mainly used when you fetch the structure of another table than CustomFields and to avoid overwriting CustomFields structures cache) (eg: $this->$table_name->anything, and your field's structure will be accessible with $this->$table_name->anything->custom_field_column_name)
+	*    @param    $notrigger                   false/true - enable (default) or disable the activation of a trigger when this function is called
+	*    @return     int/null/obj/obj[]         <0 if KO, null if no field found, one field object if only one field could be found, an array of fields objects if OK
+	*/
+       function fetchFieldStruct($id=null, $nohide=false, $table=null, $cachepath=null, $notrigger=0) {
+
+		// Forging the SQL statement
+                $whereaddendum = '';
+		$whereaddendumid = '';
+                // If an ID is set, we will fetch only this column, else if empty we will fetch all columns from the table
+		if (isset($id)) {
+                    // If the ID is numeric, we search the field with the ordinal position (id of the column in the SQL meta database)
+                    if (is_numeric($id) and $id > 0) { // if we supplied an id, we fetch only this one record
+                        $whereaddendumid .= " AND ordinal_position = ".$id; // ordinal_position does NOT exist in statistics table, so we must avoid putting this in the where clause for that join (see below in the $sql request)
+                    // Else if it's a string, we search for a column name
+                    } elseif (is_string($id) and !empty($id)) {
+                        $whereaddendum .= " AND column_name = '".$id."'";
+                    }
 		}
 
+		if (!$nohide) { // We filter the reserved columns so that the user  cannot alter them, even by mistake and we get only the specified field by id (unless it is specified that we need them, generally used internally in this class)
+			$whereaddendum .= " AND column_name != 'rowid' AND column_name != 'fk_".$this->module."'";
+		}
+
+                // Forging Where
+                $where = "table_schema = '".$this->db->database_name."'";
+                if (empty($table)) {
+                    $where .= " AND table_name = '".$this->moduletable."'";
+                } else {
+                    $where .= " AND table_name = '".$table."'";
+                }
+                $where .= " ".$whereaddendum;
+
+                // Forging SQL Request
+                // Description: we fetch the SQL structure (but NOT the values) of the custom fields (information_schema.COLUMNS) along with foreign key and table if the field is constrained (information_schema.key_column_usage) and constraint index (information_schema.statistics).
+                // These datas are then used to properly print the field and manage them (eg: date field will be show as a date and with a calendar pickup to edit the date, etc...).
+                // Optimisation note: To optimize the query and limit the number of returned lines, we need to use a WHERE clause for every table BEFORE the join (if you do it after, the time to process the request will increase by 50x, so BEWARE!). Normally this shouldn't happen (the query optimizer should automatically do it), but with MyISAM and InnoDB it does...
+                // Outer join note: we need an outer join because most fields won't be constrained, and so they will not even appear in key_column and statistics tables, so we need an OUTER JOIN to keep columns table rows even if in the other tables the result is null.
+                // Alternative note: alternatively, it should be possible to break this request into 3 requests, because we can detect fields that are linked to a foreign key by looking at the column_key = 'mul', if that's the case we can then issue another sql request for constrained fields. But I find this SQL query quick enough, and I'm not sure if this alternative way would work faster.
+                // About id note: the column_name is the same for all information_schema tables, but ordinal_position is not the same between .columns and .key_column_usage, and it simply doesn't exist for statistics, hence why we create a specific $whereaddendumid variable to handle this special case.
+                // TODO? NOT IN takes less resources than LEFT JOIN. A commenter in that article mentions using NOT EXISTS is best. Ref: http://blog.sqlauthority.com/2008/04/22/sql-server-better-performance-left-join-or-not-in/
+                // TODO? LEFT OUTER JOIN can also be rewritten with UNION operator (but would this really be faster? In my tests, not necessarily significantly better, while it makes the query a lot heavier and unreadable...)
 		$sql = "SELECT c.ordinal_position,c.column_name,c.column_default,c.is_nullable,c.data_type,c.column_type,c.character_maximum_length,
 		k.referenced_table_name, k.referenced_column_name, k.constraint_name,
-                s.index_name,
-                e.extraoptions
-		FROM information_schema.COLUMNS as c
-		LEFT JOIN information_schema.key_column_usage as k
-		ON (k.column_name=c.column_name AND k.table_name=c.table_name AND k.table_schema=c.table_schema)
-                LEFT JOIN information_schema.statistics as s
-                ON (s.column_name=c.column_name AND s.table_name=c.table_name AND s.table_schema=c.table_schema)
-                LEFT JOIN ".$this->extratable." as e
-                ON (e.table_name=c.table_name AND e.column_name=c.column_name)
-		WHERE c.table_schema = '".$this->db->database_name."' AND c.table_name = '".$this->moduletable."' ".$whereaddendum."
-		ORDER BY c.ordinal_position;"; // We filter the reserved columns so that the user  cannot alter them, even by mistake and we get only the specified field by id
+                s.index_name
+		FROM (SELECT * FROM information_schema.columns
+                  WHERE ".$where.$whereaddendumid.") as c
+		LEFT OUTER JOIN (SELECT * FROM information_schema.key_column_usage
+                  WHERE ".$where.") as k USING(table_schema, table_name, column_name)
+                LEFT OUTER JOIN (SELECT * FROM information_schema.statistics
+                  WHERE ".$where.") as s USING(table_schema, table_name, column_name)
+		ORDER BY c.ordinal_position;";
 
 		// Trigger or not?
 		if ($notrigger) {
@@ -739,60 +690,45 @@ class CustomFields extends compatClass4 // extends CommonObject
 		} else { // else we fill the field
 			$num = $this->db->num_rows($resql); // number of lines returned as a result to our sql statement
 
-			// -- Several fields columns returned = array() of field objects
+                        // Preparing the cache
+                        if (isset($cachepath) and $cachepath and strlen($cachepath) > 0) { // if $cachepath is defined (custom cache path)
+                            eval("\$cpath = &$cachepath;"); // if a cachepath is supplied, we use it (by making a reference to the path)
+                        } elseif (!isset($cachepath)) { // if $cachepath is null (default path)
+                            $cpath = &$this->fields; // else we just use the default cache path ($this->fields)
+                            $cachepath = true;
+                        } // else if $cachepath is false, then do not store the cache
+
+			// Several fields columns returned = array() of field objects
 			if ($num > 1) {
 				$field = array();
-                                // Fetch every row from the request (there is no database access at this stage, we only get the result from our already processed query)
 				for ($i=0;$i < $num;$i++) {
-					$obj = $this->fetch_object($resql); // we retrieve the data line
-					$obj->size = $this->getFieldSizeOrValue($obj->column_type); // add the real size of the field (character_maximum_length is not reliable for that goal)
+					$obj = $this->fetch_object($resql); // we retrieve the data as an object
+					$obj->size = $this->getFieldSizeOrValue($obj->column_type); // add the real size of the field (character_maximum_length is not reliable for that goal, so we get it from the column_type)
 					$obj->id = $obj->ordinal_position; // set the id (ordinal position in the database's table)
 					$field[$obj->id] = $obj; // we store the field object in an array
 
-                                        // unserialize extra options with json
-                                        if ($obj->extraoptions) $obj->extra = json_decode($obj->extraoptions);
-
-                                        // SQL compatibility mode: if the DBMS does not support foreign keys and referential integrity checks, we use the extra options to store and fetch the infos about the constrained field
-                                        if (isset($obj->extra->referenced_table_name) and empty($obj->referenced_table_name)) $obj->referenced_table_name = $obj->extra->referenced_table_name;
-                                        if (isset($obj->extra->referenced_column_name) and empty($obj->referenced_column_name)) $obj->referenced_column_name = $obj->extra->referenced_column_name;
-
-                                        // we store the field object in an array
-                                        $field[$obj->id] = $obj;
+                                        if ($cachepath) { // if cachepath is not false
+                                            $column_name = $obj->column_name; // we get the column name of the field
+                                            $cpath->$column_name = $obj; // and we as well store the field as a property of the CustomFields class (caching for quicker access next time)
+                                        }
 				}
-
-                                // Sort fields by their position
-                                usort($field, 'customfields_cmp_obj');
-
-                                // Store in cache (in CustomFields object)
-                                foreach ($field as $obj) {
-                                    $column_name = $obj->column_name; // we get the column name of the field
-                                    $this->fields->$column_name = $obj; // and we as well store the field as a property of the CustomFields class (caching for quicker access next time)
-                                }
-
-			// -- Only one field returned = one field object
+			// Only one field returned = one field object
 			} elseif ($num == 1) {
 				$field = $this->fetch_object($resql);
 
 				$field->size = $this->getFieldSizeOrValue($field->column_type); // add the real size of the field (character_maximum_length is not reliable for that goal)
 				$field->id = $field->ordinal_position; // set the id (ordinal position in the database's table)
 
-                                // unserialize extra options with json
-                                if ($field->extraoptions) $field->extra = json_decode($field->extraoptions);
-
-                                // SQL compatibility mode: if the DBMS does not support foreign keys and referential integrity checks, we use the extra options to store and fetch the infos about the constrained field
-                                if (isset($field->extra->referenced_table_name) and empty($field->referenced_table_name)) $field->referenced_table_name = $field->extra->referenced_table_name;
-                                if (isset($field->extra->referenced_column_name) and empty($field->referenced_column_name)) $field->referenced_column_name = $field->extra->referenced_column_name;
-
-                                // Store in cache (in CustomFields object)
-				$column_name = $field->column_name; // we get the column name of the field
-				$this->fields->$column_name = $field; // and we as well store the field as a property of the CustomFields class
-
-			// -- No field returned = null
+                                if ($cachepath) { // if cachepath is not false
+                                    $column_name = $field->column_name; // we get the column name of the field
+                                    $cpath->$column_name = $field; // and we as well store the field as a property of the CustomFields class (caching for quicker access next time)
+                                }
+			// No field returned = null
 			} else {
 				$field = null;
 			}
 
-			$this->db->free($resql); // free last request (sparing a bit of memory)
+			$this->db->free($resql);
 
 			// Return the field
 			return $field;
@@ -801,11 +737,15 @@ class CustomFields extends compatClass4 // extends CommonObject
 
        /**
 	*    Fetch ALL the fields sql definitions from the database (not the records! See fetch and fetchAll to fetch records)
-	*    @param     nohide	defines if the system fields (primary field and foreign key) must be hidden in the fetched results
-	*    @return     int/null/obj[]         <0 if KO, null if no field found, an array of fields objects if OK (even if only one field is found)
+	*    Note: this is mainly an alias for fetchFieldStruct but that always return an array (ease the processing since you don't have to care about if only one object is returned or multiple, you just do a foreach loop).
+	*    @param    $nohide			false/true - defines if the two system fields (primary field and foreign key) must be hidden in the fetched results
+	*    @param    $table                           null/string - null to fetch the customfields structure for the current module, or can be set to any table if you want to get the structure of another table's fields
+	*    @param    $cachepath                null/false/string - enable caching of the fields structure inside this instance of CustomFields object. false: disable caching; null (default): default path ($this->fields->custom_field_column_name); string: a path can be specified to replace the default cache path (mainly used when you fetch the structure of another table than CustomFields and to avoid overwriting CustomFields structures cache) (eg: $this->$table_name->anything, and your field's structure will be accessible with $this->$table_name->anything->custom_field_column_name)
+	*    @param    $notrigger                   false/true - enable (default) or disable the activation of a trigger when this function is called
+	*    @return     int/null/obj[]                 <0 if KO, null if no field found, an array of fields objects if OK (even if only one field is found)
 	*/
-       function fetchAllFieldsStruct($nohide=false, $notrigger=0) {
-		$fields = $this->fetchFieldStruct(null, $nohide, $notrigger);
+       function fetchAllFieldsStruct($nohide=false, $table=null, $cachepath=null, $notrigger=0) {
+		$fields = $this->fetchFieldStruct(null, $nohide, $table, $cachepath, $notrigger);
 		if ( !(is_array($fields) or is_null($fields) or is_integer($fields)) ) { $fields = array($fields); } // we convert to an array if we've got only one field, functions relying on this one expect to get an array if OK
 		return $fields;
        }
@@ -856,103 +796,91 @@ class CustomFields extends compatClass4 // extends CommonObject
 		}
        }
 
-       /**
-	*    Load the sql informations about a field from the database
-	*    @param	    table		table where to search in
-	*    @param     name      column_name to search
-	*    @return     obj         <-1 if KO, field if OK
-	*/
-       function fetchReferencedField($table='', $name='', $notrigger = 0) {
-
-		if (!empty($table)) {
-			$sqltable = $table;
-		} else {
-			$sqltable = $this->moduletable;
-		}
-		if (!empty($name)) {
-			$sqlname = $name;
-		} else {
-			$sqlname = $this->fetchPrimaryField($sqltable); // if no referenced column name defined, we get the name of the primary field of the referenced table
-		}
-		// Forging the SQL statement
-		$sql = "SELECT c.ordinal_position,c.column_name,c.column_default,c.is_nullable,c.data_type,c.column_type,c.character_maximum_length,
-		k.referenced_table_name, k.referenced_column_name, k.constraint_name,
-                s.index_name
-		FROM information_schema.COLUMNS as c
-		LEFT JOIN information_schema.key_column_usage as k
-		ON (k.column_name=c.column_name AND k.table_name=c.table_name AND k.table_schema=c.table_schema)
-                LEFT JOIN information_schema.statistics as s
-                ON (s.column_name=c.column_name AND s.table_name=c.table_name AND s.table_schema=c.table_schema)
-		WHERE c.table_schema ='".$this->db->database_name."' AND c.table_name = '".$sqltable."' AND c.column_name = '".$sqlname."'
-		ORDER BY c.ordinal_position;";
-
-		// Trigger or not?
-		if ($notrigger) {
-			$trigger = null;
-		} else {
-			$trigger = strtoupper($this->module).'_CUSTOMFIELD_FETCHREFFIELD';
-		}
-
-		// Executing the SQL statement
-		$resql = $this->executeSQL($sql,__FUNCTION__.'_CustomFields',$trigger);
-
-		// Filling the field object
-		if ($resql < 0) { // if there's no error
-			return $resql; // we return the error code
-
-		} else { // else we fill the field
-			$obj = null;
-			if ($this->db->num_rows($resql) > 0) {
-			    $obj = $this->fetch_object($resql);
-
-			    $obj->size = $this->getFieldSizeOrValue($obj->column_type); // add the real size of the field (character_maximum_length is not reliable for that goal)
-			}
-			$this->db->free($resql);
-
-			// Return the field
-			return $obj;
-		}
-       }
-
 	/**
 	 *	Check in the database if a field column name exists in a table
-	 *	@param	$table	table name
-	 *	@param	$name	column name
+	 *	@param	$reftable	table name
+	 *	@param	$refname	column name
+	 *	@param        $name           optional, used to specify where to cache (this should be the name of the current constrained field) - only useful if $caching is enabled
+	 *	@param        $caching       if checking a constrained field, you can specify to cache all fields of the referenced table to accelerate further accesses
 	 *	@return	false if KO, true if OK
 	 */
-	function checkIfIdenticalFieldExistsInRefTable($table, $name) {
-		$fieldref = $this->fetchReferencedField($table, $name);
-		if (isset($fieldref)) {
-			if ( !($fieldref <= 0)) { // Special feature : if the customfield has a column name similar to one in the linked table, then we show the values of this field instead
-				return true;
-			 } else {
-				return false;
-			 }
+	function checkIfFieldExists($refname, $reftable=null, $name=null, $caching=false) {
+		// If caching is disabled, we simply fetch the referenced field
+                if (!$caching) {
+                    $fieldref = $this->fetchFieldStruct($refname, true, $reftable, false);
+                // Else if caching is enabled...
+                } else {
+                    // ...we check if the referenced were already accessed and cached, and if that's not the case...
+                    if (!isset($name) or !isset($this->referenced_fields->$reftable)) {
+                        // ...we just fetch the whole referenced table once and cache all its fields for next time (so that next time this table is accessed by whatever customfield, it will directly access the cache instead of the database)
+                        $fieldref = $this->fetchAllFieldsStruct(true, $reftable, '$this->referenced_fields->'.$reftable);
+                    } // Now the referenced table and all its fields structures is cached in any case
+
+                    // If the searched field's name exists in the cache of the table, ...
+                    if (isset($this->referenced_fields->$reftable->$refname)) {
+                        // ... then it's ok
+                        $fieldref = $this->referenced_fields->$reftable->$refname;
+                    } else {
+                        // else it doesn't exists in the table (since the cache is up-to-date, if the field cannot be found in the cache then it doesn't exist at all)
+                        $fieldref = null;
+                    }
+                }
+
+                // Return code
+		if (isset($fieldref) and !($fieldref <= 0)) { // check that a field was found (returned value not null), and that it's not an error code (int <= 0)
+		    return true; // if ok then return true
 		} else {
-			return false;
+		    return false; // else it's KO
 		}
 	}
 
        /**
-	*    Load the records from a specified table and for the specified column name (plus another field with a column name identical to the $field->column_name)
-	*    @param	   field		the constrained field (which contains a non-null referenced_column_name property)
-	*    @return     obj[]         <-1 if KO, array of records if OK
+	*    Load from a constrainted field, the records from the referenced table by this constrainted field, fetching the primary column/rowid values to be used as keys + one or several fields values concatenated to be printed as values in a html select
+	*    Also contain Smart Value Substitution for constrained fields (the feature that depending on the name, it will check similar columns names in the referenced table to fetch one or several fields values and concatenate them to then print them as values instead of just the rowid)
+	*
+	*    @param	   field		the constrained field as an object with the field's structure (which contains a non-null referenced_column_name property)
+	*    @return     obj[]         <-1 if KO, array of records if OK (with 1st value = rowid/primary column, and maybe 2nd value = smart value substitution from other fields in the same table)
 	*/
        function fetchReferencedValuesList($field, $notrigger = 0) {
 
-		// -- Forging the sql statement
+                if (empty($field->referenced_table_name)) return null; // return null if there's no referenced table
 
-		// First field : the referenced one
-		$sqlfields = $field->referenced_column_name;
-		$orderby = $field->referenced_column_name; // by default we order by this field (generally rowid)
-		// Second field (if it exists) : one that has the same name as the customfield
-		$realrefcolumn=explode('_', $field->column_name); // we take only the first part of the column name, before _ char (so you can name fkid_mylabel and it will look for the foreign fkid column)
-		if ( $this->checkIfIdenticalFieldExistsInRefTable($field->referenced_table_name, $realrefcolumn[0]) ) { // Special feature : if the customfield has a column name similar to one in the linked table, then we show the values of this field instead
-			$sqlfields.=','.$realrefcolumn[0];
-			$orderby = $realrefcolumn[0]; // if a second field is found, we order by this one (eg: a list of name is better ordered alphabetically)
-		}
+		// -- Smart Value Substitution for constrained fields
+                // Description: break the customfield's name depending on a separator (by default '_'), and then check if each part corresponds to a field in the referenced table (if yes, we will show these fields as the value, instead of the rowid/primary field)
 
-		$sql = 'SELECT '.$sqlfields.' FROM '.$field->referenced_table_name.' ORDER BY '.$orderby.';';
+                $sqlfields = array(); // will contain all the sql fields in the end
+		$realrefcolumns=explode($this->svsdelimiter, $field->column_name); // split the customfield's name into several parts depending on the separator (by default '_', eg: if you name the customfield 'fkid_mylabel', it will look for the foreign 'fkid' column)
+                // Check if each part has a corresponding column in the referenced table, or not
+                foreach ($realrefcolumns as $refcol) {
+                    if ( $this->checkIfFieldExists($refcol, $field->referenced_table_name, $field->column_name, true) ) { // Check...
+                        array_push($sqlfields, $refcol); // If it has a corresponding column, then we push this column into the sql fields array that we keep for later usages
+                    }
+                }
+
+                // -- Forging the sql statement
+
+                // List of fields to fetch...
+                if (count($sqlfields) > 1) { // ... if several corresponding foreign fields were found, we must concatenate all these fields in one to process them nicely (functions relying on this one expect one [rowid] or two fields [rowid, $field->column_name] at most, not more)
+                    $concat = 'CONCAT('.implode(",' ',", $sqlfields).') as '.$field->column_name;
+                    $sqlfields = array($concat);
+                } elseif (count($sqlfields) == 1) { // ... else if there is only one corresponding foreign field, we still have to make an alias to get coherent (so that the second field can still be accessed with the customfield's name: $field->column_name)
+                    $sqlfields[0] .= ' as '.$field->column_name;
+                } // ... else, no corresponding foreign field was found, the array is empty, we don't have to do anything
+
+                // Adding the rowid/primary field, this is ALWAYS needed as this is the key that will be used when selecting a value (this id is unique, names and other values can make collisions)
+                array_unshift($sqlfields, $field->referenced_column_name); // Adding it at the first position in the array, this is important
+
+                // Order by...
+                if (count($sqlfields) > 1) { // ... the smart substituted value if a corresponding foreign field was found...
+                    $orderby = $field->column_name; // (eg: a list of name is better ordered alphabetically)
+                } else { // ... else, there's only the rowid/primary field ...
+                    $orderby = $field->referenced_column_name; // by default we order by this field (generally rowid)
+                }
+
+
+                // Final touch, crafting the final sql request
+		$sql = 'SELECT '.implode(',', $sqlfields).' FROM '.$field->referenced_table_name.' ORDER BY '.$orderby.';';
+
 
 		// Trigger or not?
 		if ($notrigger) {
@@ -1024,7 +952,7 @@ class CustomFields extends compatClass4 // extends CommonObject
 	*    @param      id          id object
 	*    @return     int or string         <-1 if KO, name of primary column if OK
 	*/
-       function fetchPrimaryField($table, $notrigger = 0) {
+       function fetchPrimaryField($table, $fallback=true, $notrigger = 0) {
 
 		// Forging the SQL statement
 		$sql = "SELECT column_name
@@ -1043,15 +971,38 @@ class CustomFields extends compatClass4 // extends CommonObject
 
 		// Filling in all the fetched fields into an array of fields objects
 		if ($resql < 0) { // if there's an error in the SQL
-			return $resql; // return the error code
+                    $errmsg = $this->db->lasterror();
+		    $this->error.=($this->error?', '.$errmsg:$errmsg);
+		    return $resql; // return the error code
 		} else {
 			$tables = array();
+                        // If there is at least one result, we fetch the first one (in case there are multiple primary keys, but this is theoretically impossible with mysql, but is possible in sql standard)
 			if ($this->db->num_rows($resql) > 0) {
 				$obj = $this->db->fetch_array($resql);
-			}
+                                $prifield = $obj[0]; // get the column_name of the first field (normally there should be only one ayway)
+                        // else, no primary field could be found (but there wasn't any sql error, so probably the table has no primary field set, this happens on Views for example)
+			} elseif ($fallback) {
+                            $fields = $this->fetchFieldStruct(null, true, $table, false);
+                            // if a field could be found in the table structure, we fetch the first one
+                            if (!empty($fields)) {
+                                $arr = (array)$fields; // convert to an array so that we can access the first field (impossible with objects without knowing the name of the property)
+                                $firstfield=reset($arr); // access the first field
+                                $prifield=$firstfield->column_name; // store the column_name of the first field
+                            // if there is no field at all in this table, then we return an error
+                            } else {
+                                $prifield = -1;
+                            }
+			} else {
+                            $prifield = -1;
+                        }
 			$this->db->free($resql);
 
-			return $obj[0]; // we return the string value of the column name of the primary field
+                        if (!is_string($prifield) and $prifield < 0) {
+                            $errmsg = "No primary field could be found in the specified table $table!";
+                            $this->error.=($this->error?', '.$errmsg:$errmsg);
+                        }
+
+			return $prifield; // we return the string value of the column name of the primary field
 		}
        }
 
@@ -1061,19 +1012,11 @@ class CustomFields extends compatClass4 // extends CommonObject
 	*	@return	< 0 if KO, > 0 if OK
 	*/
 	function deleteCustomField($id, $notrigger = 0) {
-		// Get the column_name
-                if (empty($id)) {
-                    $this->errors[] = 'Empty value';
-                    $this->error .= 'Empty value';
-                    return -1;
-                } elseif (is_numeric($id)) { // if it's an id (ordinal_position), we must fetch the column_name from db
-                    // Fetch the customfield object (so that we get all required informations to proceed to deletion : column_name, index and foreign key constraints if any)
-                    $field = $this->fetchFieldStruct($id);
-                    // Get the column name from the id
-                    $fieldname = $field->column_name;
-                } else { // else it's already a column_name
-                    $fieldname = $id;
-                }
+
+		// Fetch the customfield object (so that we get all required informations to proceed to deletion : column_name, index and foreign key constraints if any)
+		$field = $this->fetchFieldStruct($id);
+		// Get the column name from the id
+		$fieldname = $field->column_name;
 
 		// Delete the associated constraint if exists
 		$this->deleteConstraint($id);
@@ -1091,14 +1034,7 @@ class CustomFields extends compatClass4 // extends CommonObject
 		// Executing the SQL statement
 		$rtncode = $this->executeSQL($sql,__FUNCTION__.'_CustomFields',$trigger);
 
-                // Delete the extra options record associated with this field
-                $rtncode2 = 1;
-                if ($rtncode >= 0) {
-                    $sqle = "DELETE FROM ".$this->extratable." WHERE table_name='".$this->moduletable."' AND column_name='".$fieldname."';";
-                    $rtncode2 = $this->executeSQL($sqle,__FUNCTION__.'_CustomFields',$trigger);
-                }
-
-		return min($rtncode, $rtncode2);
+		return $rtncode;
 	}
 
 	/**	Delete a constraint for a customfield
@@ -1143,97 +1079,71 @@ class CustomFields extends compatClass4 // extends CommonObject
 	 *	@param	customdef	custom sql definition that will be appended to the definition generated automatically (so you can add sql parameters the author didn't foreseen)
 	 *	@param	customsql	custom sql statement that will be executed after the creation/update of the custom field (so that you can make complex statements)
 	 *	@param	fieldid		id of the field to update (ordinal position). Leave this null to create the custom field, supply it if you want to update (or just use updateCustomField which is a simpler alias)
-	 *	@param        extra               object which properties will be stored as extra options (can be anything). Extra options already stored in the database will be kept, unless a new value for a property is explicitly defined, in which case the option in the database is overwritten (you can set a property to null to erase it)
 	 *	@param	notrigger	do not activate triggers?
 	 *
 	 *	@return -1 if KO, 1 if OK
 	 */
-	function addCustomField($fieldname, $type, $size, $nulloption, $defaultvalue = null, $constraint = null, $customtype = null, $customdef = null, $customsql = null, $fieldid = null, $extra = null, $notrigger = 0) {
+	function addCustomField($fieldname, $type, $size, $nulloption, $defaultvalue = null, $constraint = null, $customtype = null, $customdef = null, $customsql = null, $fieldid = null, $notrigger = 0) {
 
-            // Cleaning input vars
-            $defaultvalue = $this->db->escape(trim($defaultvalue));
-            //$size = $this->db->escape(trim($size)); // NOTE: $size can contain enum values too !
-            //$customtype = $this->db->escape(trim($customtype));
-            //$customdef = $this->db->escape(trim($customdef));
-            //$customsql = $this->db->escape(trim($customsql));
+		// Cleaning input vars
+		$defaultvalue = $this->db->escape(trim($defaultvalue));
+		//$size = $this->db->escape(trim($size)); // NOTE: $size can contain enum values too !
+		//$customtype = $this->db->escape(trim($customtype));
+		//$customdef = $this->db->escape(trim($customdef));
+		//$customsql = $this->db->escape(trim($customsql));
 
-            if (!empty($fieldid)) {
-                $mode = "update";
-            } else {
-                $mode = "add";
-            }
+		if (!empty($fieldid)) {
+			$mode = "update";
+		} else {
+			$mode = "add";
+		}
 
-            // Delete the associated constraint if exists (the function will check if a constraint exists, if true then it will be deleted)
-            if (!empty($fieldid)) {
-                $this->deleteConstraint($fieldid);
-            }
+		// Delete the associated constraint if exists
+		if (!empty($fieldid)) {
+			$this->deleteConstraint($fieldid);
+		}
 
-            // Automatically get the type of the field from constraint
-            if (!empty($constraint)) {
-                $prfieldname = $this->fetchPrimaryField($constraint);
-                $prfield = $this->fetchReferencedField($constraint,$prfieldname);
+		// Automatically get the type of the field from constraint
+		if (!empty($constraint)) {
+			$prifieldname = $this->fetchPrimaryField($constraint);
+			$prifield = $this->fetchFieldStruct($prifieldname, true, $constraint);
 
-                $type = $prfield->data_type;
-                $nulloption = $prfield->is_nullable;
-                $size = $prfield->size;
-            }
+			$type = $prifield->data_type;
+			//$nulloption = $prifield->is_nullable; // commenting this allows to create constrained fields that accepts null values
+			$size = $prifield->size;
+		}
 
-            // Forging the SQL statement
-            $sql = $this->forgeSQLCustomField($fieldname, $type, $size, $nulloption, $defaultvalue, $customtype, $customdef, $fieldid);
+		// Forging the SQL statement
+		$sql = $this->forgeSQLCustomField($fieldname, $type, $size, $nulloption, $defaultvalue, $customtype, $customdef, $fieldid);
 
-            // Trigger or not?
-            if ($notrigger) {
-                $trigger = null;
-            } else {
-                $trigger = strtoupper($this->module).'_CUSTOMFIELD_'.strtoupper($mode).'FIELD';
-            }
+		// Trigger or not?
+		if ($notrigger) {
+			$trigger = null;
+		} else {
+			$trigger = strtoupper($this->module).'_CUSTOMFIELD_'.strtoupper($mode).'FIELD';
+		}
 
-            // Executing the SQL statement
-            $rtncode1 = $this->executeSQL($sql, $mode.'CustomField_CustomFields',$trigger);
+		// Executing the SQL statement
+		$rtncode1 = $this->executeSQL($sql, $mode.'CustomField_CustomFields',$trigger);
 
-            // Executing the constraint linking if the field is a constrained field
-            $rtncodec = 1;
-            if (!empty($constraint)) {
-                $sqlconstraint = 'ALTER TABLE '.$this->moduletable.' ADD CONSTRAINT fk_'.$fieldname.' FOREIGN KEY ('.$fieldname.') REFERENCES '.$constraint.'('.$prfield->column_name.');';
-                $rtncodec = $this->executeSQL($sqlconstraint, $mode.'ConstraintCustomField_CustomFields',$trigger);
+		// Executing the custom sql request if defined
+		$rtncodec = 1;
+		if (!empty($constraint)) {
+			$sqlconstraint = 'ALTER TABLE '.$this->moduletable.' ADD CONSTRAINT fk_'.$fieldname.' FOREIGN KEY ('.$fieldname.') REFERENCES '.$constraint.'('.$prifield->column_name.');';
+			$rtncodec = $this->executeSQL($sqlconstraint, $mode.'ConstraintCustomField_CustomFields',$trigger);
+		}
 
-                // Mirroring constraint in the extra options (compatibility mode for MyIsam, without foreign keys constrained field will still work!)
-                if (!isset($extra) or !is_object($extra)) $extra = new stdClass();
-                $extra->referenced_table_name = $constraint;
-                $extra->referenced_column_name = $prifield->column_name;
-            } else {
-                // If there is no constraint, we remove the constraints in extra options (the deletion of foreign keys are done above)
-                if (!isset($extra) or !is_object($extra)) $extra = new stdClass();
-                $extra->referenced_table_name = null; // we don't unset because we want the variable to stay, but null
-                $extra->referenced_column_name = null;
-            }
+		$rtncode2 = 1;
+		if (!empty($customsql)) {
+			$rtncode2 = $this->executeSQL($customsql, $mode.'CustomSQLCustomField_CustomFields',$trigger);
+		}
 
-            // Executing the custom sql request if defined
-            $rtncode2 = 1;
-            if (!empty($customsql)) {
-                $rtncode2 = $this->executeSQL($customsql, $mode.'CustomSQLCustomField_CustomFields',$trigger);
-            }
-
-            // Executing the update/creation (upsert) of the extra options in the extra table
-            $rtncode3 = 1; // final return code for this part
-            // Upsert extra options only if the custom field was successfully created/updated (else we shouldn't modify the extra table anyway, kind of a rollback)
-            if ($rtncode1 >= 0) {
-                if (!isset($extra) or !is_object($extra)) $extra = new stdClass(); // necessary to have a properly formatted $extra (an object) prior to call the setExtra() function
-                if ($mode == 'update') {
-                    // update mode, we have an id and we update the extra options (or even the column name) for this field
-                    $rtncode3 = $this->setExtra($fieldid, $extra, $fieldname);
-                } else {
-                    // else we are in create mode: we just have a column_name and create an all-new entry in the extra options table
-                    $rtncode3 = $this->setExtra($fieldname, $extra, $fieldname);
-                }
-            }
-
-            // Return code : -1 error or 1 OK
-            if (min($rtncode1, $rtncode2, $rtncodec, $rtncode3) < 0) { // If there was at least one error, we return -1
-                return -1;
-            } else { // Else everything's OK
-                return 1;
-            }
+		// Return code : -1 error or 1 OK
+		if ($rtncode1 < 0 or $rtncode2 < 0 or $rtncodec < 0) {
+			return -1;
+		} else {
+			return 1;
+		}
 	}
 
 	/*	Update a customfield's definition (will create the field if it does not exists)
@@ -1242,84 +1152,9 @@ class CustomFields extends compatClass4 // extends CommonObject
 	*
 	*	@return -1 if KO, 1 if OK
 	*/
-	function updateCustomField($fieldid, $fieldname, $type, $size, $nulloption, $defaultvalue, $constraint = null, $customtype = null, $customdef = null, $customsql = null, $extra = null, $notrigger = 0) {
-	    return $this->addCustomField($fieldname, $type, $size, $nulloption, $defaultvalue, $constraint, $customtype, $customdef, $customsql, $fieldid, $extra, $notrigger);
+	function updateCustomField($fieldid, $fieldname, $type, $size, $nulloption, $defaultvalue, $constraint = null, $customtype = null, $customdef = null, $customsql = null, $notrigger = 0) {
+		return $this->addCustomField($fieldname, $type, $size, $nulloption, $defaultvalue, $constraint, $customtype, $customdef, $customsql, $fieldid, $notrigger);
 	}
-
-        /** Set the extra options of one custom field
-         *  TODO: function to do it in batch for several custom fields at once
-         *
-         *  @param  int/string  $fieldid ordinal_position or column_name of the field to modify
-         *  @param  object  $extra  object with properties that should be saved as extra options (just use a stdClass() object and append any property you want)
-         *  @param  string  $newfieldname (optional)    internal variable used to update the field in addCustomField(). You should not be caring about this.
-         *
-         *  @return < 0 if KO, > 0 if OK
-         *
-         */
-        function setExtra($fieldid, $extra, $newfieldname=null, $notrigger = 0) {
-            // Quit if we don't have the required variables in the required format
-            if (!isset($fieldid) or !is_object($extra)) {
-                $this->addError('setExtra: fieldid or extra not in the appropriate format.');
-                return -1;
-            }
-
-            // Fetch the customfield's structure
-            $field = $this->fetchFieldStruct($fieldid);
-
-            // Merge two objects: the already existent extra options for this field (from the db), plus the extra options given in parameters of this function
-            if (isset($field->extra)) {
-                $fullextra = (object) array_merge((array) $field->extra, (array) $extra); // note: user provided $extra options overrides the ones already stored for the field in case when there are identical keys in both
-            } else {
-                $fullextra = $extra;
-            }
-            // JSON encode + reversable escape for special characters (such as single quote, else it won't work with SQL!)
-            $fullextraoptions = $this->escape(json_encode($fullextra));
-
-            // Upsert (update + insert)
-            // create mode: in case there is no previous field record, we just take the $newfieldname
-            /*
-            if (isset($field->column_name)) {
-                $oldfieldname = $field->column_name;
-            } else {
-                $oldfieldname = $newfieldname;
-            }
-            */
-            $oldfieldname = $field->column_name;
-            // update mode with column_name changing: in case a $newfieldname is supplied, we will change the column_name (internal usage for addCustomField() function).
-            if (!empty($newfieldname)) {
-                $fieldname = $newfieldname;
-            } else {
-                $fieldname = $oldfieldname;
-            }
-
-            // Cross-DBMS implementation of Upsert, see for more infos http://en.wikipedia.org/wiki/Upsert
-            $sqle1 = "UPDATE ".$this->extratable." SET table_name='".$this->moduletable."', column_name='".$fieldname."', extraoptions='".$fullextraoptions."' WHERE column_name='".$oldfieldname."';";
-            /* DOESN'T WORK! this SHOULD work, but it doesn't because MySQL put a lock on the composite primary keys, and it then produces an error that shouldn't happen. There exist other solutions, but none of them are standard.
-            $sqle2 = "INSERT INTO ".$this->extratable." (table_name, column_name, extraoptions)
-                            SELECT '".$this->moduletable."', '".$fieldname."', '".$fullextraoptions."'
-                            FROM ".$this->extratable."
-                            WHERE NOT EXISTS (SELECT 1 FROM ".$this->extratable." WHERE table_name='".$this->moduletable."' AND column_name='".$fieldname."');"; // TODO: bug: the record will only be inserted (eg: in the case the field was created before the extraoptions table was created with an older release of this module) if there is at least ONE record in the extra table, else the SELECT returns nothing at all! Fix to make this sql works everytime? But how to do that with every possible DBMS without using DUAL (since it's not standard)?
-            */
-            $sqle2 = "INSERT INTO ".$this->extratable." (table_name, column_name, extraoptions)
-                            VALUES ('".$this->moduletable."', '".$fieldname."', '".$fullextraoptions."')";
-
-            // Trigger or not?
-            if ($notrigger) {
-                    $trigger = null;
-            } else {
-                    $trigger = strtoupper($this->module).'_'.$fieldid.'_CUSTOMFIELD_SETEXTRA';
-            }
-
-            // Execute the upsert of the extra options record
-            // update first
-            $rtncode = $this->executeSQL($sqle1, __FUNCTION__.'CustomFields', $trigger);
-
-            // insert after (this will fail if the extra options record already exists anyway, because we have a composite primary key for table_name + column_name, so there can be no duplicates)
-            $this->db->query($sqle2); // Note: this WILL produce an error in case the record already exists, but we don't care (because we have no workaround thank's to MySQL...)
-
-            // Return the error code
-            return $rtncode;
-        }
 
 
 	// ============ FIELDS PRINTING FUNCTIONS ===========/
@@ -1327,124 +1162,144 @@ class CustomFields extends compatClass4 // extends CommonObject
 	/**
 	 *     Return HTML string to put an input field into a page
 	 *     @param      field             Field object
-	 *     @param      currentvalue           Current value of the parameter (will be filled in the value attribute of the HTML field)
+	 *     @param      currentvalue           null/string/array - Current value of the parameter (will be filled in the value attribute of the HTML field) - null: default column value; string: value will be selected and printed; array (format: array[i][0] = id, array[i][1] = value): will force the function to print a select box with the given array of ids/values
 	 *     @param      moreparam       To add more parametes on html input tag
 	 *     @return       out			An html string ready to be printed
 	 */
 	function showInputField($field,$currentvalue=null,$moreparam='') {
-		global $conf, $langs;
+            global $conf, $langs;
 
-		$key=$field->column_name;
-		$label=$langs->trans($key);
-		$type=$field->data_type;
-		if ($field->column_type == 'tinyint(1)') { $type = 'boolean'; }
-		$size=$this->character_maximum_length;
-		if (empty($currentvalue)) { $currentvalue = $field->column_default;}
+            // Init vars
+            $key=$field->column_name;
+            $label=$langs->trans($key);
+            $type=$field->data_type;
+            if ($field->column_type == 'tinyint(1)') { $type = 'boolean'; }
+            $size=$this->character_maximum_length;
+            if (!isset($currentvalue) or !strlen($currentvalue)) { $currentvalue = $field->column_default;}
 
-		if ($type == 'date') {
-		    $showsize=10;
-		} elseif ($type == 'datetime') {
-		    $showsize=19;
-		} elseif ($type == 'int') {
-		    $showsize=10;
-		} else {
-		    $showsize=round($size);
-		    if ($showsize > 48) $showsize=48; // max show size limited to 48
-		}
+            if ($type == 'date') {
+                $showsize=10;
+            } elseif ($type == 'datetime') {
+                $showsize=19;
+            } elseif ($type == 'int') {
+                $showsize=10;
+            } else {
+                $showsize=round($size);
+                if ($showsize > 48) $showsize=48; // max show size limited to 48
+            }
 
-		$out = ''; // var containing the html output
-		// Constrained field
-		if (!empty($field->referenced_column_name)) {
+            $out = ''; // var containing the html output
 
-			/*
-			$tables = $this->fetchAllTables();
-			$tables = array_merge(array('' => $langs->trans('None')), $tables); // Adding a none choice (to avoid choosing a constraint or just to delete one)
-			$html=new Form($this->db);
-			$out.=$html->selectarray($this->varprefix.$key,$tables,$field->referenced_table_name);
-			*/
+            // == Managing cases of special printing
+            // 1st special case: custom array of ids/values crafted from a custom sql request (see customfields_fields_extend_lib.php)
+            if (is_array($currentvalue)) {
+                $out.='<select name="'.$this->varprefix.$key.'">';
+                foreach ($currentvalue as $record) {
+                    $id = $record['id'];
+                    $value = $record['value'];
+                    if (isset($record['selected']) and $record['selected'] = true) {
+                        $selected = 'selected="selected"';
+                    } else {
+                        $selected = '';
+                    }
+                    $out.='<option value="'.$id.'" '.$selected.'>'.$langs->trans($value).'</option>';
+                }
+                $out.='</select>';
+            // 2nd special case: Constrained field
+            } elseif (!empty($field->referenced_column_name)) {
 
-			// -- Fetch the records (list of values)
-			$refarray = $this->fetchReferencedValuesList($field);
+                /*
+                $tables = $this->fetchAllTables();
+                $tables = array_merge(array('' => $langs->trans('None')), $tables); // Adding a none choice (to avoid choosing a constraint or just to delete one)
+                $html=new Form($this->db);
+                $out.=$html->selectarray($this->varprefix.$key,$tables,$field->referenced_table_name);
+                */
 
-			// -- Print the list
+                // -- Fetch the records (list of values)
+                $refarray = $this->fetchReferencedValuesList($field);
 
-			// Special feature : if the customfield has a column name similar to one in the linked table, then we show the values of this field instead
-			$key1 = $field->referenced_column_name;
-			if (count((array)$refarray[0]) > 1) {
-				$realrefcolumn=explode('_', $field->column_name); // we take only the first part of the column name, before _ char (so you can name fkid_mylabel and it will look for the foreign fkid column)
-				$key2 = $realrefcolumn[0];
-			} else {
-				$key2 = $field->referenced_column_name;
-			}
+                // -- Print the list
 
-			$out.='<select name="'.$this->varprefix.$key.'">';
-			$out.='<option value=""></option>'; // Empty option
-			foreach ($refarray as $ref) {
-				if ($ref->$key1 == $currentvalue) {
-					$selected = 'selected="selected"';
-				} else {
-					$selected = '';
-				}
-				$out.='<option value="'.$ref->$key1.'" '.$selected.'>'.$ref->$key2.'</option>';
-			}
-			$out.='</select>';
+                // Special feature : smart value substitution for constrained fields : if the customfield has a column name similar to one (or several) in the linked table, then we show the values of this field instead
+                $key1 = $field->referenced_column_name; // main key is the rowid (or whatever is called the primary field for the referenced table) - this allows to avoid confusion when selecting values (since this key necessarily has a unique value, since it's a SQL primary field)
+                // Second key: value that will be shown
+                if (count((array)$refarray[0]) > 1) { // Either we substitute based on the name of the customfield
+                    $key2 = $field->column_name; // the value will necessarily be stored in a field called by the customfield's name (because we name it like this in fetchReferencedValuesList() ).
+                } else { // Either we just show the first key (rowid/primary field) as the value
+                    $key2 = $field->referenced_column_name;
+                }
 
-		// Normal non-constrained fields
-		} else {
-			if ($type == 'varchar') {
-				$out.='<input type="text" name="'.$this->varprefix.$key.'" size="'.$showsize.'" maxlength="'.$size.'" value="'.$currentvalue.'"'.($moreparam?$moreparam:'').'>';
-			} elseif ($type == 'text') {
-				require_once(DOL_DOCUMENT_ROOT."/core/class/doleditor.class.php");
-				$doleditor=new DolEditor($this->varprefix.$key,$currentvalue,'',200,'dolibarr_notes','In',false,false,$conf->fckeditor->enabled && $conf->global->FCKEDITOR_ENABLE_SOCIETE,5,100);
-				$out.=$doleditor->Create(1);
-			} elseif ($type == 'date') {
-				//$out.=' (YYYY-MM-DD)';
-				$html=new Form($db);
-				$out.=$html->select_date($currentvalue,$this->varprefix.$key,0,0,1,$this->varprefix.$key,1,1,1);
-			} elseif ($type == 'datetime') {
-				//$out.=' (YYYY-MM-DD HH:MM:SS)';
-				if (empty($currentvalue)) { $currentvalue = 'YYYY-MM-DD HH:MM:SS'; }
-				$out.='<input type="text" name="'.$this->varprefix.$key.'" size="'.$showsize.'" maxlength="'.$size.'" value="'.$currentvalue.'"'.($moreparam?$moreparam:'').'>';
-			} elseif ($type == 'enum') {
-				$out.='<select name="'.$this->varprefix.$key.'">';
-				// cleaning out the enum values and exploding them into an array
-				$values = trim($field->size);
-				$values = str_replace("'", "", $values); // stripping single quotes
-				$values = str_replace('"', "", $values); // stripping double quotes
-				$values = explode(',', $values); // values of an enum are stored at the same place as the size of the other types. We explode them into an array (easier to walk and process)
-				foreach ($values as $value) {
-					if ($value == $currentvalue) {
-						$selected = 'selected="selected"';
-					} else {
-						$selected = '';
-					}
-					$out.='<option value="'.$value.'" '.$selected.'>'.$langs->trans($value).'</option>';
-				}
-				$out.='</select>';
-			} elseif ($type == 'boolean') {
-				$out.='<select name="'.$this->varprefix.$key.'">';
-				$out.='<option value="1" '.($currentvalue=='1'?'selected="selected"':'').'>'.$langs->trans("True").'</option>';
-				$out.='<option value="false" '.($currentvalue=='false'?'selected="selected"':'').'>'.$langs->trans("False").'</option>';
-				$out.='</select>';
+                // Printing a select with all the values and keys
+                $out.='<select name="'.$this->varprefix.$key.'">';
+                if (strtolower($field->is_nullable) == 'yes') $out.='<option value=""></option>'; // Empty option if null is allowed for this field
+                foreach ($refarray as $ref) {
+                    if ($ref->$key1 == $currentvalue) {
+                        $selected = 'selected="selected"';
+                    } else {
+                        $selected = '';
+                    }
+                    $out.='<option value="'.$ref->$key1.'" '.$selected.'>'.$ref->$key2.'</option>';
+                }
+                $out.='</select>';
 
-			// Any other field
-			} else { // for all other types (custom types and other undefined), we use a basic text input
-				$out.='<input type="text" name="'.$this->varprefix.$key.'" size="'.$showsize.'" maxlength="'.$size.'" value="'.$currentvalue.'"'.($moreparam?$moreparam:'').'>';
-			}
-		}
+            // 3rd case: Normal non-constrained fields
+            } else {
+                if ($type == 'varchar') {
+                    $out.='<input type="text" name="'.$this->varprefix.$key.'" size="'.$showsize.'" maxlength="'.$size.'" value="'.$currentvalue.'"'.($moreparam?$moreparam:'').'>';
+                } elseif ($type == 'text') {
+                    require_once(DOL_DOCUMENT_ROOT."/core/class/doleditor.class.php");
+                    $doleditor=new DolEditor($this->varprefix.$key,$currentvalue,'',200,'dolibarr_notes','In',false,false,$conf->fckeditor->enabled && $conf->global->FCKEDITOR_ENABLE_SOCIETE,5,100);
+                    $out.=$doleditor->Create(1);
+                } elseif ($type == 'date') {
+                    //$out.=' (YYYY-MM-DD)';
+                    $html=new Form($this->db);
+                    $out.=$html->select_date($currentvalue,$this->varprefix.$key,0,0,1,$this->varprefix.$key,1,1,1);
+                } elseif ($type == 'datetime') {
+                    //$out.=' (YYYY-MM-DD HH:MM:SS)';
+                    if (empty($currentvalue)) { $currentvalue = 'YYYY-MM-DD HH:MM:SS'; }
+                    $out.='<input type="text" name="'.$this->varprefix.$key.'" size="'.$showsize.'" maxlength="'.$size.'" value="'.$currentvalue.'"'.($moreparam?$moreparam:'').'>';
+                } elseif ($type == 'enum') {
+                    $out.='<select name="'.$this->varprefix.$key.'">';
+                    // cleaning out the enum values and exploding them into an array
+                    $values = trim($field->size);
+                    $values = str_replace("'", "", $values); // stripping single quotes
+                    $values = str_replace('"', "", $values); // stripping double quotes
+                    $values = explode(',', $values); // values of an enum are stored at the same place as the size of the other types. We explode them into an array (easier to walk and process)
+                    foreach ($values as $value) {
+                        if ($value == $currentvalue) {
+                            $selected = 'selected="selected"';
+                        } else {
+                            $selected = '';
+                        }
+                        $out.='<option value="'.$value.'" '.$selected.'>'.$langs->trans($value).'</option>';
+                    }
+                    $out.='</select>';
+                } elseif ($type == 'boolean') {
+                    $out.='<select name="'.$this->varprefix.$key.'">';
+                    $out.='<option value="1" '.($currentvalue=='1'?'selected="selected"':'').'>'.$langs->trans("True").'</option>';
+                    $out.='<option value="false" '.($currentvalue=='0'?'selected="selected"':'').'>'.$langs->trans("False").'</option>';
+                    $out.='</select>';
+
+                // Any other field
+                } else { // for all other types (custom types and other undefined), we use a basic text input
+                    $out.='<input type="text" name="'.$this->varprefix.$key.'" size="'.$showsize.'" maxlength="'.$size.'" value="'.$currentvalue.'"'.($moreparam?$moreparam:'').'>';
+                }
+            }
 
 	    return $out;
 	}
 
 	/**
 	 *	Draw an input form (same as showInputField but produce a full form with an edit button and an action)
-	 *	@param	$field	field object
-	 *	@param	$currentvalue	current value of the field (will be set in the value attribute of the HTML input field)
-	 *	@param	$page	URL of the page that will process the action (by default, the same page)
-	 *	@param	$moreparam	More parameters
-	 *	@return	$out			An html form ready to be printed
+	 *	@param        $id                         id of the object in database (generally stored in GETPOST('id') or GETPOST('rowid'))
+	 *	@param	$field	               field object
+	 *	@param	$currentvalue     current value of the field (will be set in the value attribute of the HTML input field)
+	 *	@param        $idvar                   name of the variable that holds the id for this module (generally 'id', but can be 'rowid', 'facid', 'socid', etc..)
+	 *	@param	$page	               URL of the page that will process the action (by default, the same page)
+	 *	@param	$moreparam      More parameters
+	 *	@return	$out                      An html form ready to be printed
 	 */
-	function showInputForm($field, $currentvalue=null, $page=null, $moreparam='') {
+	function showInputForm($id, $field, $currentvalue=null, $idvar='id', $page=null, $moreparam='') {
 		global $langs;
 
 		$out = '';
@@ -1452,8 +1307,9 @@ class CustomFields extends compatClass4 // extends CommonObject
 		if (empty($page)) { $page = $_SERVER["PHP_SELF"]; }
 		$name = $this->varprefix.$field->column_name;
 		$out.='<form method="post" action="'.$page.'" name="form_'.$name.'">';
-		$out.='<input type="hidden" name="action" value="set_'.$name.'">';
-		$out.='<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
+		$out.='<input type="hidden" name="action" value="set_'.$name.'">'; // action (just a 'set_mycustomfield')
+                $out.='<input type="hidden" name="'.$idvar.'" value="'.$id.'">'; // Pass on the ID (necessary to correctly reload the page and to save the new value)
+		$out.='<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">'; // Newtoken is needed, it's generated by Dolibarr, and is needed so that the form is accepted
 		$out.='<table class="nobordernopadding" cellpadding="0" cellspacing="0">';
 		$out.='<tr><td>';
 		$out.=$this->showInputField($field, $currentvalue, $moreparam);
@@ -1482,11 +1338,26 @@ class CustomFields extends compatClass4 // extends CommonObject
 		if (isset($value)) {
 			// Constrained field
 			if (!empty($field->referenced_column_name) and !empty($value)) {
-				// Special feature : if the customfield has a column name similar to one in the linked table, then we show the values of this field instead
-				$realrefcolumn=explode('_', $field->column_name); // we take only the first part of the column name, before _ char (so you can name fkid_mylabel and it will look for the foreign fkid column)
-				if ( $this->checkIfIdenticalFieldExistsInRefTable($field->referenced_table_name, $realrefcolumn[0]) ) {
+				// Special feature : if the customfield has one or several column names similar to one in the linked table, then we show the values of this (these) field(s) instead
+				$sqlfields = array();
+                                $realrefcolumns=explode($this->svsdelimiter, $field->column_name); // we take only the first part of the column name, before _ char (so you can name fkid_mylabel and it will look for the foreign fkid column)
+                                // Check which field should be "linked" in the referenced table (simply put, which fields exist there)
+                                foreach ($realrefcolumns as $refcol) {
+                                    if ( $this->checkIfFieldExists($refcol, $field->referenced_table_name, $field->column_name, true) ) { // Special feature : if the customfield has a column name similar to one in the linked table, then we show the values of this field instead
+                                        array_push($sqlfields, $refcol); // store each field that found a correspondance (that exists)
+                                    }
+                                }
+                                // Forging the columns sql request
+                                if (count($sqlfields) > 1) { // if there are several correspondances, we concatenate all fields in one
+                                    $concat = 'CONCAT('.implode(",' ',", $sqlfields).') as '.$field->column_name;
+                                    $sqlfields = array($concat);
+                                } elseif (count($sqlfields) == 1) { // if there is only one, then we still set an alias so that the field's name is still coherent (the customfield's name)
+                                    $sqlfields[0] .= ' as '.$field->column_name;
+                                } // else, there's no correspondance, we will just show the raw value (rowid/primary field's value) - nothing to do
+                                // Forging the output
+				if (!empty($sqlfields)) {
 					// Constructing the sql statement
-					$column = $realrefcolumn[0];
+					$column = $sqlfields[0]; // TODO: ok here the array is not useful at all, but this way the code above is the same as in fetchReferencedValuesList()
 					$table = $field->referenced_table_name;
 					$where = $field->referenced_column_name.'='.$value;
 
@@ -1494,7 +1365,7 @@ class CustomFields extends compatClass4 // extends CommonObject
 					$record = $this->fetchAny($column, $table, $where);
 
 					// Outputting the value
-					$out.= $record->$column;
+					$out.= $record[0]->{$field->column_name}; // in the format $record->$column_name where $column_name is the current customfield's name (generally it's stored in $field->column_name)
 				// Else we just print out the value of the field
 				} else {
 					$out.=$value;
@@ -1540,6 +1411,7 @@ class CustomFields extends compatClass4 // extends CommonObject
 
 	/**
 	 *	Simplify the printing of the value of a field by accepting a string field name instead of an object
+	 *	Note: this function caches fields structure and then reuse it automatically to reduce overload when calling multiple times this function (actually it is pretty efficient for CPU and memory!).
 	 *	@param	fieldname	string field name of the field to print
 	 *	@param	value		value to show (current value of the field)
 	 *	@param	outputlangs	for multilingual support
@@ -1563,6 +1435,7 @@ class CustomFields extends compatClass4 // extends CommonObject
 
 	/**
 	 *	Same as simpleprintField but for PDF (without html entities)
+	 *	Note: this function caches fields structure and then reuse it automatically to reduce overload when calling multiple times this function (actually it is pretty efficient for CPU and memory!).
 	 *	@param	fieldname	string field name of the field to print
 	 *	@param	value		value to show (current value of the field)
 	 *	@param	outputlangs	for multilingual support
@@ -1625,61 +1498,6 @@ class CustomFields extends compatClass4 // extends CommonObject
             if (count($matchs) > 0) $fieldname = substr($fieldname, strlen($this->varprefix)); // strip the prefix if prefix detected
 
             return $fieldname;
-        }
-
-        /** Add an error in the array + automatically format them in a single nice imploded string
-         *
-         * @param   string/array  $errormsg   error message to add (can be an array or a single string)
-         *
-         * @return  true
-         *
-         */
-        function addError($errormsg) {
-            // Stack error message(s) in the local array
-            if (is_array($errormsg)) {
-                array_push($this->errors, $errormsg);
-            } else {
-                $this->errors[] = $errormsg;
-            }
-
-            // Refresh the concatenated string of all errors
-            $this->error = implode(";\n", $this->errors);
-
-            return true;
-        }
-
-        /** Easy function to print the errors encountered by CustomFields (if any)
-         *
-         *  @param  string  $error  string error message to print, null = customfield's errors will be printed
-         *
-         *  @return     bool        true if an error was printed, false if nothing was printed
-         */
-        function printErrors($error=null) {
-            // either take an input error message, or use customfield's saved errors
-            if (!empty($error)) {
-                $mesg = $error;
-            } else {
-                //$this->error = implode(";\n", $this->errors);
-                $mesg = $this->error;
-            }
-
-            // If there is/are errors
-            if (!empty($mesg)) {
-                // Print error messages
-                if (function_exists('setEventMessage')) {
-                    setEventMessage($mesg, 'errors'); // New way since Dolibarr v3.3
-                } elseif (function_exists('dol_htmloutput_errors')) {
-                    dol_htmloutput_errors($mesg); // Old way to print error messages
-                } else {
-                    print('<pre>');
-                    print($mesg); // if no other error printing function was found, we just print out the errors with a basic html formatting
-                    print('</pre>');
-                }
-
-                return true;
-            } else {
-                return false;
-            }
         }
 
 }

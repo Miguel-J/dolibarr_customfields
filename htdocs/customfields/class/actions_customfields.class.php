@@ -4,7 +4,7 @@
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * at your option any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -38,7 +38,7 @@ class ActionsCustomFields // extends CommonObject
      */
     function customfields_print_forms($printtype, $parameters, $object, $action = null) {
         global $conf, $user;
-         // CustomFields : print fields at creation and edition (will prepare the data for the printing library in lib folder)
+        // CustomFields : print fields at creation and edition (will prepare the data for the printing library in lib folder)
         if ($conf->global->MAIN_MODULE_CUSTOMFIELDS) { // if the customfields module is activated...
             if (!is_object($parameters)) $parameters = (object)$parameters; // fix for a bug of $parameters which is not always an object (sometimes it's an array)
 
@@ -48,46 +48,84 @@ class ActionsCustomFields // extends CommonObject
             if (!isset($action)) $action = GETPOST('action'); // Get action var if it was not set
 
             // Preparing the CustomFields print arguments
-            if ($parameters->context == 'invoicecard' or $object->table_element == 'facture') { // for invoices
-                $currentmodule = 'facture';
-                $idvar = 'facid';
-                $rights = 'facture';
-            }
-            elseif ($parameters->context == 'propalcard' or $object->table_element == 'propal') { // for propales
-                $currentmodule = 'propal'; // EDIT ME: var to edit for each module
-                $idvar = 'id'; // EDIT ME: the name of the POST or GET variable that contains the id of the object (look at the URL for something like module.php?modid=3&... when you edit a field)
-                $rights = 'propale'; // EDIT ME: try first to put it null, then if it doesn't work try to find the right name (search in the same file for something like $user->rights->modname where modname is the string you must put in $rights).
-            }
-            elseif ($parameters->context == 'productcard' or $object->table_element == 'product') { // for products/services
+            if ($parameters->context == 'productcard' or $object->table_element == 'product') { // for products/services (can't be generic because rights differ between products and services, but the database is the same! Only the $object->type allows to make the difference...)
                 $currentmodule = 'product';
                 $idvar = 'id';
                 // We use different rights depending on the product type (product or service?)
                 // we need to supply it in the $rights var because product module has not the same name in rights property
                 if ($object->type == 0) {
-                        $rights = 'produit';
+                        $rights = '$user->rights->produit->creer';
                 } elseif ($object->type == 1) {
-                        $rights = 'service';
+                        $rights = '$user->rights->service->creer';
                 }
             }
-            else { // Generic Hook : else we try a generic approach, based on the $modulesarray keys (contexts) and values (table_element)
+            else { // Generic Hook : else we try a generic approach, based on the $modulesarray (contexts, table_element, idvar, etc..)
                 include(dirname(__FILE__).'/../conf/conf_customfields.lib.php');
-                if (isset($modulesarray[$parameters->context])) {
-                    $currentmodule = $modulesarray[$parameters->context];
-                }
-                elseif (in_array($object->table_element, $modulesarray)) {
-                    $currentmodule = $object->table_element;
+                include_once(dirname(__FILE__).'/../conf/conf_customfields_func.lib.php');
+
+
+                // -- Search if a similar context can be found in $modulesarray (array of supported modules by CustomFields) - must be done first!
+                // Get module's contexts: Contexts are stored as a string separated by ':', so we split it to an array
+                $contexts = explode(':', $parameters->context);
+                $found = false; // will be used to make sure that once we've found the module's parameters, we won't search anymore
+
+                // Get array of supported contexts by CustomFields
+                $supportedcontexts = array_values_recursive('context', $modulesarray);
+                $supportedcontexts = array_flip($supportedcontexts); // switch them to keys (isset() is a lot faster than in_array() )
+
+                foreach ($contexts as $context) { // for each contexts
+                    // if the context is supported by CustomFields
+                    if (isset($supportedcontexts[$context])) {
+                        $tmpmod = array_extract_recursive(array('context'=>$context), $modulesarray); // Extract the subarray containing the found context
+                        // If there are multiple results with the same context (happens with object and object's lines, eg: invoices and invoices products lines), we make the difference by table_element (because necessarily they must have a different table, else it's meaningless)
+                        if (count($tmpmod) > 1) {
+                            $tmpmod = array_extract_recursive(array('table_element'=>$object->table_element), $tmpmod);
+                        }
+
+                        if (count($tmpmod) > 0 // check that at least one result was returned (if misconfiguration in CF config file, it may happen that there's no result)
+                            and ( isset($tmpmod[0]['table_element']) and $object->table_element == $tmpmod[0]['table_element'] ) ) { // and that the table_element of the result is valid (if not, we will search by table_element, since table_element is MORE important than context for the rest of CustomFields code as well as Dolibarr since table_element is linked to the database)
+                            $currentmodule = $tmpmod[0]['table_element']; // Assign the module's name (table_element)
+
+                            $found = true; // set found flag (if it's false, this will mean that the foreach loop has terminated without finding any valid context, and thus we will launch another search)
+                            break; // break because we only need at least one valid context to know if we have to print customfields or not
+                        }
+                    }
                 }
 
+                // -- Search if a similar table_element (Dolibarr's module) can be found in $modulesarray - only if the module could not be found by context!
+                if (!$found and in_array($object->table_element, array_values_recursive('table_element', $modulesarray))) {
+                    $currentmodule = $object->table_element;
+                    // Extract the subarray containing the found context (necessary to set further parameters)
+                    $tmpmod = array_extract_recursive(array('table_element'=>$object->table_element), $modulesarray);
+                }
+
+                // -- Set a few more parameters
+                // set id variable if specified in $modulesarray (by default = 'id')
+                if (isset($tmpmod[0]['idvar'])) $idvar = $tmpmod[0]['idvar'];
+                // set rights  if specified
+                if (isset($tmpmod[0]['rights'])) $rights = $tmpmod[0]['rights'];
             }
 
             include_once(dirname(__FILE__).'/../lib/customfields_printforms.lib.php');
             print '<br>';
 
-            if ($printtype == 'create') {
-                $action == 'edit' ?  $id = $object->id : $id = null; // If we are in a create form used to edit already instanciated fields, then we fetch the instanciated object by its id
-                customfields_print_creation_form($currentmodule, $id);
-            } else {
-                customfields_print_datasheet_form($currentmodule, $object, $action, $user, $idvar, $rights);
+            // Print the customfields forms
+            if ($printtype == 'create') { // Creation page: all customfields are editable at once
+                if ($action == 'edit' or $action == 'editline' or $action == 'edit_line') {
+                    // Fetch the $object id
+                    if (!empty($object->rowid)) { // Prefer the rowid when available (generally more reliable)
+                        $objid = $object->rowid;
+                    } else {
+                        $objid = $object->id;
+                    }
+
+                    $id = $objid; // If we are in a create form used to edit already instanciated fields, then we fetch the instanciated object by its id
+                } else {
+                    $id = null; // else it's a normal first-time create form, so we don't want to fetch any past value (since there should be none)
+                }
+                customfields_print_creation_form($currentmodule, $object, $parameters, $action, $id);
+            } else { // Datasheet page: customfields are either not editable, or only one is editable at a time
+                customfields_print_datasheet_form($currentmodule, $object, $parameters, $action, $user, $idvar, $rights);
             }
         }
     }
@@ -100,13 +138,61 @@ class ActionsCustomFields // extends CommonObject
         /* print_r($parameters);
             echo "action: ".$action;
             print_r($object); */
+        //print('CUSTOMFIELDS ACTIONS DETECTED'); //debugline
 
-        if (!isset($object->element) or $action == 'create' or $action == 'edit') { // For the special case of edit (create form but used to edit parameters), this case is handled in the customfields lib and in the customfields_print_forms() function above (see $action == 'edit').
-            $printtype = 'create';
+        if (!isset($object->element) or $action == 'create' or $action == 'add' or $action == 'edit') { // For the special case of edit (create form but used to edit parameters), this case is handled in the customfields lib and in the customfields_print_forms() function above (see $action == 'edit').
+            $printtype = 'create'; // show create form: all customfields are editable at once
         } else {
-            $printtype = 'edit';
+            $printtype = 'datasheet'; // show datasheet form: either the customfields aren't edited and we just show their values and an edit button, either we are editing ONE customfield at a time
         }
         $this->customfields_print_forms($printtype, $parameters, $object, $action);
     }
+
+    // Add customfields in forms that adds new lines (eg: products/services lines in invoices, etc..)
+    function formCreateProductOptions($parameters, $object, $action) {
+        //print('CUSTOMFIELDS ACTIONS ADDLINE DETECTED'); //debugline
+
+        // Trick to force $object to point towards the database for products lines, instead of the parent object (stored in $object->table_element_line instead of $object->table_element)
+        $object->table_element = $object->table_element_line;
+        $printtype = 'create';
+
+        // Printing the customfields
+        print('<table>'); // need to pre-create a table here since the hook is contained inside a div instead of table
+        $this->customfields_print_forms($printtype, $parameters, $object, $action);
+        print('</table>');
+    }
+
+    // Add customfields in forms that edit product lines (eg: products/services lines in invoices, etc..)
+    function formEditProductOptions($parameters, $object, $action) {
+        //print('CUSTOMFIELDS ACTIONS PRINTOBJECTLINE DETECTED'); //debugline
+
+        if (!is_object($parameters)) $parameters = (object)$parameters; // trick to make sure that $parameters is an object (sometimes it's an array)
+
+        // Cloning object to avoid modifying the original (the original may be needed below)
+        // If the line object is submitted in $parameters, we use it
+        if (!empty($parameters->line)) {
+            $object2 = clone $parameters->line;
+        // Else we use the $object (which is the parent of the line, eg: invoice is parent of invoice's products lines)
+        } else {
+            $object2 = clone $object;
+        }
+        // Trick to force $object2 to point towards the database for products lines, instead of the parent object (stored in $object->table_element_line instead of $object->table_element)
+        $object2->table_element = $object->table_element_line;
+
+        // Print type: Always show the create form (the edit/datasheet form is not needed here)
+        $printtype = 'create';
+
+        // Printing the customfields
+        print('<table>'); // need to pre-create a table here since the hook is contained inside a div instead of table
+        $this->customfields_print_forms($printtype, $parameters, $object2, $action);
+        print('</table>');
+    }
+
+    /* Add customfields as options in forms that adds new lines for modules that supports it (eg: supplier's orders, etc.)
+    function formCreateProductSupplierOptions($parameters, $object, $action) {
+        print('CUSTOMFIELDS ACTIONS ADDLINE PRODUCT DETECTED'); //debugline
+        //$this->formObjectOptions($parameters, $object, $action);
+    }
+    */
 
 }
