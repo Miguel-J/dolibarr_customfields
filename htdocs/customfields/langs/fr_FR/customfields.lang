@@ -86,4 +86,9 @@ SizeDesc=ex: 256 pour une zone de texte, <br />ou "premier","deuxio","tertio" AV
 SizeNote=Note: requis seulement pour Liste déroulante, pour les autres types vous pouvez laisser ceci vide.
 CustomSQLDefinitionDesc=la définition personnalisée du champ sera ajoutée à la suite de toutes les définitions au-dessus - Type, Taille, etc.
 CustomSQLDesc=sera executée après la création/modification du champ selon les paramètres au-dessus
+
+# Confirm forms
+ConfirmDeleteCustomField=Voulez-vous vraiment supprimer le champ suivant: 
+CautionDataLostForever=ATTENTION: toutes les données stockés dans ce champ seront perdues et irrécupérables!
+DeleteCustomField=Supprimer un champ personnalisé
 ##### COMMENT #####

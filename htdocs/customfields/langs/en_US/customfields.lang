@@ -86,4 +86,9 @@ SizeDesc=eg: 256 for a varchar, or "firstval","secondval","thirdval" WITH the qu
 SizeNote=Note: required for DropdownBox type, otherwise can generally be left empty.
 CustomSQLDefinitionDesc=custom definition of the field to be appended after the above
 CustomSQLDesc=to be triggered after the creation/edition of the field
+
+# Confirm forms
+ConfirmDeleteCustomField=Do you really want to delete the following custom field: 
+CautionDataLostForever=CAUTION: all datas stored in this custom field will be lost forever!
+DeleteCustomField=Delete a custom field
 ##### COMMENT #####

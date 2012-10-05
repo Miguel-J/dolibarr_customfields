@@ -73,7 +73,7 @@ function customfields_fill_object(&$object,$fromobject = null, $outputlangs = nu
         $customfields = new CustomFields($db, $fromobject->table_element_line);
     }
 
-    if (!$customfields->probeCustomFields()) return null; // if the customfields table does not exist (CF not configured for this module), then we simply exit
+    if (!$customfields->probeTable()) return null; // if the customfields table does not exist (CF not configured for this module), then we simply exit
 
     // Fetch the customfields (columns names)
     $columns = $customfields->fetchAllFieldsStruct();
@@ -91,7 +91,7 @@ function customfields_fill_object(&$object,$fromobject = null, $outputlangs = nu
         // Preparing the lines' ids in an array
         $lids = array();
         foreach($linesids as $lineid) {
-            array_push($lids, $lineid->$prifield);
+            $lids[] = $lineid->$prifield;
         }
         // Fetch the (customfields) records of all the lines for this object
         $lines = $customfields->fetch($lids);

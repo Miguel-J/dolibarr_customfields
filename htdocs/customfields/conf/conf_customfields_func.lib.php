@@ -41,7 +41,8 @@ function array_values_recursive($needle, $haystack){
             $result = array_merge($result, array_values_recursive($needle, $v));
         } else {
             if(!strcmp($k, $needle)) {
-                array_push($result, $v);
+                $result[] = $v;
+                //array_push($result, $v);
             }
         }
     }
@@ -79,7 +80,8 @@ function array_extract_recursive($needle, $haystack){
             if (is_array($v)) {
                 $result = array_merge($result, array_extract_recursive($needle, $v)); // search for subarrays
                 if (isset($v[$key]) and !strcmp($v[$key], $value)) { // check that the searched key exists and that the value corresponds (if true, we have a match for this exact pair of key/value)
-                    array_push($result, $v);
+                    $result[] = $v;
+                    // array_push($result, $v); // overhead of function calling, better use $result[] = $v;
                     break; // since the subarray is at least pushed once, we don't want to push it twice because it also contains another $needle pattern, so just break
                 }
             }

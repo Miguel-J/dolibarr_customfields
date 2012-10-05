@@ -84,7 +84,7 @@ function customfields_print_creation_form($currentmodule, $object = null, $param
     include_once(dirname(__FILE__).'/../fields/customfields_fields_extend.lib.php'); // to allow user's function overloading (eg: at printing, at edition, etc..)
     $customfields = new CustomFields($db, $currentmodule);
 
-    if ($customfields->probeCustomFields()) { // ... and if the table for this module exists, we show the custom fields
+    if ($customfields->probeTable()) { // ... and if the table for this module exists, we show the custom fields
         $fields = $customfields->fetchAllFieldsStruct();
         if (isset($id)) $datas = $customfields->fetch($id); // fetching the record - the values of the customfields for this id (if it exists)
         foreach ($fields as $field) {
@@ -143,7 +143,7 @@ function customfields_print_datasheet_form($currentmodule, $object, $parameters,
     include_once(DOL_DOCUMENT_ROOT.'/core/lib/functions.lib.php'); // for images img_edit()
     $customfields = new CustomFields($db, $currentmodule);
 
-    if ($customfields->probeCustomFields()) { // ... and if the table for this module exists, we show the custom fields
+    if ($customfields->probeTable()) { // ... and if the table for this module exists, we show the custom fields
         //print '<table class="border" width="100%">';
 
         if (!empty($object->rowid)) {

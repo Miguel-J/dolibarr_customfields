@@ -63,14 +63,14 @@ $customfields = new CustomFields($db, $currentmodule);
 // **** ACTIONS ****
 if ($action == "set")
 {
-    Header("Location: customfields.php");
+    Header("Location: customfields.php"); // TODO: what's this????
     exit;
 }
 
 // Initialization of the module's customfields (we create the customfields table for this module)
 if ($action == 'init') {
     $rtncode = $customfields->initCustomFields();
-    if ($rtncode > 0) { // If no error, we refresh the page
+    if ($rtncode > 0 and !count($customfields->errors)) { // If no error, we refresh the page
         Header("Location: ".$_SERVER["PHP_SELF"]."?module=".$currentmodule.$tabembedded);
         exit();
     } else { // else we print the errors
@@ -104,7 +104,7 @@ if ($action == 'add' or $action == 'update') {
                     $result=$customfields->updateCustomField($_POST['fieldid'], $_POST['field'],$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql']);
                 }
                 // Error ?
-                if ($result > 0) { // If no error, we refresh the page
+                if ($result > 0 and !count($customfields->errors)) { // If no error, we refresh the page
                     Header("Location: ".$_SERVER["PHP_SELF"]."?module=".$currentmodule.$tabembedded);
                     exit();
                 } else { // else we show the error
@@ -125,11 +125,20 @@ if ($action == 'add' or $action == 'update') {
     }
 }
 
+// Confirmation form to delete a field
+$form = new Form($db);
+if ($action == 'delete')
+{
+    $field = $customfields->fetchFieldStruct($_GET["fieldid"]);
+    $text=$langs->trans('ConfirmDeleteCustomField').' '.$field->column_name."<br />".$langs->trans('CautionDataLostForever');
+    $formconfirm=$form->formconfirm($_SERVER["PHP_SELF"]."?fieldid=".$_GET["fieldid"]."&module=".$currentmodule.$tabembedded,$langs->trans('DeleteCustomField'),$text,'confirm_delete',null,'no',1);
+}
+
 // Deleting a field
-if ($action == 'delete') {
+if ($action == 'confirm_delete') {
     if(isset($_GET["fieldid"])) {
         $result=$customfields->deleteCustomField($_GET["fieldid"]);
-        if ($result >= 0) {
+        if ($result >= 0 and !count($customfields->errors)) {
             Header("Location: ".$_SERVER["PHP_SELF"]."?module=".$currentmodule.$tabembedded);
             exit();
         } else {
@@ -138,7 +147,30 @@ if ($action == 'delete') {
     } else {
         $error++;
         $langs->load("errors");
-        $mesg=$langs->trans("ErrorFieldCanNotContainSpecialCharacters",$langs->transnoentities("AttributeCode"));
+        $mesg=$langs->trans("ErrorNoFieldSelected",$langs->transnoentities("AttributeCode"));
+    }
+}
+
+// Moving customfields action (changing the order)
+if ($action == 'move' and !empty($_GET['offset']) and is_numeric($_GET['offset'])) {
+    if(isset($_GET["fieldid"])) {
+        $offset = $_GET['offset'];
+        $fieldid = $_GET["fieldid"];
+
+        $extra = new stdClass();
+        $field = $customfields->fetchFieldStruct($_GET["fieldid"]);
+        if (!isset($field->extra->position)) {
+            $extra->position = $field->ordinal_position + $offset;
+        } else {
+            $extra->position = $field->extra->position + $offset;
+        }
+        $result = $customfields->setExtra($fieldid, $extra);
+
+        if ($result < 0 or count($customfields->errors) > 0) $mesg=$customfields->error;
+    } else {
+        $error++;
+        $langs->load("errors");
+        $mesg=$langs->trans("ErrorNoFieldSelected",$langs->transnoentities("AttributeCode"));
     }
 }
 
@@ -162,6 +194,8 @@ if (!$tabembedded) {
     print($langs->trans('Description').":<br />".$langs->trans("CustomFieldsLongDescription"));
     dol_fiche_end();
 }
+
+if (isset($formconfirm)) print $formconfirm;
 
 // extract current module's config in CustomFields
 $modarr = array_extract_recursive(array('table_element'=>$currentmodule), $modulesarray);
@@ -192,7 +226,7 @@ if (function_exists('setEventMessage')) {
 }
 
 // Probing if the customfields table exists for this module
-$tableexists = $customfields->probeCustomFields();
+$tableexists = $customfields->probeTable();
 
 // if the table for this module is not created, we ask user if he wants to create it
 if (!$tableexists) {
@@ -223,13 +257,7 @@ if (!$tableexists) {
 
     if ($fieldsarray < 0) { // error
         $error++;
-        $mesg=$customfields->error;
-        // Print error messages
-        if (function_exists('setEventMessage')) {
-            setEventMessage($mesg, 'errors'); // New way since Dolibarr v3.3
-        } else {
-            dol_htmloutput_errors($mesg); // Old way to print error messages
-        }
+        $customfields->printErrors();
     } else {
         // generated rows of the table
         $i = 0; // used to alternate background color
@@ -247,6 +275,9 @@ if (!$tableexists) {
                     print $customfields->varprefix.$obj->column_name;
                     print '</td>';
                     print '<td align="center">';
+                    print '<a href="'.$_SERVER["PHP_SELF"].'?module='.$currentmodule.$tabembedded.'&action=move&offset=-1&fieldid='.$obj->ordinal_position.'">'.img_up().'</a>';
+                    print '<a href="'.$_SERVER["PHP_SELF"].'?module='.$currentmodule.$tabembedded.'&action=move&offset=1&fieldid='.$obj->ordinal_position.'">'.img_down().'</a>';
+                    print '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
                     print '<a href="'.$_SERVER["PHP_SELF"].'?module='.$currentmodule.$tabembedded.'&action=edit&fieldid='.$obj->ordinal_position.'">'.img_edit().'</a>';
                     print '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
                     print '<a href="'.$_SERVER["PHP_SELF"].'?module='.$currentmodule.$tabembedded.'&action=delete&fieldid='.$obj->ordinal_position.'">'.img_delete().'</a>';
