@@ -35,7 +35,7 @@ $langs->load('customfields-user@customfields'); // customfields language support
 // **** EXPANSION VARIABLES ****
 // Here you can edit the values to expand the functionnalities of CustomFields (it will try to automatically manage the changes, if not you can add special cases by yourselves, please refer to the Readme-CF.txt)
 
-$fields_prefix = 'cf_'; // prefix that will be prepended to the variable name of a field for accessing the field's values
+$fieldsprefix = 'cf_'; // prefix that will be prepended to the variable name of a field for accessing the field's values
 
 // $modulesarray contains the modules support and their associated contexts : keys = contexts and values = table_element (the name of the module in the database like llx_product, product is the table_element)
 $modulesarray = array("invoicecard"=>"facture",
