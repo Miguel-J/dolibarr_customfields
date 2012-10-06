@@ -34,11 +34,11 @@ class modCustomFields extends DolibarrModules
 	 *   \brief      Constructor. Define names, constants, directories, boxes, permissions
 	 *   \param      DB      Database handler
 	 */
-	function modCustomFields($DB)
+	function __construct($db)
 	{
         global $langs,$conf;
 
-        $this->db = $DB;
+        $this->db = $db;
 
 		// Id for module (must be unique).
 		// Use here a free id (See in Home -> System information -> Dolibarr for list of used modules id).
@@ -64,8 +64,14 @@ class modCustomFields extends DolibarrModules
 		// If file is in module/img directory under name object_pictovalue.png, use this->picto='pictovalue@module'
 		$this->picto='generic';
 
+                // Defined all module parts (triggers, login, substitutions, menus, etc...) (0=disable,1=enable)
+                $this->module_parts = array('triggers' => 1, 'substitutions' => 1);
+                //$this->module_parts = array('triggers' => 1,
+                //              'login' => 0,
+                //              'substitutions' => 0,
+                //              'menus' => 0);
 		// Defined if the directory /mymodule/includes/triggers/ contains triggers or not
-		$this->triggers = 0;
+		$this->triggers = 1; // TOFIX: can be removed now?
 
 		// Data directories to create when module is enabled.
 		// Example: this->dirs = array("/mymodule/temp");
@@ -76,13 +82,13 @@ class modCustomFields extends DolibarrModules
 		//$this->style_sheet = '/mymodule/mymodule.css.php';
 
 		// Config pages. Put here list of php page names stored in admin directory used to setup module.
-		$this->config_page_url = array("customfields.php");
+		$this->config_page_url = array("customfields.php@customfields");
 
 		// Dependencies
 		$this->depends = array();		// List of modules id that must be enabled if this module is enabled
 		$this->requiredby = array();	// List of modules id to disable if this one is disabled
 		$this->phpmin = array(5,0);					// Minimum version of PHP required by module
-		$this->need_dolibarr_version = array(3,0);	// Minimum version of Dolibarr required by module
+		$this->need_dolibarr_version = array(3,1);	// Minimum version of Dolibarr required by module
 		$this->langfiles = array("customfields@customfields", "customfields-user@customfields");
 
 		// Constants
@@ -90,7 +96,10 @@ class modCustomFields extends DolibarrModules
 		// Example: $this->const=array(0=>array('MYMODULE_MYNEWCONST1','chaine','myvalue','This is a constant to add',1),
 		//                             1=>array('MYMODULE_MYNEWCONST2','chaine','myvalue','This is another constant to add',0) );
 		//                             2=>array('MAIN_MODULE_MYMODULE_NEEDSMARTY','chaine',1,'Constant to say module need smarty',1)
-		$this->const = array();
+		include_once(DOL_DOCUMENT_ROOT.'/customfields/conf/conf_customfields.lib.php');
+		$this->const = array(
+				     0=>array('MAIN_MODULE_CUSTOMFIELDS_HOOKS', 'chaine', implode(':', array_keys($modulesarray)), 'Hooks list for managing printing functions of the CustomFields module', 0, 'current', 1),
+				     );
 
 		// Array to add new pages in new tabs
 		// Example: $this->tabs = array('objecttype:+tabname1:Title1:@mymodule:$user->rights->mymodule->read:/mymodule/mynewtab1.php?id=__ID__',  // To add a new tab identified by code tabname1
@@ -231,18 +240,28 @@ class modCustomFields extends DolibarrModules
 	 */
 	function init()
 	{
-		$sql = array();
+            $sql = array();
 
-		$result=$this->load_tables();
+            $result=$this->load_tables();
 
-		return $this->_init($sql);
+            // Create CustomFields's extraoptions table if it does not exist
+            include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
+            $customfields = new CustomFields($this->db, '');
+            if (!$customfields->probeTableExtra()) {
+                $rtncode = $customfields->initExtraTable();
+
+                // Print error messages if any
+                if ($rtncode < 0 or count($customfields->errors) > 0) $customfields->printErrors();
+            }
+
+            return $this->_init($sql);
 	}
 
 	/**
 	 *		Function called when module is disabled.
-	 *      Remove from database constants, boxes and permissions from Dolibarr database.
+	 *      	Remove from database constants, boxes and permissions from Dolibarr database.
 	 *		Data directories are not deleted.
-	 *      @return     int             1 if OK, 0 if KO
+	 *      	@return     int             1 if OK, 0 if KO
 	 */
 	function remove()
 	{

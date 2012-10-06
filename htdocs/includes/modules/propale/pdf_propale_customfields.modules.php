@@ -118,7 +118,7 @@ class pdf_propale_customfields extends ModelePDFPropales
 		if (! is_object($outputlangs)) $outputlangs=$langs;
 		// For backward compatibility with FPDF, force output charset to ISO, because FPDF expect text to be encoded in ISO
 		$sav_charset_output=$outputlangs->charset_output;
-		if (!class_exists('TCPDF')) $outputlangs->charset_output='ISO-8859-1';
+		if (! empty($conf->global->MAIN_USE_FPDF)) $outputlangs->charset_output='ISO-8859-1';
 
 		$outputlangs->load("main");
 		$outputlangs->load("dict");
@@ -148,7 +148,7 @@ class pdf_propale_customfields extends ModelePDFPropales
 
 			if (! file_exists($dir))
 			{
-				if (create_exdir($dir) < 0)
+				if (dol_mkdir($dir) < 0)
 				{
 					$this->error=$langs->trans("ErrorCanNotCreateDir",$dir);
 					return 0;
@@ -1074,36 +1074,45 @@ class pdf_propale_customfields extends ModelePDFPropales
 	}
 
 	/**
-	 *   	\brief      Show the customfields in a new page
+	 *   	\brief      Show the customfields in a new page (used to debug if CustomFields setup is correct)
 	 *   	\param      pdf     		PDF factory
-	 * 		\param		object			Object invoice
+	 * 		\param		object			Object invoice/propal/product/whatever...
 	 *      \param      outputlangs		Object lang for output
 	 */
 	function _pagecustomfields(&$pdf,$object,$outputlangs)
 	{
 		$default_font_size = pdf_getPDFFontSize($outputlangs);
 
+                if (empty($object->table_element) or empty($object->id)) {
+                    $pdf->MultiCell(0,3, "Current \$object is not compatible with CustomFields, could not find table_element or id.", 0, 'L');
+                    return 1;
+                }
+
 		// Init and main vars
 		include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
-		$customfields = new CustomFields($this->db, '');
+		$customfields = new CustomFields($this->db, $object->table_element);
 
-		// Fetching the list of fields columns
-		//$fields = $customfields->fetchAllCustomFields();
+                // Fetching custom fields records
+                $fields = $customfields->fetch($object->id);
 
-		// Setting the starting position of the text cursor
-		$pdf->SetXY($this->page_largeur - $this->marge_droite - ($pdf->GetStringWidth($titre) + 3), $pdf->GetY()+4);
-		$pdf->SetY($pdf->GetY()+1);
+                if (!isset($fields)) {
+                    $pdf->MultiCell(0,3, "No custom field could be found for this object. Please check your configuration (did you create at least one customfield and set a value in the current datasheet?)", 0, 'L');
+                    return 1;
+                } else {
+                    // Setting the starting position of the text cursor
+                    $pdf->SetXY($this->page_largeur - $this->marge_droite - ($pdf->GetStringWidth($titre) + 3), $pdf->GetY()+4);
+                    $pdf->SetY($pdf->GetY()+1);
 
-		// Printing the customfields
-		foreach ($object->customfields as $field) {
-			$name = $customfields->varprefix.$field->column_name; // name of the property (this is one customfield)
-			$translatedname = $customfields->findLabelPDF($field->column_name, $outputlangs); // label of the customfield
-			$value = $customfields->printFieldPDF($field, $object->$name, $outputlangs); // value (cleaned and properly formatted) of the customfield
+                    // Printing the customfields
+                    foreach ($fields as $key=>$field) {
+                            $translatedname = $customfields->findLabelPDF($key, $outputlangs); // label of the customfield
+                            $value = $customfields->simpleprintFieldPDF($key, $field, $outputlangs); // value (cleaned and properly formatted) of the customfield
 
-			$pdf->SetFont('','B', $default_font_size);
-			$pdf->MultiCell(0,3, $translatedname.': '.$value, 0, 'L'); // printing the customfield
-			$pdf->SetY($pdf->GetY()+1); // line return for the next printing
-		}
+                            $pdf->SetFont('','B', $default_font_size);
+                            $pdf->MultiCell(0,3, $translatedname.': '.$value, 0, 'L'); // printing the customfield
+                            $pdf->SetY($pdf->GetY()+1); // line return for the next printing
+                    }
+                }
 
 		return 1;
 	}

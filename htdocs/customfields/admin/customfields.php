@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2011   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2012   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,15 +19,20 @@
  *	\file       htdocs/admin/customfields.php
  *	\ingroup    others
  *	\brief          Configuring page for custom fields (add/delete/edit custom fields)
- *	\version    $Id: customfields.php, v1.2.0
+ *	\version    $Id: customfields.php, v2.11
  */
 
 // **** INIT ****
-require('../main.inc.php');
-require_once(DOL_DOCUMENT_ROOT."/customfields/conf/conf_customfields.lib.php");
-require_once(DOL_DOCUMENT_ROOT."/customfields/class/customfields.class.php");
-require_once(DOL_DOCUMENT_ROOT."/lib/admin.lib.php");
-require_once(DOL_DOCUMENT_ROOT."/customfields/lib/customfields.lib.php");
+$res=0;
+if (! $res && file_exists(dirname(__FILE__)."/../main.inc.php")) $res=@include(dirname(__FILE__)."/../main.inc.php");			// for root directory
+if (! $res && file_exists(dirname(__FILE__)."/../../main.inc.php")) $res=@include(dirname(__FILE__)."/../../main.inc.php");		// for level1 directory ("custom" directory)
+if (! $res && file_exists(dirname(__FILE__)."/../../../main.inc.php")) $res=@include(dirname(__FILE__)."/../../../main.inc.php");	// for level2 directory
+if (! $res) die("Include of main fails");
+
+require_once(dirname(__FILE__).'/../conf/conf_customfields.lib.php');
+require_once(dirname(__FILE__).'/../class/customfields.class.php');
+require_once(dirname(__FILE__).'/../lib/customfields_printforms.lib.php');
+require_once(DOL_DOCUMENT_ROOT.'/lib/admin.lib.php');
 
 // Security check
 if (!$user->admin)
@@ -55,14 +60,14 @@ $customfields = new CustomFields($db, $currentmodule);
 // **** ACTIONS ****
 if ($action == "set")
 {
-    Header("Location: customfields.php");
+    Header("Location: customfields.php"); // TODO: what's this????
     exit;
 }
 
 // Initialization of the module's customfields (we create the customfields table for this module)
 if ($action == 'init') {
     $rtncode = $customfields->initCustomFields();
-    if ($rtncode > 0) { // If no error, we refresh the page
+    if ($rtncode > 0 and !count($customfields->errors)) { // If no error, we refresh the page
         Header("Location: ".$_SERVER["PHP_SELF"]."?module=".$currentmodule);
         exit();
     } else { // else we print the errors
@@ -96,7 +101,7 @@ if ($action == 'add' or $action == 'update') {
                     $result=$customfields->updateCustomField($_POST['fieldid'], $_POST['field'],$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql']);
                 }
                 // Error ?
-                if ($result > 0) { // If no error, we refresh the page
+                if ($result > 0 and !count($customfields->errors)) { // If no error, we refresh the page
                     Header("Location: ".$_SERVER["PHP_SELF"]."?module=".$currentmodule);
                     exit();
                 } else { // else we show the error
@@ -117,11 +122,20 @@ if ($action == 'add' or $action == 'update') {
     }
 }
 
+// Confirmation form to delete a field
+$form = new Form($db);
+if ($action == 'delete')
+{
+    $field = $customfields->fetchFieldStruct($_GET["fieldid"]);
+    $text=$langs->trans('ConfirmDeleteCustomField').' '.$field->column_name."<br />".$langs->trans('CautionDataLostForever');
+    $formconfirm=$form->formconfirm($_SERVER["PHP_SELF"]."?fieldid=".$_GET["fieldid"]."&module=".$currentmodule,$langs->trans('DeleteCustomField'),$text,'confirm_delete',null,'no',1);
+}
+
 // Deleting a field
-if ($action == 'delete') {
+if ($action == 'confirm_delete') {
     if(isset($_GET["fieldid"])) {
         $result=$customfields->deleteCustomField($_GET["fieldid"]);
-        if ($result >= 0) {
+        if ($result >= 0 and !count($customfields->errors)) {
             Header("Location: ".$_SERVER["PHP_SELF"]."?module=".$currentmodule);
             exit();
         } else {
@@ -130,7 +144,30 @@ if ($action == 'delete') {
     } else {
         $error++;
         $langs->load("errors");
-        $mesg=$langs->trans("ErrorFieldCanNotContainSpecialCharacters",$langs->transnoentities("AttributeCode"));
+        $mesg=$langs->trans("ErrorNoFieldSelected",$langs->transnoentities("AttributeCode"));
+    }
+}
+
+// Moving customfields action (changing the order)
+if ($action == 'move' and !empty($_GET['offset']) and is_numeric($_GET['offset'])) {
+    if(isset($_GET["fieldid"])) {
+        $offset = $_GET['offset'];
+        $fieldid = $_GET["fieldid"];
+
+        $extra = new stdClass();
+        $field = $customfields->fetchFieldStruct($_GET["fieldid"]);
+        if (!isset($field->extra->position)) {
+            $extra->position = $field->ordinal_position + $offset;
+        } else {
+            $extra->position = $field->extra->position + $offset;
+        }
+        $result = $customfields->setExtra($fieldid, $extra);
+
+        if ($result < 0 or count($customfields->errors) > 0) $mesg=$customfields->error;
+    } else {
+        $error++;
+        $langs->load("errors");
+        $mesg=$langs->trans("ErrorNoFieldSelected",$langs->transnoentities("AttributeCode"));
     }
 }
 
@@ -147,12 +184,23 @@ $linkback='<a href="'.DOL_URL_ROOT.'/admin/modules.php">'.$langs->trans("BackToM
 
 print_fiche_titre($langs->trans("CustomFieldsSetup"),$linkback,'setup');
 
+dol_fiche_head();
+print($langs->trans('Description').":<br />".$langs->trans("CustomFieldsLongDescriptionWithAd"));
+dol_fiche_end();
+
+if (isset($formconfirm)) print $formconfirm;
+
 $head = customfields_admin_prepare_head($modulesarray, $currentmodule); // draw modules tabs
 
-dol_htmloutput_errors($mesg); // Print error messages
+// Print error messages that can be returned by various functions
+if (function_exists('setEventMessage')) {
+    setEventMessage($mesg, 'errors'); // New way since Dolibarr v3.3
+} else {
+    dol_htmloutput_errors($mesg); // Old way to print error messages
+}
 
 // Probing if the customfields table exists for this module
-$tableexists = $customfields->probeCustomFields();
+$tableexists = $customfields->probeTable();
 
 // if the table for this module is not created, we ask user if he wants to create it
 if (!$tableexists) {
@@ -179,12 +227,11 @@ if (!$tableexists) {
     print "</tr>";
 
     // generating custom fields list
-    $fieldsarray = $customfields->fetchAllCustomFields();
+    $fieldsarray = $customfields->fetchAllFieldsStruct();
 
     if ($fieldsarray < 0) { // error
         $error++;
-        $mesg=$customfields->error;
-        dol_htmloutput_errors($mesg); // Print error messages
+        $customfields->printErrors();
     } else {
         // generated rows of the table
         $i = 0; // used to alternate background color
@@ -202,6 +249,9 @@ if (!$tableexists) {
                     print $customfields->varprefix.$obj->column_name;
                     print '</td>';
                     print '<td align="center">';
+                    print '<a href="'.$_SERVER["PHP_SELF"].'?module='.$currentmodule.$tabembedded.'&action=move&offset=-1&fieldid='.$obj->ordinal_position.'">'.img_up().'</a>';
+                    print '<a href="'.$_SERVER["PHP_SELF"].'?module='.$currentmodule.$tabembedded.'&action=move&offset=1&fieldid='.$obj->ordinal_position.'">'.img_down().'</a>';
+                    print '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
                     print '<a href="'.$_SERVER["PHP_SELF"].'?module='.$currentmodule.'&action=edit&fieldid='.$obj->ordinal_position.'">'.img_edit().'</a>';
                     print '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
                     print '<a href="'.$_SERVER["PHP_SELF"].'?module='.$currentmodule.'&action=delete&fieldid='.$obj->ordinal_position.'">'.img_delete().'</a>';
@@ -253,7 +303,7 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
     if ($action == 'create') {
         print_titre($langs->trans('NewField'));
     } elseif ($action == 'edit') {
-        $fieldobj = $customfields->fetchCustomField($_GET["fieldid"]); // fetching the field data
+        $fieldobj = $customfields->fetchFieldStruct($_GET["fieldid"]); // fetching the field data
         print_titre($langs->trans('FieldEdition',$fieldobj->column_name));
     }
 

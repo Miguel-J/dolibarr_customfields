@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2011   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2012   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,15 +19,18 @@
  *	\file       htdocs/customfields/conf/conf_customfields.lib.php
  *	\ingroup    others
  *	\brief          Contains all the configurable variables to expand the functionnalities of CustomFields
- *	\version    $Id: customfields.php, v1.2.2
+ *	\version    $Id: customfields.php, v1.2.7
  */
 
 // Loading the translation class if it's not yet loaded (or with another name) - DO NOT EDIT!
 if (! is_object($langs))
 {
     include_once(DOL_DOCUMENT_ROOT."/core/class/translate.class.php");
-    $langs=new Translate("",$conf);
+    $langs=new Translate(dirname(__FILE__).'/../langs/',$conf);
 }
+
+$langs->load('customfields@customfields'); // customfields standard language support
+$langs->load('customfields-user@customfields'); // customfields language support for user's values (like enum, fields names, etc..)
 
 // **** EXPANSION VARIABLES ****
 // Here you can edit the values to expand the functionnalities of CustomFields (it will try to automatically manage the changes, if not you can add special cases by yourselves, please refer to the Readme-CF.txt)
@@ -54,5 +57,10 @@ $sql_datatypes = array( 'varchar' => $langs->trans("Textbox"),
                                              'enum(\'Yes\',\'No\')' => $langs->trans("YesNoBox"),
                                              'boolean' => $langs->trans("TrueFalseBox"),
                                              'enum' => $langs->trans("DropdownBox"),
+                                             'date' => $langs->trans("DateBox"),
+                                             'datetime' => $langs->trans("DateTimeBox"),
+                                             'int' => $langs->trans("Integer"),
+                                             'float' => $langs->trans("Float"),
+                                            'double' => $langs->trans("Double"),
                                              'other' => $langs->trans("Other").'/'.$langs->trans("Constraint"),
                                                 );

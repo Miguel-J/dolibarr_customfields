@@ -194,6 +194,7 @@ if ($action == 'confirm_deleteline' && $confirm == 'yes')
                 $outputlangs = new Translate("",$conf);
                 $outputlangs->setDefaultLang($newlang);
             }
+			$object->fetch($id);
             if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE)) $result=facture_pdf_create($db, $object, '', $object->modelpdf, $outputlangs, GETPOST('hidedetails'), GETPOST('hidedesc'), GETPOST('hideref'));
             if ($result > 0)
             {
@@ -355,6 +356,7 @@ if ($action == 'confirm_valid' && $confirm == 'yes' && $user->rights->facture->v
             $outputlangs = new Translate("",$conf);
             $outputlangs->setDefaultLang($newlang);
         }
+		$object->fetch($id);
         if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE)) facture_pdf_create($db, $object, '', $object->modelpdf, $outputlangs, GETPOST('hidedetails'), GETPOST('hidedesc'), GETPOST('hideref'));
     }
     else
@@ -412,6 +414,7 @@ if ($action == 'modif' && ((empty($conf->global->MAIN_USE_ADVANCED_PERMS) && $us
             $outputlangs = new Translate("",$conf);
             $outputlangs->setDefaultLang($newlang);
         }
+		$object->fetch($id);
         if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE)) facture_pdf_create($db, $object, '', $object->modelpdf, $outputlangs, GETPOST('hidedetails'), GETPOST('hidedesc'), GETPOST('hideref'));
     }
 }
@@ -532,10 +535,6 @@ if ($action == 'confirm_converttoreduc' && $confirm == 'yes' && $user->rights->f
  */
 if ($action == 'add' && $user->rights->facture->creer)
 {
-    foreach ($_POST as $key=>$value) { // Generic way to fill all the fields to the object (particularly useful for triggers and customfields)
-	$object->$key = $value;
-    }
-
     $object->socid=GETPOST('socid');
 
     $db->begin();
@@ -742,6 +741,8 @@ if ($action == 'add' && $user->rights->facture->creer)
 
                         for ($i=0;$i<$num;$i++)
                         {
+                            $desc=($lines[$i]->desc?$lines[$i]->desc:$lines[$i]->libelle);
+
                             if ($lines[$i]->subprice < 0)
                             {
                                 // Negative line, we create a discount line
@@ -769,7 +770,6 @@ if ($action == 'add' && $user->rights->facture->creer)
                             else
                             {
                                 // Positive line
-                                $desc=($lines[$i]->desc?$lines[$i]->desc:$lines[$i]->libelle);
                                 $product_type=($lines[$i]->product_type?$lines[$i]->product_type:0);
 
                                 // Date start
@@ -905,6 +905,11 @@ if (($action == 'addline' || $action == 'addline_predef') && $user->rights->fact
 {
     $result=0;
 
+    if ($_POST['np_price'] < 0 && $_POST["qty"] < 0)
+    {
+        $mesg='<div class="error">'.$langs->trans("ErrorBothFieldCantBeNegative",$langs->transnoentitiesnoconv("UnitPriceHT"),$langs->transnoentitiesnoconv("Qty")).'</div>';
+        $result = -1 ;
+    }
     if (empty($_POST['idprod']) && $_POST["type"] < 0)
     {
         $mesg='<div class="error">'.$langs->trans("ErrorFieldRequired",$langs->transnoentitiesnoconv("Type")).'</div>';
@@ -1062,6 +1067,7 @@ if (($action == 'addline' || $action == 'addline_predef') && $user->rights->fact
             $outputlangs = new Translate("",$conf);
             $outputlangs->setDefaultLang($newlang);
         }
+		$object->fetch($id);
         if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE)) facture_pdf_create($db, $object, '', $object->modelpdf, $outputlangs, GETPOST('hidedetails'), GETPOST('hidedesc'), GETPOST('hideref'));
 
         unset($_POST['qty']);
@@ -1160,6 +1166,7 @@ if ($action == 'updateligne' && $user->rights->facture->creer && $_POST['save'] 
             $outputlangs = new Translate("",$conf);
             $outputlangs->setDefaultLang($newlang);
         }
+		$object->fetch($id);
         if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE)) facture_pdf_create($db, $object, '', $object->modelpdf, $outputlangs, GETPOST('hidedetails'), GETPOST('hidedesc'), GETPOST('hideref'));
     }
 }
@@ -1210,7 +1217,7 @@ if ($action == 'down' && $user->rights->facture->creer)
         $outputlangs = new Translate("",$conf);
         $outputlangs->setDefaultLang($newlang);
     }
-    if (empty($conf->global->MAIN_DISABLE_PDF_AUTOUPDATE)) facture_pdf_create($db, $object, '', $object->modelpdf, $outputlangs, GETPOST('hidedetails'), GETPOST('hidedesc'), GETPOST('hideref'));
+    facture_pdf_create($db, $object, '', $object->modelpdf, $outputlangs, GETPOST('hidedetails'), GETPOST('hidedesc'), GETPOST('hideref'));
 
     Header ('Location: '.$_SERVER["PHP_SELF"].'?facid='.$object->id.'#'.$_GET['rowid']);
     exit;
@@ -1756,14 +1763,6 @@ if ($action == 'create')
         print '</td></tr>';
     }
 
-    // CustomFields : print fields at creation
-    if ($conf->global->MAIN_MODULE_CUSTOMFIELDS) { // if the customfields module is activated...
-	$currentmodule = 'facture'; // EDIT THIS: var to edit for each module
-
-	include_once(DOL_DOCUMENT_ROOT.'/customfields/lib/customfields.lib.php');
-	customfields_print_creation_form($currentmodule);
-    }
-
     // Modele PDF
     print '<tr><td>'.$langs->trans('Model').'</td>';
     print '<td>';
@@ -1893,6 +1892,18 @@ if ($action == 'create')
         }
     }
 
+    // CustomFields : print fields at creation
+    if ($conf->global->MAIN_MODULE_CUSTOMFIELDS) { // if the customfields module is activated...
+        //$object->table_element = 'facture'; // edit me for each module...
+
+        $action = GETPOST('action');
+        if (empty($action)) $action = 'create';
+
+        include_once(DOL_DOCUMENT_ROOT.'/customfields/class/actions_customfields.class.php');
+        $customfieldsactions = new ActionsCustomFields();
+        $customfieldsactions->formObjectOptions($parameters, $object, $action);
+    }
+
     print "</table>\n";
 
     // Button "Create Draft"
@@ -1947,8 +1958,19 @@ else
             if ($object->paye) $resteapayer=0;
             $resteapayeraffiche=$resteapayer;
 
-            $absolute_discount=$soc->getAvailableDiscounts('','fk_facture_source IS NULL');
-            $absolute_creditnote=$soc->getAvailableDiscounts('','fk_facture_source IS NOT NULL');
+            if (! empty($conf->global->FACTURE_DEPOSITS_ARE_JUST_PAYMENTS))
+            {
+                $filterabsolutediscount="fk_facture_source IS NULL";  // If we want deposit to be substracted to payments only and not to total of final invoice
+                $filtercreditnote="fk_facture_source IS NOT NULL";    // If we want deposit to be substracted to payments only and not to total of final invoice
+            }
+            else
+            {
+                $filterabsolutediscount="fk_facture_source IS NULL OR (fk_facture_source IS NOT NULL AND description='(DEPOSIT)')";
+                $filtercreditnote="fk_facture_source IS NOT NULL AND description <> '(DEPOSIT)'";
+            }
+
+            $absolute_discount=$soc->getAvailableDiscounts('',$filterabsolutediscount);
+            $absolute_creditnote=$soc->getAvailableDiscounts('',$filtercreditnote);
             $absolute_discount=price2num($absolute_discount,'MT');
             $absolute_creditnote=price2num($absolute_creditnote,'MT');
 
@@ -2244,9 +2266,8 @@ else
                 else
                 {
                     // Remise dispo de type remise fixe (not credit note)
-                    $filter='fk_facture_source IS NULL';
                     print '<br>';
-                    $html->form_remise_dispo($_SERVER["PHP_SELF"].'?facid='.$object->id, 0,  'remise_id',$soc->id, $absolute_discount, $filter, $resteapayer, ' - '.$addabsolutediscount);
+                    $html->form_remise_dispo($_SERVER["PHP_SELF"].'?facid='.$object->id, GETPOST('discountid'), 'remise_id', $soc->id, $absolute_discount, $filterabsolutediscount, $resteapayer, ' ('.$addabsolutediscount.')');
                 }
             }
             else
@@ -2276,9 +2297,8 @@ else
                 else
                 {
                     // Remise dispo de type avoir
-                    $filter='fk_facture_source IS NOT NULL';
                     if (! $absolute_discount) print '<br>';
-                    $html->form_remise_dispo($_SERVER["PHP_SELF"].'?facid='.$object->id, 0, 'remise_id_for_payment', $soc->id, $absolute_creditnote, $filter, $resteapayer);
+                    $html->form_remise_dispo($_SERVER["PHP_SELF"].'?facid='.$object->id, 0, 'remise_id_for_payment', $soc->id, $absolute_creditnote, $filtercreditnote, $resteapayer);
                 }
             }
             if (! $absolute_discount && ! $absolute_creditnote)
@@ -2623,18 +2643,15 @@ else
                 print '</tr>';
             }
 
+            // CUSTOMFIELDS : Main form printing and editing functions
+            if ($conf->global->MAIN_MODULE_CUSTOMFIELDS) { // if the customfields module is activated...
+                include_once(DOL_DOCUMENT_ROOT.'/customfields/class/actions_customfields.class.php');
+                $customfieldsactions = new ActionsCustomFields();
+                $customfieldsactions->formObjectOptions($parameters, $object, $action);
+            }
+
             print '</table><br>';
 
-
-	    // CUSTOMFIELDS : Main form printing and editing functions
-	    if ($conf->global->MAIN_MODULE_CUSTOMFIELDS) { // if the customfields module is activated...
-		$currentmodule = 'facture'; // EDIT ME: var to edit for each module
-		$idvar = 'id'; // EDIT ME: the name of the POST or GET variable that contains the id of the object (look at the URL for something like module.php?modid=3&...)
-
-		include_once(DOL_DOCUMENT_ROOT.'/customfields/lib/customfields.lib.php');
-		customfields_print_main_form($currentmodule, $object, $action, $user, $idvar);
-
-	    }
 
             /*
              * Lines
@@ -3055,20 +3072,21 @@ else
 
         $facturestatic=new Facture($db);
 
-        $sql = 'SELECT ';
+        if (! $sall) $sql = 'SELECT';
+        else $sql = 'SELECT DISTINCT';
         $sql.= ' f.rowid as facid, f.facnumber, f.type, f.increment, f.total, f.total_ttc,';
         $sql.= ' f.datef as df, f.date_lim_reglement as datelimite,';
         $sql.= ' f.paye as paye, f.fk_statut,';
         $sql.= ' s.nom, s.rowid as socid';
-        if (! $sall) $sql.= ' ,SUM(pf.amount) as am';   // To be able to sort on status
+        if (! $sall) $sql.= ', SUM(pf.amount) as am';   // To be able to sort on status
         $sql.= ' FROM '.MAIN_DB_PREFIX.'societe as s';
-        if (!$user->rights->societe->client->voir && !$socid) $sql.= ", ".MAIN_DB_PREFIX."societe_commerciaux as sc";
+        if (! $user->rights->societe->client->voir && ! $socid) $sql.= ", ".MAIN_DB_PREFIX."societe_commerciaux as sc";
         $sql.= ', '.MAIN_DB_PREFIX.'facture as f';
-        if ($sall) $sql.= ' LEFT JOIN '.MAIN_DB_PREFIX.'facturedet as fd ON fd.fk_facture = f.rowid';
         if (! $sall) $sql.= ' LEFT JOIN '.MAIN_DB_PREFIX.'paiement_facture as pf ON pf.fk_facture = f.rowid';
+        else $sql.= ' LEFT JOIN '.MAIN_DB_PREFIX.'facturedet as fd ON fd.fk_facture = f.rowid';
         $sql.= ' WHERE f.fk_soc = s.rowid';
         $sql.= " AND f.entity = ".$conf->entity;
-        if (!$user->rights->societe->client->voir && !$socid) $sql.= " AND s.rowid = sc.fk_soc AND sc.fk_user = " .$user->id;
+        if (! $user->rights->societe->client->voir && ! $socid) $sql.= " AND s.rowid = sc.fk_soc AND sc.fk_user = " .$user->id;
         if ($socid) $sql.= ' AND s.rowid = '.$socid;
         if ($userid)
         {
@@ -3115,16 +3133,16 @@ else
         {
             $sql.= ' AND f.facnumber LIKE \'%'.$db->escape(trim($search_ref)) . '%\'';
         }
-        if ($sall)
-        {
-            $sql.= ' AND (s.nom LIKE \'%'.$db->escape($sall).'%\' OR f.facnumber LIKE \'%'.$db->escape($sall).'%\' OR f.note LIKE \'%'.$db->escape($sall).'%\' OR fd.description LIKE \'%'.$db->escape($sall).'%\')';
-        }
         if (! $sall)
         {
             $sql.= ' GROUP BY f.rowid, f.facnumber, f.type, f.increment, f.total, f.total_ttc,';
             $sql.= ' f.datef, f.date_lim_reglement,';
             $sql.= ' f.paye, f.fk_statut,';
             $sql.= ' s.nom, s.rowid';
+        }
+        else
+        {
+        	$sql.= ' AND (s.nom LIKE \'%'.$db->escape($sall).'%\' OR f.facnumber LIKE \'%'.$db->escape($sall).'%\' OR f.note LIKE \'%'.$db->escape($sall).'%\' OR fd.description LIKE \'%'.$db->escape($sall).'%\')';
         }
         $sql.= ' ORDER BY ';
         $listfield=explode(',',$sortfield);
@@ -3172,10 +3190,7 @@ else
             print '</td>';
             print '<td class="liste_titre" align="center">';
             print '<input class="flat" type="text" size="1" maxlength="2" name="month" value="'.$month.'">';
-            //print '&nbsp;'.$langs->trans('Year').': '.$syear;
-            //print 'xx'.$syear.'zz';
-            //if ($syear == '') $syear = date("Y");
-            $htmlother->select_year($syear?$syear:-1,'year',1, 20, 5);
+            $htmlother->select_year($year?$year:-1,'year',1, 20, 5);
             print '</td>';
             print '<td class="liste_titre" align="left">&nbsp;</td>';
             print '<td class="liste_titre" align="left">';

@@ -130,10 +130,6 @@ if ($action == 'add' && ($user->rights->produit->creer || $user->rights->service
 
 	$product=new Product($db);
 
-	foreach ($_POST as $key=>$value) { // Generic way to fill all the fields to the object (particularly useful for triggers and customfields)
-		$product->$key = $value;
-	}
-
 	$usecanvas=$_POST["canvas"];
 	if (empty($conf->global->MAIN_USE_CANVAS)) $usecanvas=0;
 
@@ -773,13 +769,18 @@ if ($action == 'create' && ($user->rights->produit->creer || $user->rights->serv
 
 		print "</td></tr>";
 
-		// CustomFields : print fields at creation
-		if ($conf->global->MAIN_MODULE_CUSTOMFIELDS) { // if the customfields module is activated...
-		    $currentmodule = 'product';
+                // CustomFields : print fields at creation
+                if ($conf->global->MAIN_MODULE_CUSTOMFIELDS) { // if the customfields module is activated...
+                    $object = $product;
+                    $object->table_element = 'product'; // edit me for each module...
 
-		    include_once(DOL_DOCUMENT_ROOT.'/customfields/lib/customfields.lib.php');
-		    customfields_print_creation_form($currentmodule);
-		}
+                    $action = GETPOST('action');
+                    if (empty($action)) $action = 'create';
+
+                    include_once(DOL_DOCUMENT_ROOT.'/customfields/class/actions_customfields.class.php');
+                    $customfieldsactions = new ActionsCustomFields();
+                    $customfieldsactions->formObjectOptions($parameters, $object, $action);
+                }
 
 		print '</table>';
 
@@ -833,7 +834,7 @@ if ($action == 'create' && ($user->rights->produit->creer || $user->rights->serv
  * Product card
  */
 
-if ($id || $ref)
+else if ($id || $ref)
 {
 	$product=new Product($db);
 
@@ -1069,13 +1070,13 @@ if ($id || $ref)
 			print '</tr>';
 
 			// Accountancy sell code
-			print '<tr><td>'.$html->editfieldkey("ProductAccountancySellCode",'productaccountancycodesell',$product->accountancy_code_sell,'id',$product->id,$user->rights->produit->creer).'</td><td colspan="2">';
-			print $html->editfieldval("ProductAccountancySellCode",'productaccountancycodesell',$product->accountancy_code_sell,'id',$product->id,$user->rights->produit->creer);
+			print '<tr><td>'.$html->editfieldkey("ProductAccountancySellCode",'productaccountancycodesell',$product->accountancy_code_sell,'id',$product->id,$user->rights->produit->creer|$user->rights->service->creer).'</td><td colspan="2">';
+			print $html->editfieldval("ProductAccountancySellCode",'productaccountancycodesell',$product->accountancy_code_sell,'id',$product->id,$user->rights->produit->creer|$user->rights->service->creer);
 			print '</td></tr>';
 
 			// Accountancy buy code
-			print '<tr><td>'.$html->editfieldkey("ProductAccountancyBuyCode",'productaccountancycodebuy',$product->accountancy_code_buy,'id',$product->id,$user->rights->produit->creer).'</td><td colspan="2">';
-			print $html->editfieldval("ProductAccountancyBuyCode",'productaccountancycodebuy',$product->accountancy_code_buy,'id',$product->id,$user->rights->produit->creer);
+			print '<tr><td>'.$html->editfieldkey("ProductAccountancyBuyCode",'productaccountancycodebuy',$product->accountancy_code_buy,'id',$product->id,$user->rights->produit->creer|$user->rights->service->creer).'</td><td colspan="2">';
+			print $html->editfieldval("ProductAccountancyBuyCode",'productaccountancycodebuy',$product->accountancy_code_buy,'id',$product->id,$user->rights->produit->creer|$user->rights->service->creer);
 			print '</td></tr>';
 
 			// Status (to sell)
@@ -1173,30 +1174,20 @@ if ($id || $ref)
 			// Note
 			print '<tr><td valign="top">'.$langs->trans("Note").'</td><td colspan="2">'.(dol_textishtml($product->note)?$product->note:dol_nl2br($product->note,1,true)).'</td></tr>';
 
+                        // CUSTOMFIELDS : Main form printing and editing functions
+                        if ($conf->global->MAIN_MODULE_CUSTOMFIELDS) { // if the customfields module is activated...
+                            $object = $product;
+                            include_once(DOL_DOCUMENT_ROOT.'/customfields/class/actions_customfields.class.php');
+                            $customfieldsactions = new ActionsCustomFields();
+                            $customfieldsactions->formObjectOptions($parameters, $object, $action);
+                        }
+
 			print "</table>\n";
 		}
 		else
 		{
 			$canvas->assign_values('view');
 			$canvas->display_canvas();
-		}
-
-		// CUSTOMFIELDS : Main form printing and editing functions
-		if ($conf->global->MAIN_MODULE_CUSTOMFIELDS) { // if the customfields module is activated...
-		print '<br>';
-		$currentmodule = 'product';
-		$idvar = 'id';
-
-		// We use different rights depending on the product type (product or service?)
-		// we need to supply it in the $rights var because product module has not the same name in rights property
-		if ($product->type == 0) {
-			$rights = 'produit';
-		} elseif ($product->type == 1) {
-			$rights = 'service';
-		}
-
-		include_once(DOL_DOCUMENT_ROOT.'/customfields/lib/customfields.lib.php');
-		customfields_print_main_form($currentmodule, $product, $action, $user, $idvar, $rights);
 		}
 
 		dol_fiche_end();
