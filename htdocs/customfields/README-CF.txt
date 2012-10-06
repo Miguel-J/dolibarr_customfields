@@ -1,7 +1,7 @@
 =================================================
 *				CUSTOMFIELDS MODULE				*
 *			by Stephen Larroque (lrq3000)		*
-*				version	2.10 (branch v2)		*
+*				version	2.11 (branch v2)		*
 *			for Dolibarr >= 3.2.0				*
 *			release date 2012/10/06				*
 *			last update (see on github)			*
@@ -550,13 +550,15 @@ everything is handled in the hooks class of CustomFields and config file.
 A: This is behaviour is probably due to some of your records containing an illegal value for the new constraint. For example, if you switch your customfield's constraint from your products' table containing 100 products to your you choose the llx_users table containing 2 users, the database won't know what to do with the illegal values higher than 2, so it won't accept the new constraint and set to None.
 In this case, just edit yourself the illegal values, either by fixing them or just deleting all the values for this customfields (but in this case you can just delete the customfields and recreate it).
 
+= Q: After updating CustomFields, I get an error complaining that "the customfields_extraoptions table does not exist"!
+A: Simply disable then renable the CustomFields module on the modules administration page. CustomFields will proceed to the creation of the extraoptions table automatically, and you won't get errors anymore.
+
 ===== TO DO =====
 
 Should do :
 * Add an AJAX select box for constained values : when a constrained type is selected and a table is selected, a hidden select box would show up with the list of the fields of this table to choose the values that will be printed as the values for this customfield (eg: for table llx_users you could select the "nom" field and then it would automatically prepend "nom_" to the field's name).
 * Add a javascript options values generator for the enum type (a hidden input that would be shown only when DropdownBox type is selected and that would permit to add options by clicking a plus button).
 * Add support for other modules
-* Button to reorder the appearance of fields in editing mode (they currently appear in the same order as they were created)
 
 Known bugs :
 * in product and service modules, if you edit a field, the proposals and other fields below won't be shown, you need to refresh the page. This problem resides in Dolibarr I think (since we are simply using a hook).
@@ -566,7 +568,6 @@ Never/Maybe one day :
 * Add support for repeatable (predefined) invoices (the way it is currently managed makes it very difficult to manage this without making a big exception, adding specific functions in customfields modules that would not at all will be reusable anywhere else, when customfields has been designed to be as generic as possible to support any module and any version of dolibarr, because it's managed by a totally different table while it's still managed by the same module, CustomFields work with the paradigm: one module, one table).
 * Add support for clonable propal at creation (same as for repeatable invoices).
 * Add variables to access products or services customfields from tags (is it really useful ? How to use them without modifying the lines printing function ?)
-add custom fields in invoices products lines (custom data per product) -> do this with by adding customfields in the products datasheet directly. This feature may be added in the future if a hook enables it to do it (and it should be fairly easy with such a hook).
 
 ===== SPECIAL THANK'S =====
 - Thank's to Laurent Destailleur for supporting my work and to help me get used to the Dolibarr system.

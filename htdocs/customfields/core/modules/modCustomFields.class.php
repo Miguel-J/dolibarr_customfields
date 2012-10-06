@@ -240,11 +240,21 @@ class modCustomFields extends DolibarrModules
 	 */
 	function init()
 	{
-		$sql = array();
+            $sql = array();
 
-		$result=$this->load_tables();
+            $result=$this->load_tables();
 
-		return $this->_init($sql);
+            // Create CustomFields's extraoptions table if it does not exist
+            include_once(dirname(__FILE__).'/../../class/customfields.class.php');
+            $customfields = new CustomFields($this->db, '');
+            if (!$customfields->probeTableExtra()) {
+                $rtncode = $customfields->initExtraTable();
+
+                // Print error messages if any
+                if ($rtncode < 0 or count($customfields->errors) > 0) $customfields->printErrors();
+            }
+
+            return $this->_init($sql);
 	}
 
 	/**
