@@ -71,7 +71,7 @@ class ActionsCustomFields // extends CommonObject
                 }
             }
             else { // Generic Hook : else we try a generic approach, based on the $modulesarray keys (contexts) and values (table_element)
-                include_once(DOL_DOCUMENT_ROOT."/customfields/conf/conf_customfields.lib.php");
+                include_once(dirname(__FILE__).'/../conf/conf_customfields.lib.php');
                 if (isset($modulesarray[$parameters->context])) {
                     $currentmodule = $modulesarray[$parameters->context];
                 }
@@ -81,14 +81,14 @@ class ActionsCustomFields // extends CommonObject
 
             }
 
-            include_once(DOL_DOCUMENT_ROOT.'/customfields/lib/customfields.lib.php');
+            include_once(dirname(__FILE__).'/../lib/customfields_printforms.lib.php');
             print '<br>';
 
             if ($printtype == 'create') {
                 $action == 'edit' ?  $id = $object->id : $id = null; // If we are in a create form used to edit already instanciated fields, then we fetch the instanciated object by its id
                 customfields_print_creation_form($currentmodule, $id);
             } else {
-                customfields_print_main_form($currentmodule, $object, $action, $user, $idvar, $rights);
+                customfields_print_datasheet_form($currentmodule, $object, $action, $user, $idvar, $rights);
             }
         }
     }

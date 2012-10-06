@@ -27,7 +27,7 @@ require('../../main.inc.php');
 require_once(DOL_DOCUMENT_ROOT."/customfields/conf/conf_customfields.lib.php");
 require_once(DOL_DOCUMENT_ROOT."/customfields/class/customfields.class.php");
 require_once(DOL_DOCUMENT_ROOT."/core/lib/admin.lib.php");
-require_once(DOL_DOCUMENT_ROOT."/customfields/lib/customfields.lib.php");
+require_once(DOL_DOCUMENT_ROOT."/customfields/lib/customfields_printforms.lib.php");
 
 // Security check
 if (!$user->admin)
@@ -179,7 +179,7 @@ if (!$tableexists) {
     print "</tr>";
 
     // generating custom fields list
-    $fieldsarray = $customfields->fetchAllCustomFields();
+    $fieldsarray = $customfields->fetchAllFieldsStruct();
 
     if ($fieldsarray < 0) { // error
         $error++;
@@ -253,7 +253,7 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
     if ($action == 'create') {
         print_titre($langs->trans('NewField'));
     } elseif ($action == 'edit') {
-        $fieldobj = $customfields->fetchCustomField($_GET["fieldid"]); // fetching the field data
+        $fieldobj = $customfields->fetchFieldStruct($_GET["fieldid"]); // fetching the field data
         print_titre($langs->trans('FieldEdition',$fieldobj->column_name));
     }
 

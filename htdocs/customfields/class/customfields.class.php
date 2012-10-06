@@ -23,19 +23,20 @@
  *		\author		Stephen Larroque
  */
 
-// Include the config file (only used for $varprefix at this moment, so this class is pretty much self contained and independant)
-include(DOL_DOCUMENT_ROOT."/customfields/conf/conf_customfields.lib.php");
+// Include the config file (only used for $varprefix at this moment, so this class is pretty much self contained and independent - except for triggers and translation, but these are NOT necessary for CustomFields management, only for printing fields more nicely and for logs)
+include(dirname(__FILE__).'/../conf/conf_customfields.lib.php');
 
 // Loading the translation class if it's not yet loaded (or with another name) - DO NOT EDIT!
 if (! is_object($langs))
 {
     include_once(DOL_DOCUMENT_ROOT."/core/class/translate.class.php");
-    $langs=new Translate(DOL_DOCUMENT_ROOT."/customfields/langs/",$conf);
+    $langs=new Translate(dirname(__FILE__).'/../langs/',$conf);
 }
 
 // Put here all includes required by your class file
 $langs->load('customfields@customfields'); // customfields standard language support
 $langs->load('customfields-user@customfields'); // customfields language support for user's values (like enum, fields names, etc..)
+
 
 /**
  *      \class      customfields
@@ -48,6 +49,7 @@ class CustomFields // extends CommonObject
 	var $errors=array();				//!< To return several error codes (or messages)
 	//var $element='customfields';			//!< Id that identify managed objects
 	//var $table_element='customfields';	//!< Name of table without prefix where object is stored
+        var $dbtype; // type of the database, will be used to use the right function to issue sql requests
 
 	var $varprefix = 'cf_'; // prefix that will be prepended to the variables names for accessing the fields values
 
@@ -59,11 +61,13 @@ class CustomFields // extends CommonObject
      *      @param      DB      Database handler
      *      @param      currentmodule        	Current module (facture/propal/etc.)
      */
-    function CustomFields($DB, $currentmodule)
+    function __construct($db, $currentmodule)
     {
-	$this->db = $DB;
+	$this->db = $db;
 	$this->module = $currentmodule;
 	$this->moduletable = MAIN_DB_PREFIX.$this->module."_customfields";
+
+        $this->dbtype = $db->type; // or $conf->db->type
 
 	global $fields_prefix;
 	if (!empty($fields_prefix)) $this->varprefix = $fields_prefix;
@@ -97,6 +101,49 @@ class CustomFields // extends CommonObject
 		return str_replace($search,$replace,$str);
 	}
 
+        /**
+         *      Return an object with only lowercase column_names (otherwise, on some OSes like Unix, mysql functions may return uppercase or mixed case column_name)
+         *      Note: similar to mysql_fetch_object, but always return lowercase column_name for every items
+         *      @param      $res        Mysql/Mysqli/PGsql/SQlite/MSsql resource
+         *      @return       $obj         Object containing one row
+         */
+        function fetch_object($res, $class_name=null, $params=null) {
+            // get the record as an object
+            if ($this->dbtype === 'mysql') {
+                if (isset($class_name) and isset($params)) {
+                    $row = mysql_fetch_object($res, $class_name, $params);
+                } elseif (isset($class_name)) {
+                    $row = mysql_fetch_object($res, $class_name);
+                } else {
+                    $row = mysql_fetch_object($res);
+                }
+            } elseif($this->dbtype === 'mysqli') {
+                if (isset($class_name) and isset($params)) {
+                    $row = mysqli_fetch_object($res, $class_name, $params);
+                } elseif (isset($class_name)) {
+                    $row = mysqli_fetch_object($res, $class_name);
+                } else {
+                    $row = mysqli_fetch_object($res);
+                }
+            } elseif($this->dbtype === 'mssql') {
+                $row = mssql_fetch_object($res);
+            } elseif($this->dbtype === 'sqlite') {
+                $row = $res->fetch(PDO::FETCH_OBJ);
+            } elseif($this->dbtype === 'pgsql') {
+                if (isset($class_name) and isset($params)) {
+                    $row = pg_fetch_object($res, null, $class_name, $params);
+                } elseif (isset($class_name)) {
+                    $row = pg_fetch_object($res, null, $class_name);
+                } else {
+                    $row = pg_fetch_object($res);
+                }
+            }
+            //$row = $this->fetch_object($res); // get the record as an object [DEPRECATED]
+            $obj = array_change_key_case((array)$row, CASE_LOWER); // change column_name case to lowercase
+            $obj = (object)$obj; // cast back as an object
+            return $obj; // return the object
+        }
+
 	//--------------- Main Functions ---------------------
 
 	/**
@@ -108,7 +155,7 @@ class CustomFields // extends CommonObject
 	function fetch($id=null, $notrigger=0)
 	{
 		// Get all the columns (custom fields), primary field included (that's why there's the true)
-		$fields = $this->fetchAllCustomFields(true);
+		$fields = $this->fetchAllFieldsStruct(true);
 
 		// Forging the SQL statement - we set all the column_name to fetch (because Dolibarr wants to avoid SELECT *, so we must name the columns we fetch)
 		foreach ($fields as $field) {
@@ -145,14 +192,14 @@ class CustomFields // extends CommonObject
 
 				$record = array();
 				for ($i=0;$i < $num;$i++) {
-					$obj = $this->db->fetch_object($resql);
+					$obj = $this->fetch_object($resql);
 					$obj->id = $obj->$prifield; // set the record's id
 					$record[$obj->id] = $obj; // add the record to our records' array
 				}
 				$this->records = $record; // and we as well store the records as a property of the CustomFields class
 			// Only one record returned = one object
 			} elseif ($num == 1) {
-				$record = $this->db->fetch_object($resql);
+				$record = $this->fetch_object($resql);
 
 				// If we get only 1 result and $id is not set, this means that we are not looking for a particular record, we are fetching all records but we find only one. In this case, we must find the id by ourselves.
 				if (!isset($id)) {
@@ -225,11 +272,11 @@ class CustomFields // extends CommonObject
 			if ($num > 1) {
 				$record = array();
 				for ($i=0;$i < $num;$i++) {
-					$record[] = $this->db->fetch_object($resql);
+					$record[] = $this->fetch_object($resql);
 				}
 			// Only one record returned = one object
 			} elseif ($num == 1) {
-				$record = $this->db->fetch_object($resql);
+				$record = $this->fetch_object($resql);
 			// No record returned = null
 			} else {
 				$record = null;
@@ -252,7 +299,7 @@ class CustomFields // extends CommonObject
 	function create($object, $notrigger=0)
 	{
 		// Get all the columns (custom fields)
-		$fields = $this->fetchAllCustomFields();
+		$fields = $this->fetchAllFieldsStruct();
 
 		if (empty($fields)) return null;
 
@@ -277,7 +324,7 @@ class CustomFields // extends CommonObject
 			}
 		}
 
-                // we add the object id (filtered by fetchAllCustomFields)
+                // we add the object id (filtered by fetchAllFieldsStruct)
                 array_push($sqlfields, "fk_".$this->module);
                 array_push($sqlvalues, $object->id);
 
@@ -359,7 +406,7 @@ class CustomFields // extends CommonObject
 	function createFromClone($id, $cloneid, $notrigger=0)
 	{
 		// Get all the columns (custom fields)
-		$fields = $this->fetchAllCustomFields();
+		//$fields = $this->fetchAllFieldsStruct();
 
 		$object = $this->fetch($id);
 
@@ -436,7 +483,7 @@ class CustomFields // extends CommonObject
 		// Forging the SQL statement
 		$sql = '';
 		if (!empty($id)) { // if a field id was supplied, we forge an update sql statement, else we forge an add field sql statement
-			$field = $this->fetchCustomField($id); // fetch the field by id (ordinal_position) so we can get the field name
+			$field = $this->fetchFieldStruct($id); // fetch the field by id (ordinal_position) so we can get the field name
 			if ($fieldname != $field->column_name) { // if the name of the field changed, then we use the CHANGE keyword to rename the field and apply other statements
 				$sql = "ALTER TABLE ".$this->moduletable." CHANGE ".$field->column_name." ".$fieldname." ";
 			} else {
@@ -561,7 +608,7 @@ class CustomFields // extends CommonObject
 	*    @param    nohide				defines if the system fields (primary field and foreign key) must be hidden in the fetched results
 	*    @return     int/null/obj/obj[]         <0 if KO, null if no field found, one field object if only one field could be found, an array of fields objects if OK
 	*/
-       function fetchCustomField($id=null, $nohide=false, $notrigger=0) {
+       function fetchFieldStruct($id=null, $nohide=false, $notrigger=0) {
 
 		// Forging the SQL statement
 		$whereaddendum = '';
@@ -596,7 +643,7 @@ class CustomFields // extends CommonObject
 		}
 
 		// Executing the SQL statement
-		$resql = $this->executeSQL($sql,"fetchCustomField", $trigger);
+		$resql = $this->executeSQL($sql,"fetchFieldStruct", $trigger);
 
 		// Filling the field object
 		if ($resql < 0) { // if there's no error
@@ -609,7 +656,7 @@ class CustomFields // extends CommonObject
 			if ($num > 1) {
 				$field = array();
 				for ($i=0;$i < $num;$i++) {
-					$obj = $this->db->fetch_object($resql); // we retrieve the data line
+					$obj = $this->fetch_object($resql); // we retrieve the data line
 					$obj->size = $this->getFieldSizeOrValue($obj->column_type); // add the real size of the field (character_maximum_length is not reliable for that goal)
 					$obj->id = $obj->ordinal_position; // set the id (ordinal position in the database's table)
 					$field[$obj->id] = $obj; // we store the field object in an array
@@ -619,7 +666,7 @@ class CustomFields // extends CommonObject
 				}
 			// Only one field returned = one field object
 			} elseif ($num == 1) {
-				$field = $this->db->fetch_object($resql);
+				$field = $this->fetch_object($resql);
 
 				$field->size = $this->getFieldSizeOrValue($field->column_type); // add the real size of the field (character_maximum_length is not reliable for that goal)
 				$field->id = $field->ordinal_position; // set the id (ordinal position in the database's table)
@@ -643,8 +690,8 @@ class CustomFields // extends CommonObject
 	*    @param     nohide	defines if the system fields (primary field and foreign key) must be hidden in the fetched results
 	*    @return     int/null/obj[]         <0 if KO, null if no field found, an array of fields objects if OK (even if only one field is found)
 	*/
-       function fetchAllCustomFields($nohide=false, $notrigger=0) {
-		$fields = $this->fetchCustomField(null, $nohide, $notrigger);
+       function fetchAllFieldsStruct($nohide=false, $notrigger=0) {
+		$fields = $this->fetchFieldStruct(null, $nohide, $notrigger);
 		if ( !(is_array($fields) or is_null($fields) or is_integer($fields)) ) { $fields = array($fields); } // we convert to an array if we've got only one field, functions relying on this one expect to get an array if OK
 		return $fields;
        }
@@ -684,7 +731,7 @@ class CustomFields // extends CommonObject
 			if ($this->db->num_rows($resql) > 0) {
 				$num = $this->db->num_rows($resql);
 				for ($i=0;$i < $num;$i++) {
-					$obj = $this->db->fetch_object($resql); // we retrieve the data line
+					$obj = $this->fetch_object($resql); // we retrieve the data line
 					$name = $obj->column_name;
 					$constaints->$name = $obj; // we store the field object in an array
 				}
@@ -742,7 +789,7 @@ class CustomFields // extends CommonObject
 		} else { // else we fill the field
 			$obj = null;
 			if ($this->db->num_rows($resql) > 0) {
-			    $obj = $this->db->fetch_object($resql);
+			    $obj = $this->fetch_object($resql);
 
 			    $obj->size = $this->getFieldSizeOrValue($obj->column_type); // add the real size of the field (character_maximum_length is not reliable for that goal)
 			}
@@ -811,7 +858,7 @@ class CustomFields // extends CommonObject
 			if ($this->db->num_rows($resql) > 0) {
 				$num = $this->db->num_rows($resql);
 				for ($i=0;$i < $num;$i++) {
-					$obj = $this->db->fetch_object($resql); // we retrieve the data line
+					$obj = $this->fetch_object($resql); // we retrieve the data line
 					$refarray[] = $obj; // we store the field object in an array
 				}
 			}
@@ -902,7 +949,7 @@ class CustomFields // extends CommonObject
 	function deleteCustomField($id, $notrigger = 0) {
 
 		// Fetch the customfield object (so that we get all required informations to proceed to deletion : column_name, index and foreign key constraints if any)
-		$field = $this->fetchCustomField($id);
+		$field = $this->fetchFieldStruct($id);
 		// Get the column name from the id
 		$fieldname = $field->column_name;
 
@@ -935,7 +982,7 @@ class CustomFields // extends CommonObject
 		$rtncode2 = 1;
 
 		// Fetch customfield's informations
-		$field = $this->fetchCustomField($id);
+		$field = $this->fetchFieldStruct($id);
 
 		// Delete the associated constraint if exists
 		if (!empty($field->constraint_name)) {
@@ -1276,7 +1323,7 @@ class CustomFields // extends CommonObject
                         $fieldname = $this->stripPrefix($fieldname); // strip the prefix if detected at the beginning
 
 			if (!isset($this->fields->$fieldname)) {
-				$field = $this->fetchCustomField($fieldname, true);
+				$field = $this->fetchFieldStruct($fieldname, true);
 			} else {
 				$field = $this->fields->$fieldname;
 			}
@@ -1299,7 +1346,7 @@ class CustomFields // extends CommonObject
                         $fieldname = $this->stripPrefix($fieldname); // strip the prefix if detected at the beginning
 
 			if (!isset($this->fields->$fieldname)) {
-				$field = $this->fetchCustomField($fieldname, true);
+				$field = $this->fetchFieldStruct($fieldname, true);
 			} else {
 				$field = $this->fields->$fieldname;
 			}
@@ -1348,6 +1395,61 @@ class CustomFields // extends CommonObject
             if (count($matchs) > 0) $fieldname = substr($fieldname, strlen($this->varprefix)); // strip the prefix if prefix detected
 
             return $fieldname;
+        }
+
+        /** Add an error in the array + automatically format them in a single nice imploded string
+         *
+         * @param   string/array  $errormsg   error message to add (can be an array or a single string)
+         *
+         * @return  true
+         *
+         */
+        function addError($errormsg) {
+            // Stack error message(s) in the local array
+            if (is_array($errormsg)) {
+                array_push($this->errors, $errormsg);
+            } else {
+                $this->errors[] = $errormsg;
+            }
+
+            // Refresh the concatenated string of all errors
+            $this->error = implode(";\n", $this->errors);
+
+            return true;
+        }
+
+        /** Easy function to print the errors encountered by CustomFields (if any)
+         *
+         *  @param  string  $error  string error message to print, null = customfield's errors will be printed
+         *
+         *  @return     bool        true if an error was printed, false if nothing was printed
+         */
+        function printErrors($error=null) {
+            // either take an input error message, or use customfield's saved errors
+            if (!empty($error)) {
+                $mesg = $error;
+            } else {
+                //$this->error = implode(";\n", $this->errors);
+                $mesg = $this->error;
+            }
+
+            // If there is/are errors
+            if (!empty($mesg)) {
+                // Print error messages
+                if (function_exists('setEventMessage')) {
+                    setEventMessage($mesg, 'errors'); // New way since Dolibarr v3.3
+                } elseif (function_exists('dol_htmloutput_errors')) {
+                    dol_htmloutput_errors($mesg); // Old way to print error messages
+                } else {
+                    print('<pre>');
+                    print($mesg); // if no other error printing function was found, we just print out the errors with a basic html formatting
+                    print('</pre>');
+                }
+
+                return true;
+            } else {
+                return false;
+            }
         }
 
 }

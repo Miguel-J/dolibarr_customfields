@@ -17,10 +17,10 @@
  */
 
 /**
- *	\file       htdocs/customfields/lib/customfields.lib.php
+ *	\file       htdocs/customfields/lib/customfields_printforms.lib.php
  *	\brief      Printing library for the customfields module, very generic and useful (but no core database managing functions, they are in customfields.class.php)
  *	\ingroup    customfields
- *	\version    $Id: customfields.lib.php, v1.2.4
+ *	\version    $Id: customfields_printforms.lib.php, v1.2.4
  */
 
 /**
@@ -76,11 +76,11 @@ function customfields_print_creation_form($currentmodule, $id = null) {
     global $db, $langs;
 
     // Init and main vars
-    include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
+    include_once(dirname(__FILE__).'/../class/customfields.class.php');
     $customfields = new CustomFields($db, $currentmodule);
 
     if ($customfields->probeCustomFields()) { // ... and if the table for this module exists, we show the custom fields
-        $fields = $customfields->fetchAllCustomFields();
+        $fields = $customfields->fetchAllFieldsStruct();
         if (isset($id)) $datas = $customfields->fetch($id); // fetching the record - the values of the customfields for this id (if it exists)
         foreach ($fields as $field) {
             $name = $field->column_name;
@@ -107,11 +107,11 @@ function customfields_print_creation_form($currentmodule, $id = null) {
  *      @param      object                     the object containing the required informations (if we are in facture's module, it will be the facture object, if we are in propal it will be the propal object etc..)
  *      @return     void        returns nothing because this is a procedure : it just does what we want
  */
-function customfields_print_main_form($currentmodule, $object, $action, $user, $idvar = 'id', $rights = null) {
+function customfields_print_datasheet_form($currentmodule, $object, $action, $user, $idvar = 'id', $rights = null) {
     global $db, $langs, $conf;
 
     // Init and main vars
-    include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
+    include_once(dirname(__FILE__).'/../class/customfields.class.php');
     include_once(DOL_DOCUMENT_ROOT.'/core/lib/functions.lib.php'); // for images img_edit()
     $customfields = new CustomFields($db, $currentmodule);
 
@@ -119,7 +119,7 @@ function customfields_print_main_form($currentmodule, $object, $action, $user, $
         //print '<table class="border" width="100%">';
 
         // == Fetching customfields
-        $fields = $customfields->fetchAllCustomFields(); // fetching the customfields list
+        $fields = $customfields->fetchAllFieldsStruct(); // fetching the customfields list
         $datas = $customfields->fetch($object->id); // fetching the record - the values of the customfields for this id (if it exists)
         $datas->id = $object->id; // in case the record does not yet exist for this id, we at least set the id property of the datas object (useful for the update later on)
 

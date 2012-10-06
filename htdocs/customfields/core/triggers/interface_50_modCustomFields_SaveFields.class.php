@@ -135,7 +135,7 @@ class InterfaceSaveFields
             $object->origin_id = GETPOST('id'); // the clone functions do not store the origin_id in the standard dolibarr package (as of v3.1b)
             return $this->run_trigger($action,$object,$user,$langs,$conf);
         }
-        /* Managed by the customfields.lib.php for edition and by the SQL cascading for deletion
+        /* Managed by the customfields_printforms.lib.php for edition and by the SQL cascading for deletion
         elseif ($action == 'PROPAL_MODIFY') {
             dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
         }
@@ -166,7 +166,7 @@ class InterfaceSaveFields
             $object->origin_id = GETPOST('facid'); // the clone functions do not store the origin_id in the standard dolibarr package (as of v3.1b)
             return $this->run_trigger($action,$object,$user,$langs,$conf);
         }
-        /* Managed by the customfields.lib.php for edition and by the SQL cascading for deletion
+        /* Managed by the customfields_printforms.lib.php for edition and by the SQL cascading for deletion
         elseif ($action == 'BILL_MODIFY') {
             dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);
         }
@@ -191,7 +191,7 @@ class InterfaceSaveFields
             $currentmodule = $object->currentmodule;
 
             // Init and main vars
-            include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
+            include_once(dirname(__FILE__).'/../../class/customfields.class.php');
             $customfields = new CustomFields($this->db, $currentmodule);
 
             // Saving the data (creating a record)
@@ -214,7 +214,7 @@ class InterfaceSaveFields
             $currentmodule = $object->currentmodule;
 
             // Init and main vars
-            include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
+            include_once(dirname(__FILE__).'/../../class/customfields.class.php');
             $customfields = new CustomFields($this->db, $currentmodule);
 
             // Saving the data (creating a record)
@@ -234,7 +234,7 @@ class InterfaceSaveFields
             $currentmodule = $object->currentmodule;
 
             // Init and main vars
-            include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
+            include_once(dirname(__FILE__).'/../../customfields/class/customfields.class.php');
             $customfields = new CustomFields($this->db, $currentmodule);
 
             // Saving the data (creating a record)
@@ -255,11 +255,11 @@ class InterfaceSaveFields
             $currentmodule = $object->currentmodule;
 
             // Init and main vars
-            include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
+            include_once(dirname(__FILE__).'/../../class/customfields.class.php');
             $customfields = new CustomFields($this->db, $currentmodule);
 
             // Fetching the list of fields columns
-            $fields = $customfields->fetchAllCustomFields();
+            $fields = $customfields->fetchAllFieldsStruct();
 
             // Fetching customfields data
             $record = $customfields->fetch($object->id);
@@ -288,7 +288,7 @@ class InterfaceSaveFields
                     }
 
                     Exactly as if you'd have fetched the record from the database :
-                    $fields = $customfields->fetchAllCustomFields();
+                    $fields = $customfields->fetchAllFieldsStruct();
                     foreach ($fields as $field) {
                         etc... same as above
 
@@ -299,7 +299,7 @@ class InterfaceSaveFields
             return 1;
         }
 	else { // Generic trigger
-	    include(DOL_DOCUMENT_ROOT."/customfields/conf/conf_customfields.lib.php");
+	    include(dirname(__FILE__).'/../../conf/conf_customfields.lib.php');
 
 	    // Generic trigger based on the trigger array
 	    if (preg_match('/^('.implode('|',array_keys($triggersarray)).')$/i', $action, $matches) ) { // if the current action is on a supported trigger action

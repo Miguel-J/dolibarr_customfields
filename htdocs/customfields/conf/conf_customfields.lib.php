@@ -26,7 +26,7 @@
 if (! is_object($langs))
 {
     include_once(DOL_DOCUMENT_ROOT."/core/class/translate.class.php");
-    $langs=new Translate(DOL_DOCUMENT_ROOT."/customfields/langs/",$conf);
+    $langs=new Translate(dirname(__FILE__).'/../langs/',$conf);
 }
 
 $langs->load('customfields@customfields'); // customfields standard language support

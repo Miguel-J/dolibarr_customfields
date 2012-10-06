@@ -1,9 +1,9 @@
 =================================================
 *				CUSTOMFIELDS MODULE				*
 *			by Stephen Larroque (lrq3000)		*
-*				version	2.9 (branch v2)			*
+*				version	2.10 (branch v2)		*
 *			for Dolibarr >= 3.2.0				*
-*			release date 2012/09/11				*
+*			release date 2012/10/06				*
 *			last update (see on github)			*
 =================================================
 
@@ -120,24 +120,24 @@ $fields = $customfields->fetch($object->id);
 * Then you can access the field's value:
 
 $fields->variable_name
-by default (with the default varprefix of "cf_")
-$fields->cf_mycustomfield
+for example (you shouldn't use the prefix "cf_" here):
+$fields->mycustomfield
 
 * To print it with FPDF (the default PDF generation library):
 
-$pdf->MultiCell(0,3, $fields->cf_mycustomfield, 0, 'L'); // printing the customfield
+$pdf->MultiCell(0,3, $fields->mycustomfield, 0, 'L'); // printing the customfield
 
 * To print it with beautified formatting (eg: for constained fields or truefalsebox):
  
 // Getting the beautifully formatted value of the field
-$myvalue = $customfields->simpleprintFieldPDF('mycustomfield', $fields->cf_mycustomfield);
+$myvalue = $customfields->simpleprintFieldPDF('mycustomfield', $fields->mycustomfield);
  
 // Printing the field
 $pdf->MultiCell(0,3, $myvalue, 0, 'L');
 
 // old way to do it:
-// $fieldstruct = $customfields->fetchAllCustomFields();
-// $customfields->printFieldPDF($fieldstruct->cf_mycustomfield, $fields->cf_mycustomfield);
+// $fieldstruct = $customfields->fetchAllFieldsStruct();
+// $customfields->printFieldPDF($fieldstruct->mycustomfield, $fields->mycustomfield);
 
 * And if you want to print the multilanguage label of this field :
 $mylabel = $customfields->findLabel("mycustomfield", $outputlangs); // where $outputlangs is the language the PDF should be outputted to
@@ -209,7 +209,7 @@ Same 1st and 2nd steps as above.
 
 (optionnal: if you want to use the generic beautified printing functions for the values, else if you want to manage the printing by yourselves you can skip this step)
 Thirdly, we fetch the custom fields definitions, because we need the meta-data associated to the custom fields structure to properly print the values (particularly important for constrained fields, for the other types it's less important)
-		$fields = $customfields->fetchAllCustomFields();
+		$fields = $customfields->fetchAllFieldsStruct();
 
 Fourthly, you can now walk on the $records array to get all the records values. For this purpose, the CustomFields provides some functions to print the label with multilingual support as well as for the values:
 		foreach ($records as $record) { // in our list of records we walk each record
@@ -329,7 +329,7 @@ Add the creation code into the php file that creates new propals from nothing : 
     if ($conf->global->MAIN_MODULE_CUSTOMFIELDS) { // if the customfields module is activated...
 	$currentmodule = 'propal'; // EDIT THIS: var to edit for each module
 
-	include_once(DOL_DOCUMENT_ROOT.'/customfields/lib/customfields.lib.php');
+	include_once(DOL_DOCUMENT_ROOT.'/customfields/lib/customfields_printforms.lib.php');
 	customfields_print_creation_form($currentmodule);
     }
 
@@ -354,8 +354,8 @@ Add the main management code into the php file that manages every propals (the m
 	$idvar = 'id'; // EDIT ME: the name of the POST or GET variable that contains the id of the object (look at the URL for something like module.php?modid=3&... when you edit a field)
 	$rights = 'propale'; // EDIT ME: try first to put it null, then if it doesn't work try to find the right name (search in the same file for something like $user->rights->modname where modname is the string you must put in $rights).
 
-	include_once(DOL_DOCUMENT_ROOT.'/customfields/lib/customfields.lib.php');
-	customfields_print_main_form($currentmodule, $object, $action, $user, $idvar, $rights);
+	include_once(DOL_DOCUMENT_ROOT.'/customfields/lib/customfields_printforms.lib.php');
+	customfields_print_datasheet_form($currentmodule, $object, $action, $user, $idvar, $rights);
 
 	}
 
@@ -363,7 +363,7 @@ Note1: of course you must edit the $currentmodule variable to the value you chos
 Note2: you must edit the $idvar too with the right post or get variable (look at the URL for something like module.php?modid=3&... when you edit a field).
 Note3: if you cannot find the place, try to search for $action == 'edit' and find the right place inside the code. Or you can try to search for the <form tag (without >). Or just above dol_fiche_end()
 Note4: if get the following error :
-		Warning: Attempt to assign property of non-object in C:\xampp\htdocs\dolibarr\htdocs\customfields\lib\customfields.lib.php on line 114
+		Warning: Attempt to assign property of non-object in C:\xampp\htdocs\dolibarr\htdocs\customfields\lib\customfields_printforms.lib.php on line 114
 Then you have to modify the $object variable in the code above to another name (you must find it in the code). Eg: for the products module, one had to use $product instead of $object.
 		
 Done !
@@ -421,7 +421,7 @@ elseif($action == 'PROPAL_PREBUILDDOC') { // EDIT ME: edit the PROPAL name into 
 	return $this->run_trigger($action,$object,$user,$langs,$conf);
 }
 
-Note: as you can notice, there is no trigger for modify nor deletion. This is because they are both handled automatically elsewhere : deletion by the SGBD (sql) cascading, modify by the customfields.lib.php file (the customfields_print_main_form() function does all the handling of edition).
+Note: as you can notice, there is no trigger for modify nor deletion. This is because they are both handled automatically elsewhere : deletion by the SGBD (sql) cascading, modify by the customfields_printforms.lib.php file (the customfields_print_datasheet_form() function does all the handling of edition).
 Note2: you can find the (almost) full list of dolibarr's triggers at http://wiki.dolibarr.org/index.php/Interfaces_Dolibarr_vers_exterieur or http://wiki.dolibarr.org/index.php/Interfaces_Dolibarr_toward_foreign_systems
 
 Result: You should now have a fully fonctional customfields support : try to edit the values and save them, and try to generate a pdf or odt document.
@@ -519,7 +519,7 @@ files that are necessary for the CustomFields to work, they contains the core fu
 /htdocs/customfields/conf/conf_customfields.lib.php --- Configuration file : contains the main configurable variables to adapt CustomFields to your needs or to expand its support to other modules and more native sql types.
 /htdocs/customfields/langs/code_CODE/customfields.lang --- Core language file : this is where you can translate the admin config panel (data types names, labels, descriptions, etc.)
 /htdocs/customfields/langs/code_CODE/customfields-user.lang --- User defined language file : this is where you can store the labels and values of your custom fields (see the related chapter)
-/htdocs/customfields/lib/customfields.lib.php --- Core printing library for records : contains only printing functions, there's no really core functions but it permits to manage the printing of the custom fields records and their editing
+/htdocs/customfields/lib/customfields_printforms.lib.php --- Core printing library for records : contains only printing functions, there's no really core functions but it permits to manage the printing of the custom fields records and their editing
 /htdocs/customfields/sql/* --- Unused (the tables are created directly via a function in the customfields.class.php)
 /htdocs/customfields/core/triggers/interface_50_modCustomFields_SaveFields.class --- Core triggers file : this is where the actions on records are managed. This is an interface between other modules and CustomFields management. This is where you must add the actions of other modules you'd want to support (generic customfields triggers actions are provided so you just have to basically do a copy/paste, see the related chapter). Also, if CustomFields are shown in the forms but cannot be modified nor saved, then probably this trigger file is not detected by Dolibarr (maybe you can try to lower the number 50 to raise the priority?).
 /htdocs/core/modules/modCustomFields.class --- Dolibarr's module definition file : this is a core file necessary for Dolibarr to recognize the module and to declare the hooks to Dolibarr (but it does not store anything else than meta-informations).

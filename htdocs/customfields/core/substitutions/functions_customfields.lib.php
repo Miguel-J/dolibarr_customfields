@@ -53,13 +53,13 @@ function customfields_completesubstitutionarray(&$substitutionarray,$outputlangs
     // CustomFields
     if ($conf->global->MAIN_MODULE_CUSTOMFIELDS) { // if the customfields module is activated...
             // Init and main vars
-            include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
+            include_once(dirname(__FILE__).'/../../class/customfields.class.php');
             $customfields = new CustomFields($db, $object->table_element);
 
             // Fetching custom fields records
             $fields = $customfields->fetch($object->id);
 
-            $fieldstruct = $customfields->fetchAllCustomFields();
+            $fieldstruct = $customfields->fetchAllFieldsStruct();
             if (!isset($fields)) return null;
 
             foreach ($fieldstruct as $field) {
