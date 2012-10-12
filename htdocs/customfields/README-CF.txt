@@ -1,9 +1,9 @@
 =================================================
 *				CUSTOMFIELDS MODULE				*
 *			by Stephen Larroque (lrq3000)		*
-*				version	2.11 (branch v2)		*
+*				version	2.12 (branch v2)		*
 *			for Dolibarr >= 3.2.0				*
-*			release date 2012/10/06				*
+*			release date 2012/10/12				*
 *			last update (see on github)			*
 =================================================
 
@@ -13,13 +13,28 @@ This module will enable the user to create custom fields for the supported modul
 
 CustomFields has been made with the intention of being as portable, flexible, modular and reusable as possible, so that it can be adapted to any Dolibarr's module, and to (almost) any user's need (even if something isn't implemented, you can most probably just use a custom sql statement, the rest will be managed automatically, even with custom statements!).
 
-===== DOWNLOAD =====
+===== FREE VS PRO VERSION =====
 
-To download the latest release, please check the github:
-Branch v1 (for Dolibarr v3.1.x):
+This is the Free edition of CustomFields.
+
+There is no limited features: all features included works.
+
+However, a Pro edition is available if you have more complex needs that aren't fulfilled by the Free edition and if you want a professional support with a warranty.
+
+For more informations, please check the official website:
+http://www.customfields.org
+
+A comparison chart to check the differences between Free vs Pro versions is available here:
+http://www.customfields.org/website/#comparison-chart
+
+===== DOWNLOAD FREE VERSION =====
+
+To download the latest CustomFields Free edition, please check the github:
+
+For Dolibarr 3.1.x:
 https://github.com/lrq3000/dolibarr_customfields/tree/3.1
 
-Branch v2
+For Dolibarr 3.2.x and above:
 https://github.com/lrq3000/dolibarr_customfields/tree/3.2
 
 ===== CONTACT =====
@@ -27,6 +42,8 @@ https://github.com/lrq3000/dolibarr_customfields/tree/3.2
 This module was created by Stephen Larroque for the Dolibarr project.
 
 You can either contact the author by mail <lrq3000 at gmail dot com> or on the github above or on the Dolibarr's forum (french or english).
+
+However please note that there is no guaranteed support for the Free edition of CustomFields.
 
 ===== FEATURES - WHAT IT CAN DO =====
 
@@ -87,6 +104,7 @@ Eg: if you want to link to the Dolibarr's users, select Constraint "llx_users". 
 - Use of strict SQL standards, so it should work for any database following the minimum standards requirement (tested on MySQL, probably works for PostGreSQL and SQLite).
 
 ===== WHAT IT CANT DO =====
+
 What this module can NOT do (yet):
 - add custom fields in invoices products lines (custom data per product), but may be added in the future.
 note: this feature is available in the V3 branch of CustomFields.
