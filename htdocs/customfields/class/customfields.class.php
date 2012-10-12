@@ -105,7 +105,7 @@ class CustomFields extends compatClass4 // extends CommonObject
         $this->extratable = MAIN_DB_PREFIX."customfields_extraoptions";
         $this->dbtype = $db->type; // or $conf->db->type
 
-	if (!empty($fields_prefix)) $this->varprefix = $fields_prefix;
+	if (!empty($fieldsprefix)) $this->varprefix = $fieldsprefix;
 
 	return 1;
     }
