@@ -97,7 +97,6 @@ class modCustomFields extends DolibarrModules
 		// Example: $this->const=array(0=>array('MYMODULE_MYNEWCONST1','chaine','myvalue','This is a constant to add',1),
 		//                             1=>array('MYMODULE_MYNEWCONST2','chaine','myvalue','This is another constant to add',0) );
 		//                             2=>array('MAIN_MODULE_MYMODULE_NEEDSMARTY','chaine',1,'Constant to say module need smarty',1)
-		include(dirname(__FILE__).'/../../conf/conf_customfields.lib.php');
                 $this->const = array(
                                             0=>array('CUSTOMFIELDS_EDITION', 'chaine', 'FREE', 'CustomFields edition (Free or Pro)', 0, 'current', 1),
                                             1=>array('CUSTOMFIELDS_VERSION', 'chaine', $cfversion, 'CustomFields version', 0, 'current', 1),
