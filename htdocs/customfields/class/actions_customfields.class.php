@@ -19,7 +19,6 @@
  *      \file       htdocs/customfields/class/actions_customfields.class.php
  *      \ingroup    customfields
  *      \brief      Hook file for CustomFields to manage printing and editing in module's forms and datasheets
- *		\version    $Id: actions_customfields.class.php, v1.2.0
  *		\author		Stephen Larroque
  */
 
@@ -71,7 +70,7 @@ class ActionsCustomFields // extends CommonObject
                 }
             }
             else { // Generic Hook : else we try a generic approach, based on the $modulesarray keys (contexts) and values (table_element)
-                include_once(dirname(__FILE__).'/../conf/conf_customfields.lib.php');
+                include(dirname(__FILE__).'/../conf/conf_customfields.lib.php');
                 if (isset($modulesarray[$parameters->context])) {
                     $currentmodule = $modulesarray[$parameters->context];
                 }

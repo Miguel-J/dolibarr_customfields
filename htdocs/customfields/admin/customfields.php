@@ -19,7 +19,6 @@
  *	\file       htdocs/admin/customfields.php
  *	\ingroup    others
  *	\brief          Configuring page for custom fields (add/delete/edit custom fields)
- *	\version    $Id: customfields.php, v2.11
  */
 
 // **** INIT ****
@@ -29,7 +28,7 @@ if (! $res && file_exists(dirname(__FILE__)."/../../main.inc.php")) $res=@includ
 if (! $res && file_exists(dirname(__FILE__)."/../../../main.inc.php")) $res=@include(dirname(__FILE__)."/../../../main.inc.php");	// for level2 directory
 if (! $res) die("Include of main fails");
 
-require_once(dirname(__FILE__).'/../conf/conf_customfields.lib.php');
+require(dirname(__FILE__).'/../conf/conf_customfields.lib.php');
 require_once(dirname(__FILE__).'/../class/customfields.class.php');
 require_once(dirname(__FILE__).'/../lib/customfields_printforms.lib.php');
 require_once(DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php');
