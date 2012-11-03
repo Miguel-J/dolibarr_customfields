@@ -19,7 +19,6 @@
  *      \file       htdocs/customfields/core/triggers/interface_50_modCustomFields_SaveFields.class.php
  *      \ingroup    core
  *      \brief      Core triggers file for CustomFields module. Triggers actions for the customfields module. Necessary for actions to be comitted.
- *		\version	$Id: interface_50_modCustomFields_SaveFields.class.php, v1.2.6
  */
 
 
@@ -191,7 +190,7 @@ class InterfaceSaveFields
             $currentmodule = $object->currentmodule;
 
             // Init and main vars
-            include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
+            include_once(dirname(__FILE__).'/../../class/customfields.class.php');
             $customfields = new CustomFields($this->db, $currentmodule);
 
             // Saving the data (creating a record)
@@ -214,7 +213,7 @@ class InterfaceSaveFields
             $currentmodule = $object->currentmodule;
 
             // Init and main vars
-            include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
+            include_once(dirname(__FILE__).'/../../class/customfields.class.php');
             $customfields = new CustomFields($this->db, $currentmodule);
 
             // Saving the data (creating a record)
@@ -234,7 +233,7 @@ class InterfaceSaveFields
             $currentmodule = $object->currentmodule;
 
             // Init and main vars
-            include_once(DOL_DOCUMENT_ROOT.'/customfields/customfields/class/customfields.class.php');
+            include_once(dirname(__FILE__).'/../../customfields/class/customfields.class.php');
             $customfields = new CustomFields($this->db, $currentmodule);
 
             // Saving the data (creating a record)
@@ -255,7 +254,7 @@ class InterfaceSaveFields
             $currentmodule = $object->currentmodule;
 
             // Init and main vars
-            include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
+            include_once(dirname(__FILE__).'/../../class/customfields.class.php');
             $customfields = new CustomFields($this->db, $currentmodule);
 
             // Fetching the list of fields columns
@@ -299,7 +298,7 @@ class InterfaceSaveFields
             return 1;
         }
 	else { // Generic trigger
-	    include(DOL_DOCUMENT_ROOT.'/customfields/conf/conf_customfields.lib.php');
+	    include(dirname(__FILE__).'/../../conf/conf_customfields.lib.php');
 
 	    // Generic trigger based on the trigger array
 	    if (preg_match('/^('.implode('|',array_keys($triggersarray)).')$/i', $action, $matches) ) { // if the current action is on a supported trigger action

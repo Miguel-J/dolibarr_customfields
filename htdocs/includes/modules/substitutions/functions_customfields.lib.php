@@ -84,3 +84,10 @@ function customfields_completesubstitutionarray(&$substitutionarray,$outputlangs
     return 0;
 
 }
+
+/** Useless function necessary for old Dolibarr versions not to throw an error (because as soon as it sees this file, it will necessarily call to this function...)
+ *
+ */
+function customfields_completesubstitutionarray_lines(&$substitutionarray,$outputlangs,$object,$line) {
+    return;
+}

@@ -19,7 +19,6 @@
  *	\file       htdocs/includes/modules/modCustomFields.class.php
  * 	\defgroup   customfields     Module CustomFields
  *     \brief      Dolibarr's module definition file for CustomFields (meta-informations file)
- *	\version	$Id: modCustomFields.class.php, v1.1.0
  */
 include_once(DOL_DOCUMENT_ROOT ."/includes/modules/DolibarrModules.class.php");
 
@@ -64,8 +63,10 @@ class modCustomFields extends DolibarrModules
 		// If file is in module/img directory under name object_pictovalue.png, use this->picto='pictovalue@module'
 		$this->picto='generic';
 
-                // Defined all module parts (triggers, login, substitutions, menus, etc...) (0=disable,1=enable)
-                $this->module_parts = array('triggers' => 1, 'substitutions' => 1);
+                // Define all module parts (triggers, hooks, login, substitutions for ODT and emails, menus, etc...) (0=disable,1=enable, for hooks: list of hooks)
+                include(DOL_DOCUMENT_ROOT.'/customfields/conf/conf_customfields.lib.php');
+                $this->module_parts = array('triggers' => 1, 'substitutions' => 1,
+                                            'hooks'=>implode(':', array_keys($modulesarray)) );
                 //$this->module_parts = array('triggers' => 1,
                 //              'login' => 0,
                 //              'substitutions' => 0,
@@ -96,10 +97,15 @@ class modCustomFields extends DolibarrModules
 		// Example: $this->const=array(0=>array('MYMODULE_MYNEWCONST1','chaine','myvalue','This is a constant to add',1),
 		//                             1=>array('MYMODULE_MYNEWCONST2','chaine','myvalue','This is another constant to add',0) );
 		//                             2=>array('MAIN_MODULE_MYMODULE_NEEDSMARTY','chaine',1,'Constant to say module need smarty',1)
-		include_once(DOL_DOCUMENT_ROOT.'/customfields/conf/conf_customfields.lib.php');
+                $this->const = array(
+                                            0=>array('CUSTOMFIELDS_EDITION', 'chaine', 'FREE', 'CustomFields edition (Free or Pro)', 0, 'current', 1),
+                                            1=>array('CUSTOMFIELDS_VERSION', 'chaine', $cfversion, 'CustomFields version', 0, 'current', 1),
+                                            );
+                /*
 		$this->const = array(
 				     0=>array('MAIN_MODULE_CUSTOMFIELDS_HOOKS', 'chaine', implode(':', array_keys($modulesarray)), 'Hooks list for managing printing functions of the CustomFields module', 0, 'current', 1),
 				     );
+                */
 
 		// Array to add new pages in new tabs
 		// Example: $this->tabs = array('objecttype:+tabname1:Title1:@mymodule:$user->rights->mymodule->read:/mymodule/mynewtab1.php?id=__ID__',  // To add a new tab identified by code tabname1

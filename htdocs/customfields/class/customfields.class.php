@@ -19,7 +19,6 @@
  *      \file       htdocs/customfields/class/customfields.class.php
  *      \ingroup    customfields
  *      \brief      Core class file for the CustomFields module, all critical functions reside here
- *		\version    $Id: customfields.class.php, v2.11
  *		\author		Stephen Larroque
  */
 
@@ -200,8 +199,11 @@ class CustomFields extends compatClass4 // extends CommonObject
 
 		$sql = "SELECT ".$sqlfields." FROM ".$this->moduletable;
 
-		if ($id > 0) { // if we supplied an id, we fetch only this one record
-			$sql .= " WHERE fk_".$this->module."=".$id." LIMIT 1";
+                if (is_array($id)) {
+
+                    $sql .= " WHERE fk_".$this->module."=".implode(' or fk_'.$this->module.'=', $id);
+                } elseif ($id > 0) { // if we supplied an id, we fetch only this one record
+		    $sql .= " WHERE fk_".$this->module."=".$id." LIMIT 1";
 		}
 
 		// Trigger or not?
@@ -219,8 +221,8 @@ class CustomFields extends compatClass4 // extends CommonObject
 			return $resql; // we return the error code
 		} else { // else we fill the record
 			$num = $this->db->num_rows($resql); // number of results returned (number of records)
-			// Several records returned = array() of objects
-			if ($num > 1) {
+			// Several records returned = array() of objects (also if an array of $id was submitted, the user probably expects an array to be returned)
+			if ($num > 1 or ($num == 1 and is_array($id))) {
 				// Find the primary field (so that we can set the record's id)
 				$prifield = $this->fetchPrimaryField($this->moduletable);
 

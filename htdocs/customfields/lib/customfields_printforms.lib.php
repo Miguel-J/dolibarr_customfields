@@ -123,6 +123,27 @@ function customfields_print_datasheet_form($currentmodule, $object, $action, $us
         $datas = $customfields->fetch($object->id); // fetching the record - the values of the customfields for this id (if it exists)
         $datas->id = $object->id; // in case the record does not yet exist for this id, we at least set the id property of the datas object (useful for the update later on)
 
+        // == Checking rights
+        // checking the user's rights for edition for all current module's customfields
+        if (!empty($rights)) { // if a list of rights have been specified, we check the rights for creation/edition for each one
+            $rightok = true;
+            if (!is_array($rights)) { $rights = array($rights); } // convert to an arrray if we were supplied a string
+            // for each right, we will check if it exists, and if true, if the current user has ALL the required right (if one necessary right isn't possessed, then the user will be refused edition)
+            foreach ($rights as $moduleright) {
+                if (!isset($user->rights->$moduleright->creer)) { // if the specified right does NOT exist or is not set (either because the user does NOT have it which makes Dolibarr NOT specify the right, or either this means the dev implementing CF has specified a right that does not exist)
+                    $rightok = false; // no good, no access
+                    break;
+                } else { // if the right exists
+                    if (!$user->rights->$moduleright->creer) { // and if the current user does NOT possess it (set to false, but in practice Dolibarr does not set unpermitted rights to false, but rather it doesn't set them at all)
+                        $rightok = false; // then the user does not meet the necessary privileges to edit this customfield, then we skip
+                        break;
+                    }
+                }
+            }
+        } else { // else by default we just check for the current module (in the hope the current module has the same name in the rights array... eg: product module is produit in the rights property...)
+            $rightok = $user->rights->$currentmodule->creer;
+        }
+
          // == Printing/Editing custom fields
         if (isset($fields)) { // only if at least one customfield exists (there's a special case where a record may exist because there existed customfields, but all customfields were deleted, and thus the records still exist with a rowid and fk_module columns set, but with nothing else. In this case, we skip.)
 
@@ -134,7 +155,8 @@ function customfields_print_datasheet_form($currentmodule, $object, $action, $us
                 if (isset($datas->$name)) { $value = $datas->$name; } // if the property exists (the record is not empty), then we fill in this value
 
                 // == Save the edits
-                if ($action=='set_'.$customfields->varprefix.$name and isset($_POST[$customfields->varprefix.$name])) { // if we edited the value
+                if ($action=='set_'.$customfields->varprefix.$name and isset($_POST[$customfields->varprefix.$name]) // if we edited the value
+                    and $rightok) { // and the user has the required privileges to edit the field
 
                     // Forging the new record
                     $newrecord->$name = $_POST[$customfields->varprefix.$name]; // we create a new record object with the field and the id
@@ -160,19 +182,6 @@ function customfields_print_datasheet_form($currentmodule, $object, $action, $us
 
                 print '<tr><td>';
                 print $customfields->findLabel($name);
-                // checking the user's rights for edition
-                if (!empty($rights)) { // if a list of rights have been specified, we check the rights for creation/edition for each one
-                    $rightok = true;
-                    if (!is_array($rights)) { $rights = array($rights); }
-                    foreach ($rights as $moduleright) {
-                        if (isset($user->rights->$moduleright->creer) and !$user->rights->$moduleright->creer) {
-                            $rightok = false;
-                            break;
-                        }
-                    }
-                } else { // else by default we just check for the current module (in the hope the current module has the same name in the rights array... eg: product module is produit in the rights property...)
-                    $rightok = $user->rights->$currentmodule->creer;
-                }
                 // print the edit button only if authorized
                 if (!($action == 'editcustomfields' && GETPOST('field') == $name) && !(isset($objet->brouillon) and $object->brouillon == false) && $rightok) print '<span align="right"><a href="'.$_SERVER["PHP_SELF"].'?'.$idvar.'='.$object->id.'&amp;action=editcustomfields&amp;field='.$field->column_name.'">'.img_edit("default",1).'</a></td>';
                 print '</td>';
