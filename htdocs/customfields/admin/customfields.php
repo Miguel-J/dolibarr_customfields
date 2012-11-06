@@ -28,7 +28,7 @@ if (! $res && file_exists(dirname(__FILE__)."/../../main.inc.php")) $res=@includ
 if (! $res && file_exists(dirname(__FILE__)."/../../../main.inc.php")) $res=@include(dirname(__FILE__)."/../../../main.inc.php");	// for level2 directory
 if (! $res) die("Include of main fails");
 
-require_once(dirname(__FILE__).'/../conf/conf_customfields.lib.php');
+require(dirname(__FILE__).'/../conf/conf_customfields.lib.php');
 require_once(dirname(__FILE__).'/../conf/conf_customfields_func.lib.php');
 require_once(dirname(__FILE__).'/../class/customfields.class.php');
 require_once(dirname(__FILE__).'/../lib/customfields_printforms.lib.php');
@@ -96,12 +96,12 @@ if ($action == 'add' or $action == 'update') {
 
         if (! $error) {
             // We check that the field name does not contain any special character (only alphanumeric)
-            if (isset($_POST["field"]) && preg_match("/^\w[a-zA-Z0-9-_]*$/",$_POST['field'])) {
+            if (isset($_POST["field"]) && preg_match("/^\w[a-zA-Z0-9-_]*$/i",$_POST['field'])) { // note that we also force the field name (which is the sql column name) to be lowercase
                 // Calling the action function
                 if ($action == 'add') {
-                    $result=$customfields->addCustomField($_POST['field'],$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql']);
+                    $result=$customfields->addCustomField(strtolower($_POST['field']),$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql']);
                 } elseif ($action == 'update') {
-                    $result=$customfields->updateCustomField($_POST['fieldid'], $_POST['field'],$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql']);
+                    $result=$customfields->updateCustomField($_POST['fieldid'], strtolower($_POST['field']),$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql']);
                 }
                 // Error ?
                 if ($result > 0 and !count($customfields->errors)) { // If no error, we refresh the page
@@ -349,7 +349,7 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
 
     // ** Variables initializing
     if ($action == 'create') {
-        $field_name = GETPOST('field'); // if GETPOST is defined, $field_name will reload the data submitted by the admin, else if there's none it will just be empty (blank creation of a custom field). This is a clever way to avoid too many conditionnal statements
+        $field_name = GETPOST('field'); // if GETPOST is defined, $field_name will reload the data submitted by the admin, else if there's none it will just be empty (blank creation of a custom field). This is a clever way to avoid too many conditionnal statements.
         $field_type = GETPOST('type');
         $field_size = GETPOST('size');
         $field_constraint = GETPOST('constraint');

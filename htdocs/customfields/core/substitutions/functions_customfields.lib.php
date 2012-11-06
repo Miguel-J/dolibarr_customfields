@@ -60,7 +60,7 @@ function customfields_completesubstitutionarray(&$substitutionarray,$langs,$obje
     // CustomFields
     if ($conf->global->MAIN_MODULE_CUSTOMFIELDS) { // if the customfields module is activated...
         // If the cache exists, we use it, else we fetch the customfields datas and cache it
-        if (empty($cfcache->{$object->table_element})) {
+        if (!isset($cfcache->{$object->table_element})) {
             include_once(dirname(__FILE__).'/../../lib/customfields_aux.lib.php');
             $customfields = customfields_fill_object($object, null, $langs); // fetch all customfields and fill them inside $object->customfields ($customfields will then only contain the returned instance of CustomFields object, with customfields sql structure in database - it is unused here, but just used as an example)
             customfields_fill_object($object, null, $langs, 'raw', null); // fetch all customfields and their RAW value inside $object->customfields->raw (very useful for ODT conditionals substitutions). We already have one $customfields object, so we don't need another one.
@@ -68,6 +68,8 @@ function customfields_completesubstitutionarray(&$substitutionarray,$langs,$obje
         } else {
             $object->customfields = $cfcache->{$object->table_element}; // load the cache
         }
+
+        if (empty($object->customfields)) return; // if there's no custom field defined for this module, we gracefully exit
 
         // -- Begin to populate the substitution array with customfields data
         foreach ($object->customfields as $key=>$value) { // One field at a time
@@ -98,7 +100,7 @@ function customfields_completesubstitutionarray_lines(&$substitutionarray,$langs
 
     if ($conf->global->MAIN_MODULE_CUSTOMFIELDS) { // if the customfields module is activated...
         // If the cache exists, we use it, else we fetch the lines' customfields datas and cache it
-        if (empty($cflinescache->{$object->table_element})) {
+        if (!isset($cflinescache->{$object->table_element})) {
             include_once(dirname(__FILE__).'/../../lib/customfields_aux.lib.php');
             $customfields = customfields_fill_object_lines($object, null, $langs); // fetch all customfields and fill them inside $object->customfields ($customfields will then only contain the returned instance of CustomFields object, with customfields sql structure in database - it is unused here, but just used as an example)
             customfields_fill_object_lines($object, null, $langs, 'raw', null); // fetch all customfields and their RAW value inside $object->customfields->raw (very useful for ODT conditionals substitutions). We already have one $customfields object, so we don't need another one.
@@ -106,6 +108,8 @@ function customfields_completesubstitutionarray_lines(&$substitutionarray,$langs
         } else {
             $object->customfields->lines = $cflinescache->{$object->table_element}; // load the cache
         }
+
+        if (empty($object->customfields->lines->{$line->rowid})) return; // if there's no custom field defined for this module AND line, we gracefully exit
 
         // -- Begin to populate the substitution array with customfields data
         foreach ($object->customfields->lines->{$line->rowid} as $key=>$value) { // One field at a time, relative to the current line being processed

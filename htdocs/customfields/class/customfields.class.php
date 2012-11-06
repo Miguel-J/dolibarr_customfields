@@ -37,12 +37,10 @@
   One last advice: most of the time spent by functions are generally in SQL querying the database, so the better place to start optimizing would be by optimizing SQL queries first, then the number of calls to functions that do SQL queries (caching etc...), but the author tried his best to really optimize all these aspects (but one can always do better ;) ).
 */
 
-// Include the config file (only used for $varprefix at this moment, so this class is pretty much self contained and independent - except for triggers and translation, but these are NOT necessary for CustomFields management, only for printing fields more nicely and for logs)
-include(dirname(__FILE__).'/../conf/conf_customfields.lib.php');
 // Include JSON library for PHP <= 5.2 (used to define json_decode() and json_encode() for PHP4)
-if( !function_exists('json_decode') or !function_exists('json_encode') ) include(dirname(__FILE__).'/ext/JSON.php');
+if( !function_exists('json_decode') or !function_exists('json_encode') ) include_once(dirname(__FILE__).'/ext/JSON.php');
 // Include PHP4 object model compatibility library (TODO: may not work! Please check before, eg: will probably need to declare every var that is used, because this is currently not the case (but how to declare all SQL fields???))
-include(dirname(__FILE__).'/ext/php4compat.php');
+include_once(dirname(__FILE__).'/ext/php4compat.php');
 
 // Loading the translation class if it's not yet loaded (or with another name) - DO NOT EDIT!
 if (! is_object($langs))
@@ -114,13 +112,15 @@ class CustomFields extends compatClass4 // extends CommonObject
      */
     function __construct($db, $currentmodule)
     {
+        // Include the config file (only used for $varprefix at this moment, so this class is pretty much self contained and independent - except for triggers and translation, but these are NOT necessary for CustomFields management, only for printing fields more nicely and for logs)
+        include(dirname(__FILE__).'/../conf/conf_customfields.lib.php');
+
 	$this->db = $db;
 	$this->module = $currentmodule;
 	$this->moduletable = MAIN_DB_PREFIX.$this->module."_customfields";
         $this->extratable = MAIN_DB_PREFIX."customfields_extraoptions";
         $this->dbtype = $db->type; // or $conf->db->type
 
-	global $fieldsprefix, $svsdelimiter;
 	if (!empty($fieldsprefix)) $this->varprefix = $fieldsprefix;
         if (!empty($svsdelimiter)) $this->svsdelimiter = $svsdelimiter;
 
@@ -1295,6 +1295,8 @@ class CustomFields extends compatClass4 // extends CommonObject
                 //$nulloption = $prifield->is_nullable; // commenting this allows to create constrained fields that accepts null values
                 $size = $prifield->size;
             }
+
+            $fieldname = strtolower($fieldname); // force the field name (sql column name) to be lowercase to avoid errors on some platforms
 
             // Forging the SQL statement
             $sql = $this->forgeSQLCustomField($fieldname, $type, $size, $nulloption, $defaultvalue, $customtype, $customdef, $fieldid);

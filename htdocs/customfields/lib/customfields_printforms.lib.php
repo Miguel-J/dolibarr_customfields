@@ -86,9 +86,10 @@ function customfields_print_creation_form($currentmodule, $object = null, $param
 
     if ($customfields->probeTable()) { // ... and if the table for this module exists, we show the custom fields
         $fields = $customfields->fetchAllFieldsStruct();
+        if(empty($fields)) return; // quit if there's no custom field at all
         if (isset($id)) $datas = $customfields->fetch($id); // fetching the record - the values of the customfields for this id (if it exists)
         foreach ($fields as $field) {
-            $name = $field->column_name;
+            $name = strtolower($field->column_name); // the name of the customfield (which is the property of the record)
             print '<tr><td>'.$customfields->findLabel($name).'</td>';
             if(isset($parameters->context)) {
                 print '<td '.$parameters->context.'>';
@@ -96,7 +97,6 @@ function customfields_print_creation_form($currentmodule, $object = null, $param
                 print '<td colspan="2">';
             }
             $value = ''; // by default the value of this property is empty
-            $name = $field->column_name; // the name of the customfield (which is the property of the record)
             $postvalue = GETPOST($customfields->varprefix.$name);
             if ( !empty ($postvalue) ) {
                 $value = $postvalue;
@@ -166,13 +166,13 @@ function customfields_print_datasheet_form($currentmodule, $object, $parameters,
             foreach ($rights as $moduleright) {
                 //print("isset: ".isset($moduleright)." val: $moduleright\n"); // debugline
                 eval("\$misset = isset($moduleright);"); // assign to $misset the boolean value if $moduleright exists
-                if (!$misset) { // if the specified right does NOT exist (this means the dev implementing CF is probably doing something wrong)
+                if (!$misset) { // if the specified right does NOT exist or is not set (either because the user does NOT have it which makes Dolibarr NOT specify the right, or either this means the dev implementing CF has specified a right that does not exist)
                     $rightok = false; // no good, no access
                     break;
                 } else { // if the right exists
                     eval("\$mval = $moduleright;"); // assign the value of the right pointed by $moduleright
                     //print('mval: '.$mval); // debugline
-                    if (!$mval) { // and if the current user does NOT possess it
+                    if (!$mval) { // and if the current user does NOT possess it (set to false, but in practice Dolibarr does not set unpermitted rights to false, but rather it doesn't set them at all)
                         $rightok = false; // then the user does not meet the necessary privileges to edit this customfield, then we skip
                         break;
                     }
@@ -187,12 +187,13 @@ function customfields_print_datasheet_form($currentmodule, $object, $parameters,
             foreach ($fields as $field) { // for each customfields, we will print/save the edits
 
                 // == Default values from database record
-                $name = $field->column_name; // the name of the customfield (which is the property of the record)
+                $name = strtolower($field->column_name); // the name of the customfield (which is the property of the record)
                 $value = ''; // by default the value of this property is empty
                 if (isset($datas->$name)) { $value = $datas->$name; } // if the property exists (the record is not empty), then we fill in this value
 
                 // == Save the edits
-                if ($action=='set_'.$customfields->varprefix.$name and isset($_POST[$customfields->varprefix.$name]) // if we edited the value
+                $_POST_lower = array_change_key_case($_POST, CASE_LOWER);
+                if (strtolower($action)=='set_'.$customfields->varprefix.$name and isset($_POST_lower[$customfields->varprefix.$name]) // if we edited the value
                     and $rightok) { // and the user has the required privileges to edit the field
 
                     // Forging the new record
@@ -246,7 +247,7 @@ function customfields_print_datasheet_form($currentmodule, $object, $parameters,
                     print '<td colspan="3">';
                 }
                 // print the editing form...
-                if ($action == 'editcustomfields' && GETPOST('field') == $name && $rightok) {
+                if ($action == 'editcustomfields' && strtolower(GETPOST('field')) == $name && $rightok) {
 
                     // Calling custom user's functions
                     $customfunc_edit = 'customfields_field_editview_'.$currentmodule.'_'.$field->column_name;
