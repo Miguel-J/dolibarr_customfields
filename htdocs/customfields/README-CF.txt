@@ -1,11 +1,11 @@
-=================================================
-*				CUSTOMFIELDS MODULE				*
-*			by Stephen Larroque (lrq3000)		*
-*				version	2.15 (branch v2)		*
-*			for Dolibarr >= 3.2.0				*
-*			release date 2012/11/03				*
-*			last update (see on github)			*
-=================================================
+===================================================
+*				CUSTOMFIELDS MODULE				  *
+*			by Stephen Larroque (lrq3000)		  *
+*				version	2.16 (branch v2)		  *
+*	    for Dolibarr >= 3.2.0 (3.3.0 included)    *
+*			release date 2013/03/10				  *
+*			last update (see on github)			  *
+===================================================
 
 ===== DESCRIPTION =====
 
@@ -36,6 +36,9 @@ https://github.com/lrq3000/dolibarr_customfields/tree/3.1
 
 For Dolibarr 3.2.x and above:
 https://github.com/lrq3000/dolibarr_customfields/tree/3.2
+
+For Dolibarr 3.3.x and above:
+https://github.com/lrq3000/dolibarr_customfields/tree/3.3
 
 ===== CONTACT =====
 
