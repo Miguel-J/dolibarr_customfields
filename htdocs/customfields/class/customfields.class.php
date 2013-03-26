@@ -739,6 +739,8 @@ class CustomFields extends compatClass4 // extends CommonObject
 		} else { // else we fill the field
 			$num = $this->db->num_rows($resql); // number of lines returned as a result to our sql statement
 
+                        if (!isset $this->fields) $this->fields = new stdClass(); // initializing the cache object explicitly if empty (to avoid php > 5.3 warnings)
+
 			// -- Several fields columns returned = array() of field objects
 			if ($num > 1) {
 				$field = array();

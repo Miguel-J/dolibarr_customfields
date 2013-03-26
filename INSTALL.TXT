@@ -4,7 +4,7 @@ Just copy the htdocs folder inside your dolibarr folder (overwrite dolibarr/htdo
 
 Then in Configuration>Modules menu, you can activate and configure your CustomFields.
 
-NOTE: you should DISABLE then RENABLE the module if already enabled (this allow to refresh the CustomFields hooks informations).
+NOTE: you should DISABLE then RENABLE the module if already enabled (this allow to refresh the CustomFields hooks informations and also activate new functionnalities like reordering of fields).
 
 == UPDATE ==
 
