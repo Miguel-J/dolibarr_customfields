@@ -538,7 +538,7 @@ class CustomFields extends compatClass4 // extends CommonObject
 				include_once(DOL_DOCUMENT_ROOT . "/core/class/interfaces.class.php");
 				$interface=new Interfaces($this->db);
 				$result=$interface->run_triggers($trigger,$this,$user,$langs,$conf);
-				if ($result < 0) { $error++; $this->errors=$interface->errors; }
+				if ($result < 0) { $error++; $this->errors=$interface->errors; $this->addError('Error returned by a trigger after executeSQL()'); }
 				//// End call triggers
 			}
 		}
@@ -838,6 +838,8 @@ class CustomFields extends compatClass4 // extends CommonObject
                             $cpath = &$this->fields; // else we just use the default cache path ($this->fields)
                             $cachepath = true;
                         } // else if $cachepath is false, then do not store the cache
+
+                        if (!isset($cpath)) $cpath = new stdClass(); // initializing the cache object explicitly if empty (to avoid php > 5.3 warnings)
 
 			// -- Several fields columns returned = array() of field objects
 			if ($num > 1) {
@@ -1461,7 +1463,7 @@ class CustomFields extends compatClass4 // extends CommonObject
             $type=$field->data_type;
             if ($field->column_type == 'tinyint(1)') { $type = 'boolean'; }
             $size=$this->character_maximum_length;
-            if (!isset($currentvalue) or !strlen($currentvalue)) { $currentvalue = $field->column_default;}
+            if ( !is_array($currentvalue) and (!isset($currentvalue) or !strlen($currentvalue)) ) { $currentvalue = $field->column_default;}
 
             if ($type == 'date') {
                 $showsize=10;

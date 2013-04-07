@@ -56,6 +56,8 @@ if (GETPOST("tabembedded")) $tabembedded = '&tabembedded=1';
 $action = GETPOST("action");
 
 if (count($_POST["nulloption"]) == 1)  {$nulloption = true;} else {$nulloption = false;}
+if (count($_POST["requiredoption"]) == 1)  {$requiredoption = true;} else {$requiredoption = false;}
+if (count($_POST["noteditableoption"]) == 1)  {$noteditableoption = true;} else {$noteditableoption = false;}
 
 // **** INIT CUSTOMFIELD CLASS ****
 $customfields = new CustomFields($db, $currentmodule);
@@ -93,15 +95,19 @@ if ($action == 'add' or $action == 'update') {
                 $action = 'edit';
             }
         }
+        // Setting extra options
+        $extra = new stdClass();
+        if (!empty($requiredoption) and $requiredoption) $extra->required = true; else $extra->required = false;
+        if (!empty($noteditableoption) and $noteditableoption) $extra->noteditable = true; else $extra->noteditable = false;
 
         if (! $error) {
             // We check that the field name does not contain any special character (only alphanumeric)
             if (isset($_POST["field"]) && preg_match("/^\w[a-zA-Z0-9-_]*$/i",$_POST['field'])) { // note that we also force the field name (which is the sql column name) to be lowercase
                 // Calling the action function
                 if ($action == 'add') {
-                    $result=$customfields->addCustomField(strtolower($_POST['field']),$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql']);
+                    $result=$customfields->addCustomField(strtolower($_POST['field']),$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql'], null, $extra);
                 } elseif ($action == 'update') {
-                    $result=$customfields->updateCustomField($_POST['fieldid'], strtolower($_POST['field']),$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql']);
+                    $result=$customfields->updateCustomField($_POST['fieldid'], strtolower($_POST['field']),$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql'], $extra);
                 }
                 // Error ?
                 if ($result > 0 and !count($customfields->errors)) { // If no error, we refresh the page
@@ -360,6 +366,8 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
         } elseif (count($_POST["nulloption"]) == 1) {
             $checked = "checked=checked"; // if the user created the custom field but there was an error submitting it, we must be able to reload the settings so that the user can fix the problem and resubmit
         }
+        $checkedr = '';
+        $checkedne = '';
     } elseif ($action == 'edit') {
         if (GETPOST('field')) $field_name = GETPOST('field'); else $field_name = $fieldobj->column_name;
         if (GETPOST('type')) $field_type = GETPOST('type'); else $field_type = $fieldobj->data_type;
@@ -371,6 +379,8 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
         if (count($_POST["nulloption"]) == 1) $checked = "checked=checked"; else $checked = (strtolower($fieldobj->is_nullable) == 'yes' ? "checked=checked" : '');
         if (GETPOST('defaultvalue')) $field_defaultvalue = GETPOST('defaultvalue'); else $field_defaultvalue = $fieldobj->column_default;
         if (GETPOST('constraint')) $field_constraint = GETPOST('constraint'); else $field_constraint = $fieldobj->referenced_table_name;
+        if (count($_POST["requiredoption"]) == 1) $checkedr = "checked=checked"; else $checkedr = ($fieldobj->extra->required ? "checked=checked" : '');
+        if (count($_POST["noteditableoption"]) == 1) $checkedne = "checked=checked"; else $checkedne = ($fieldobj->extra->noteditable ? "checked=checked" : '');
     }
 
     // ** User Fields
@@ -408,6 +418,9 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
     print '<tr><td class="field">'.$langs->trans("CustomSQLDefinition").' ('.$langs->trans("CustomSQLDefinitionDesc").')</td><td class="valeur"><input type="text" name="customdef" size="50" value="'.GETPOST('customdef').'"></td></tr>';
     print '<tr><td class="field">'.$langs->trans("CustomSQL").' ('.$langs->trans("CustomSQLDesc").')</td><td class="valeur"><input type="text" name="customsql" size="50" value="'.GETPOST('customsql').'"></td></tr>';
 
+    // Other options
+    print '<tr><td class="field">'.$langs->trans("OtherOptions").'<br />'.$langs->trans("Required").'<br />'.$langs->trans("NotEditable").'</td><td><br /><input type="checkbox" name="requiredoption[]" value="true" '.$checkedr.'><br /><input type="checkbox" name="noteditableoption[]" value="true" '.$checkedne.'></td></tr>';
+
     print '<tr><td colspan="2" align="center"><input type="submit" name="button" class="button" value="'.$langs->trans("Save").'"> &nbsp; ';
     print '<input type="submit" name="button" class="button" value="'.$langs->trans("Cancel").'"></td></tr>';
     print "</form>\n";
@@ -417,6 +430,6 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
 // some other necessary footer and db closing
 $db->close();
 
-llxFooter('$Date: 2011/07/31 22:23:25 $ - $Revision: 0.1 $');
+llxFooter('$$');
 // end of necessary footers
 ?>

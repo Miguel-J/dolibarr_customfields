@@ -47,9 +47,14 @@ function generic_tag_filling(&$substitutionarray, $object) {
 // Note: before, $object conveyed any field's data, customfields included, but since Dolibarr v3.2.0 beta, this is not the case anymore, so we need to fetch the customfields datas manually.
 // Note2: this function is also automatically called for Dolibarr emails, which is okay but it is also called in the emails config page (?), so then a condition checks that the $object var exists and is not empty, in this case it will just quit
 // Note3: about caching: this function also caches, because Dolibarr calls it twice for every ODT generation, and it's useless to fetch twice the customfields. This is an optional optimization, but it reduces the performance overload by 2.
-function customfields_completesubstitutionarray(&$substitutionarray,$langs,$object) {
+function customfields_completesubstitutionarray(&$substitutionarray,$langs,$object,$parameters) {
     global $conf, $db;
     static  $cfcache; // cache for the customfields (their data won't change between two successive calls of this function)
+
+    if (!isset($cfcache)) $cfcache = new stdClass(); // initializing the object explicitly
+
+    // Init parameters
+    $parameters = (array)$parameters; // convert the $parameters because sometimes an object is returned instead of an array
 
     if (empty($object)) return; // check that this function is called with an $object for substitution in ODTs (else it may be called in the email config page and create a bug)
 
@@ -62,7 +67,7 @@ function customfields_completesubstitutionarray(&$substitutionarray,$langs,$obje
         // If the cache exists, we use it, else we fetch the customfields datas and cache it
         if (!isset($cfcache->{$object->table_element})) {
             include_once(dirname(__FILE__).'/../../lib/customfields_aux.lib.php');
-            $customfields = customfields_fill_object($object, null, $langs); // fetch all customfields and fill them inside $object->customfields ($customfields will then only contain the returned instance of CustomFields object, with customfields sql structure in database - it is unused here, but just used as an example)
+            $customfields = customfields_fill_object($object, null, $langs, null, true); // fetch all customfields and fill them inside $object->customfields ($customfields will then only contain the returned instance of CustomFields object, with customfields sql structure in database - it is unused here, but just used as an example)
             customfields_fill_object($object, null, $langs, 'raw', null); // fetch all customfields and their RAW value inside $object->customfields->raw (very useful for ODT conditionals substitutions). We already have one $customfields object, so we don't need another one.
             $cfcache->{$object->table_element} = $object->customfields; // cache the customfields datas - note: we store customfields per module, so that if this function is called twice for two different modules, the cache will also work
         } else {
@@ -92,9 +97,23 @@ function customfields_completesubstitutionarray(&$substitutionarray,$langs,$obje
  - for each call, we get a $line->rowid, so we choose $object->customfields->lines->{$line->rowid}
  - substitute values just like in the above function
 */
-function customfields_completesubstitutionarray_lines(&$substitutionarray,$langs,$object,$line) {
+function customfields_completesubstitutionarray_lines(&$substitutionarray,$langs,$object,$parameters) {
     global $conf, $db;
     static  $cflinescache; // cache for the lines' customfields (their data won't change between two successive calls of this function)
+
+    if (!isset($cflinescache)) $cflinescache = new stdClass(); // initializing the object explicitly
+
+    // Init parameters
+    $parameters = (array)$parameters; // convert the $parameters because sometimes an object is returned instead of an array
+
+    // For some versions of Dolibarr, the $parameters is an array which can contain more than the line object, thus we just extract the line object
+    if(isset($parameters['line'])) {
+        $line = (object)$parameters['line'];
+    // In some older versions of Dolibarr, the $parameters directly IS the line object we want
+    //} elseif (is_object($parameters) and get_class($parameters) == 'FactureLigne') {
+    } else {
+        $line = (object)$parameters;
+    }
 
     if (empty($object) or empty($line)) return; // check that this function is called with an $object and $line for substitution in ODTs (else it may be called in the email config page and create a bug)
 
@@ -102,11 +121,13 @@ function customfields_completesubstitutionarray_lines(&$substitutionarray,$langs
         // If the cache exists, we use it, else we fetch the lines' customfields datas and cache it
         if (!isset($cflinescache->{$object->table_element})) {
             include_once(dirname(__FILE__).'/../../lib/customfields_aux.lib.php');
-            $customfields = customfields_fill_object_lines($object, null, $langs); // fetch all customfields and fill them inside $object->customfields ($customfields will then only contain the returned instance of CustomFields object, with customfields sql structure in database - it is unused here, but just used as an example)
+            $customfields = customfields_fill_object_lines($object, null, $langs, null, true); // fetch all customfields and fill them inside $object->customfields ($customfields will then only contain the returned instance of CustomFields object, with customfields sql structure in database - it is unused here, but just used as an example)
             customfields_fill_object_lines($object, null, $langs, 'raw', null); // fetch all customfields and their RAW value inside $object->customfields->raw (very useful for ODT conditionals substitutions). We already have one $customfields object, so we don't need another one.
             $cflinescache->{$object->table_element} = $object->customfields->lines; // cache the lines' customfields datas - note: we store customfields per module, so that if this function is called twice for two different modules, the cache will also work
+            //$cflinescache->{$object->table_element}->customfields = $customfields;
         } else {
             $object->customfields->lines = $cflinescache->{$object->table_element}; // load the cache
+            //$customfields = $cflinescache->{$object->table_element}->customfields;
         }
 
         if (empty($object->customfields->lines->{$line->rowid})) return; // if there's no custom field defined for this module AND line, we gracefully exit

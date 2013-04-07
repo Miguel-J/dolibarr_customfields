@@ -193,7 +193,27 @@ class InterfaceSaveFields
             include_once(dirname(__FILE__).'/../../class/customfields.class.php');
             $customfields = new CustomFields($this->db, $currentmodule);
 
-            // Saving the data (creating a record)
+            // Check special options
+            $fields = $customfields->fetchAllFieldsStruct(); // fetch fields structure
+            if (empty($fields)) return; // continue checking only if there is at least one custom field defined
+
+            $err = 0; // error counter
+            $actionw = GETPOST('action');
+            foreach ($fields as $field) { // loop through every custom fields
+                $key = $customfields->varprefix.$field->column_name; // get the full name (cf_somename)
+                // Required fields
+                if ($field->extra->required and !$field->extra->noteditable and empty($object->$key) // check if a field is required, editable and empty, we stop processing
+                     and ( strcmp(substr($actionw, 0, 4), 'set_') or !strcmp(strtolower($actionw), 'set_'.$key) ) ) { // and check that if we are modifying a custom field (because CUSTOMFIELDS_MODIFY trigger is redirecting here), we only account for required field if it is the one we are currently editing (else without this check, any other required custom field will make the trigger fail since their value would be empty since we are not modifying those other custom fields!)
+                    setEventMessage($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv($customfields->findLabel($field->column_name, $langs))),'errors'); // show an error message telling that the field can't be empty
+                    $err++; // increment the error counter
+                }
+            }
+
+            // If there was at least one error in the checking, we stop processing and return an error (if a trigger returns int < 0 then the whole processing will stop, here the object creation will be canceled)
+            if ($err > 0) return -$err; // cancel the processing
+            // Else we can continue processing
+
+            // Saving the customfields data (creating a record)
             $rtncode = $customfields->create($object);
 
             // Print errors (if there are)

@@ -90,7 +90,9 @@ function customfields_print_creation_form($currentmodule, $object = null, $param
         if (isset($id)) $datas = $customfields->fetch($id); // fetching the record - the values of the customfields for this id (if it exists)
         foreach ($fields as $field) {
             $name = strtolower($field->column_name); // the name of the customfield (which is the property of the record)
-            print '<tr><td>'.$customfields->findLabel($name).'</td>';
+            $fieldrequired = '';
+            if ($field->extra->required and empty($field->extra->noteditable)) $fieldrequired = ' class="fieldrequired"';
+            print '<tr><td'.$fieldrequired.'>'.$customfields->findLabel($name).'</td>';
             if(isset($parameters->context)) {
                 print '<td '.$parameters->context.'>';
             } else {
@@ -115,7 +117,9 @@ function customfields_print_creation_form($currentmodule, $object = null, $param
                 if (function_exists($customfunc_create)) { // here the function may modify any parameter it wants (by referencing the values with a pointer like &$values), and then CF will continue to process the printing of the HTML field with these modified variables
                     $customfunc_create($currentmodule, $object, $parameters, $action, $id, $customfields, $field, $name, $value);
                 }
-                print $customfields->ShowInputField($field, $value);
+                if (!$field->extra->noteditable) {
+                    print $customfields->ShowInputField($field, $value);
+                }
             }
             print '</td></tr>';
         }
@@ -194,9 +198,12 @@ function customfields_print_datasheet_form($currentmodule, $object, $parameters,
                 // == Save the edits
                 $_POST_lower = array_change_key_case($_POST, CASE_LOWER);
                 if (strtolower($action)=='set_'.$customfields->varprefix.$name and isset($_POST_lower[$customfields->varprefix.$name]) // if we edited the value
-                    and $rightok) { // and the user has the required privileges to edit the field
+                    and $rightok // and the user has the required privileges to edit the field
+                    and !$field->extra->noteditable // and we CAN edit this field
+                    ) {
 
                     // Forging the new record
+                    $newrecord = new stdClass(); // initializing the cache object explicitly if empty (to avoid php > 5.3 warnings)
                     $newrecord->$name = $_POST[$customfields->varprefix.$name]; // we create a new record object with the field and the id
                     $newrecord->id = $objid;
 
@@ -239,7 +246,7 @@ function customfields_print_datasheet_form($currentmodule, $object, $parameters,
                 // print the customfield's label
                 print $customfields->findLabel($name);
                 // print the edit button only if authorized
-                if (!($action == 'editcustomfields' && GETPOST('field') == $name) && !(isset($objet->brouillon) and $object->brouillon == false) && $rightok) print '<span align="right"><a href="'.$_SERVER["PHP_SELF"].'?'.$idvar.'='.$objid.'&amp;action=editcustomfields&amp;field='.$field->column_name.'">'.img_edit("default",1).'</a></td>';
+                if (!($action == 'editcustomfields' && GETPOST('field') == $name) && !(isset($objet->brouillon) and $object->brouillon == false) && $rightok && !$field->extra->noteditable) print '<span align="right"><a href="'.$_SERVER["PHP_SELF"].'?'.$idvar.'='.$objid.'&amp;action=editcustomfields&amp;field='.$field->column_name.'">'.img_edit("default",1).'</a></td>';
                 print '</td>';
                 if (isset($parameters->colspan)) { // sometimes the colspan is provided in $parameters, we use it if available
                     print '<td '.$parameters->colspan.'>';

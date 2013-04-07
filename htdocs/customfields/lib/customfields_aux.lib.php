@@ -38,6 +38,8 @@
 function customfields_fill_object(&$object,$fromobject = null, $outputlangs = null, $prefix = null,$pdfformat = false,$linemode=false) {
     global $conf, $db;
 
+    if (!is_object($object)) $object = new stdClass();
+
     if (!isset($fromobject)) $fromobject = $object; // by default, $fromobject is the same as $object
 
     // -- Include necessary files
@@ -90,6 +92,7 @@ function customfields_fill_object(&$object,$fromobject = null, $outputlangs = nu
         $linesids = $customfields->fetchAny($prifield, MAIN_DB_PREFIX.$fromobject->table_element_line, $fromobject->fk_element.'='.$id); // fetch the lines' ids linked to this object's id
         // Preparing the lines' ids in an array
         $lids = array();
+        if (empty($linesids)) return null;
         foreach($linesids as $lineid) {
             $lids[] = $lineid->$prifield;
         }
@@ -98,6 +101,8 @@ function customfields_fill_object(&$object,$fromobject = null, $outputlangs = nu
     }
 
     $fkname = 'fk_'.$customfields->module; // foreign key column name in CustomFields's table, storing the id of the (product) line for this object. We need it in order to store lines' datas into a subproperty of $object->customfields->lines->$lineid (we use the line id so that's it's easy to get the relevant line with just the id afterwards)
+
+    if (empty($lines)) return null;
 
     // For every $lines, we process one $record (which is a product line if $linemode is enabled) and store it in $object
     foreach($lines as $record) {
@@ -118,18 +123,26 @@ function customfields_fill_object(&$object,$fromobject = null, $outputlangs = nu
             }
 
             // Add this customfield's record's datas to the $object
+            if (!is_object($object->customfields)) $object->customfields = new stdClass();
             if (!$linemode) {
                 // if in object mode, we simply store the datas in $object->customfields
                 if ($prefix) { // prepending the prefix whether it was specified or not
+                    if (!is_object($object->customfields->$prefix)) $object->customfields->$prefix = new stdClass();
                     $object->customfields->$prefix->$name = $fmvalue; // adding this value to a sub-property of $object to avoid any conflict (default: $object->customfields->cf_myfield)
                 } else {
                     $object->customfields->$name = $fmvalue;
                 }
             } else {
+                if (!is_object($object->customfields->lines)) $object->customfields->lines = new stdClass();
                 // else we are in lines mode, we store the datas in $object->customfields->lineid (so that the customfields are easily accessible knowing just the line's id)
                 if ($prefix) { // prepending the prefix whether it was specified or not
+                    if (!is_object($object->customfields->lines->$prefix->{$record->$fkname})) {
+                        $object->customfields->lines->$prefix = new stdClass();
+                        $object->customfields->lines->$prefix->{$record->$fkname} = new stdClass();
+                    }
                     $object->customfields->lines->$prefix->{$record->$fkname}->$name = $fmvalue; // adding this value to a sub-property of $object to avoid any conflict (default: $object->customfields->lines->$lineid->cf_myfield)
                 } else {
+                    if (!is_object($object->customfields->lines->{$record->$fkname})) $object->customfields->lines->{$record->$fkname} = new stdClass();
                     $object->customfields->lines->{$record->$fkname}->$name = $fmvalue;
                 }
             }
