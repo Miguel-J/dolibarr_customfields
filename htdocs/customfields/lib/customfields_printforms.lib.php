@@ -20,7 +20,7 @@
  *	\file       htdocs/customfields/lib/customfields_printforms.lib.php
  *	\brief      Printing library for the customfields module, very generic and useful (but no core database managing functions, they are in customfields.class.php)
  *	\ingroup    customfields
- *	\version    $Id: customfields_printforms.lib.php, v1.2.4
+ *	\version    $Id: customfields_printforms.lib.php, v1.2.9
  */
 
 /**
@@ -151,7 +151,7 @@ function customfields_print_datasheet_form($currentmodule, $object, $action, $us
             foreach ($fields as $field) { // for each customfields, we will print/save the edits
 
                 // == Default values from database record
-                $name = $field->column_name; // the name of the customfield (which is the property of the record)
+                $name = strtolower($field->column_name); // the name of the customfield (which is the property of the record)
                 $value = ''; // by default the value of this property is empty
                 if (isset($datas->$name)) { $value = $datas->$name; } // if the property exists (the record is not empty), then we fill in this value
 
