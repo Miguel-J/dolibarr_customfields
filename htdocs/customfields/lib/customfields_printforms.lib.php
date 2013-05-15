@@ -147,6 +147,7 @@ function customfields_print_datasheet_form($currentmodule, $object, $action, $us
          // == Printing/Editing custom fields
         if (isset($fields)) { // only if at least one customfield exists (there's a special case where a record may exist because there existed customfields, but all customfields were deleted, and thus the records still exist with a rowid and fk_module columns set, but with nothing else. In this case, we skip.)
 
+            $_POST_lower = array_change_key_case($_POST, CASE_LOWER);
             foreach ($fields as $field) { // for each customfields, we will print/save the edits
 
                 // == Default values from database record
@@ -155,12 +156,13 @@ function customfields_print_datasheet_form($currentmodule, $object, $action, $us
                 if (isset($datas->$name)) { $value = $datas->$name; } // if the property exists (the record is not empty), then we fill in this value
 
                 // == Save the edits
-                if ($action=='set_'.$customfields->varprefix.$name and isset($_POST[$customfields->varprefix.$name]) // if we edited the value
-                    and $rightok) { // and the user has the required privileges to edit the field
+                if (strtolower($action)==strtolower('set_'.$customfields->varprefix.$name) and isset($_POST_lower[$customfields->varprefix.$name]) // if we edited the value
+                    and $rightok // and the user has the required privileges to edit the field
+                   ) {
 
                     // Forging the new record
                     $newrecord = new stdClass(); // initializing the record object explicitly if empty (to avoid php > 5.3 warnings)
-                    $newrecord->$name = $_POST[$customfields->varprefix.$name]; // we create a new record object with the field and the id
+                    $newrecord->$name = $_POST_lower[$customfields->varprefix.$name]; // we create a new record object with the field and the id
                     $newrecord->id = $object->id;
 
                     // Insert/update the record into the database by trigger

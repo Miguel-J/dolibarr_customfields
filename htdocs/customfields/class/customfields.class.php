@@ -172,7 +172,7 @@ class CustomFields extends compatClass4 // extends CommonObject
                     $row = pg_fetch_object($res);
                 }
             }
-            //$row = $this->fetch_object($res); // get the record as an object [DEPRECATED]
+            //$row = $this->db->fetch_object($res); // get the record as an object [DEPRECATED]
             $obj = array_change_key_case((array)$row, CASE_LOWER); // change column_name case to lowercase
             $obj = (object)$obj; // cast back as an object
             return $obj; // return the object
