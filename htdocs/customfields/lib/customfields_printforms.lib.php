@@ -186,11 +186,11 @@ function customfields_print_datasheet_form($currentmodule, $object, $action, $us
                 print '<tr><td>';
                 print $customfields->findLabel($name);
                 // print the edit button only if authorized
-                if (!($action == 'editcustomfields' && GETPOST('field') == $name) && !(isset($objet->brouillon) and $object->brouillon == false) && $rightok) print '<span align="right"><a href="'.$_SERVER["PHP_SELF"].'?'.$idvar.'='.$object->id.'&amp;action=editcustomfields&amp;field='.$field->column_name.'">'.img_edit("default",1).'</a></td>';
+                if (!($action == 'editcustomfields' && strtolower(GETPOST('field')) == $name) && !(isset($objet->brouillon) and $object->brouillon == false) && $rightok) print '<span align="right"><a href="'.$_SERVER["PHP_SELF"].'?'.$idvar.'='.$object->id.'&amp;action=editcustomfields&amp;field='.$field->column_name.'">'.img_edit("default",1).'</a></td>';
                 print '</td>';
                 print '<td colspan="3">';
                 // print the editing form...
-                if ($action == 'editcustomfields' && GETPOST('field') == $name) {
+                if ($action == 'editcustomfields' && strtolower(GETPOST('field')) == $name) {
                     print $customfields->showInputForm($field, $value, $_SERVER["PHP_SELF"].'?'.$idvar.'='.$object->id);
                 } else { // ... or print the field's value
                     print $customfields->printField($field, $value);

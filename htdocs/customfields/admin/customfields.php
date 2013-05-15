@@ -95,9 +95,9 @@ if ($action == 'add' or $action == 'update') {
             if (isset($_POST["field"]) && preg_match("/^\w[a-zA-Z0-9-_]*$/",$_POST['field'])) {
                 // Calling the action function
                 if ($action == 'add') {
-                    $result=$customfields->addCustomField($_POST['field'],$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql']);
+                    $result=$customfields->addCustomField(strtolower($_POST['field']),$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql']);
                 } elseif ($action == 'update') {
-                    $result=$customfields->updateCustomField($_POST['fieldid'], $_POST['field'],$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql']);
+                    $result=$customfields->updateCustomField($_POST['fieldid'], strtolower($_POST['field']),$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql']);
                 }
                 // Error ?
                 if ($result > 0 and !count($customfields->errors)) { // If no error, we refresh the page
