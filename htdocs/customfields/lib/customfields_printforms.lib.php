@@ -159,6 +159,7 @@ function customfields_print_datasheet_form($currentmodule, $object, $action, $us
                     and $rightok) { // and the user has the required privileges to edit the field
 
                     // Forging the new record
+                    $newrecord = new stdClass(); // initializing the record object explicitly if empty (to avoid php > 5.3 warnings)
                     $newrecord->$name = $_POST[$customfields->varprefix.$name]; // we create a new record object with the field and the id
                     $newrecord->id = $object->id;
 
