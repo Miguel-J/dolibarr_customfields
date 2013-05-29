@@ -1250,7 +1250,7 @@ class pdf_customfields extends ModelePDFFactures
                 }
 
 		// Init and main vars
-		include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
+		dol_include_once('/customfields/class/customfields.class.php');
 		$customfields = new CustomFields($this->db, $object->table_element);
 
                 // Fetching custom fields records

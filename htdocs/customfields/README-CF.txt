@@ -1,9 +1,9 @@
 ===================================================
 *				CUSTOMFIELDS MODULE				  *
 *			by Stephen Larroque (lrq3000)		  *
-*				version	2.20 (branch v2)		  *
+*				version	2.21 (branch v2)		  *
 *	    for Dolibarr >= 3.2.0 (3.3.x included)    *
-*			release date 2013/05/16				  *
+*			release date 2013/05/29				  *
 *			last update (see on github)			  *
 ===================================================
 
@@ -133,7 +133,7 @@ As soon as custom fields are created, they will be shown to the user and be edit
 * First you have to load the data:
 
 // Init and main vars
-include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
+dol_include_once('/customfields/class/customfields.class.php');
 $customfields = new CustomFields($this->db, $object->table_element);
 // Fetching custom fields records
 $fields = $customfields->fetch($object->id);
@@ -149,10 +149,10 @@ $fields->mycustomfield
 $pdf->MultiCell(0,3, $fields->mycustomfield, 0, 'L'); // printing the customfield
 
 * To print it with beautified formatting (eg: for constained fields or truefalsebox):
- 
+
 // Getting the beautifully formatted value of the field
 $myvalue = $customfields->simpleprintFieldPDF('mycustomfield', $fields->mycustomfield);
- 
+
 // Printing the field
 $pdf->MultiCell(0,3, $myvalue, 0, 'L');
 
@@ -181,7 +181,7 @@ One of the main features of the CustomFields module is that it offers a generic 
 
 First, you necessarily have to instanciate the CustomFields class:
 		// Init and main vars
-		include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
+		dol_include_once('/customfields/class/customfields.class.php');
 		$customfields = new CustomFields($this->db, $currentmodule); // where $currentmodule is the current module, you can replace it by '' if you just want to use printing functions and fetchAny.
 
 Secondly, you have the fetch the records:
@@ -199,7 +199,7 @@ Thirdly, you can now print all your records this way:
 
 Full final code:
 		// Init and main vars
-		include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
+		dol_include_once('/customfields/class/customfields.class.php');
 		$customfields = new CustomFields($this->db, $currentmodule); // where $currentmodule is the current module, you can replace it by '' if you just want to use printing functions and fetchAny.
 		// Fetch all records
 		$records = $customfields->fetchAll();
@@ -322,7 +322,7 @@ If you are implementing CF for a third-party module (your own module?), then you
 	include_once(DOL_DOCUMENT_ROOT.'/core/class/hookmanager.class.php');
 	$hookmanager=new HookManager($db);
 	$hookmanager->callHooks(array('productcard'));
-	
+
 	// Insert hooks
 	    $parameters=array();
 	    $reshook=$hookmanager->executeHooks('formObjectOptions',$parameters,$object,$action);    // Note that $action and $object may have been modified by hook
@@ -386,7 +386,7 @@ Note3: if you cannot find the place, try to search for $action == 'edit' and fin
 Note4: if get the following error :
 		Warning: Attempt to assign property of non-object in C:\xampp\htdocs\dolibarr\htdocs\customfields\lib\customfields_printforms.lib.php on line 114
 Then you have to modify the $object variable in the code above to another name (you must find it in the code). Eg: for the products module, one had to use $product instead of $object.
-		
+
 Done !
 
 Result: You should now see your customfields in the datasheet, their values, and you should be able to edit them but the edits WON'T be saved.
@@ -447,7 +447,7 @@ Note2: you can find the (almost) full list of dolibarr's triggers at http://wiki
 
 Result: You should now have a fully fonctional customfields support : try to edit the values and save them, and try to generate a pdf or odt document.
 If things don't go as expected but all previous steps were successful, then proceed onto the next optional steps. Else, if everything works well, you're done.
-	
+
 ===== PORTING THE CODE AND CHANGES =====
 If dolibarr's core files gets updated in the future without including the changes I made to these, you can easily find what codes I added by just searching for "customfields" (without the quotes), because I tried to comment every code I added for this purpose, so you can consider it to be a sort of tag to easily find what have been changed and port the code.
 
