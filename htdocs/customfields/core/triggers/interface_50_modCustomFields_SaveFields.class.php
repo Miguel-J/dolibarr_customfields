@@ -233,14 +233,14 @@ class InterfaceSaveFields
             $currentmodule = $object->currentmodule;
 
             // Init and main vars
-            include_once(dirname(__FILE__).'/../../customfields/class/customfields.class.php');
+            include_once(dirname(__FILE__).'/../../class/customfields.class.php');
             $customfields = new CustomFields($this->db, $currentmodule);
 
             // Saving the data (creating a record)
             $rtncode = $customfields->createFromClone($object->origin_id, $object->id);
 
             // Print errors (if there are)
-            if (!empty($customfields->error) and strpos(strtolower($customfields->error), "Table '".$customfields->moduletable."' doesn't exist")) { // if the error is that the table doesn't exists, we ignore it because it is probably because the user does not use CustomFields for this module
+            if (!empty($customfields->error) and strpos(strtolower($customfields->error), "table '".$customfields->moduletable."' doesn't exist")) { // if the error is that the table doesn't exists, we ignore it because it is probably because the user does not use CustomFields for this module
                 dol_print_error($this->db, $customfields->error);
             }
 

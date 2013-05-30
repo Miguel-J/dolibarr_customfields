@@ -447,6 +447,7 @@ class CustomFields extends compatClass4 // extends CommonObject
 		$object = $this->fetch($id);
 
 		$object->id = $cloneid; // Affecting the new id
+                $object->rowid = $cloneid; // Affecting the new id
 
 		$rtncode = $this->create($object); // creating the new record
 
