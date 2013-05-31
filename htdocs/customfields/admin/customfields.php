@@ -89,15 +89,17 @@ if ($action == 'add' or $action == 'update') {
                 $action = 'edit';
             }
         }
+        // Setting extra options
+        $extra = new stdClass();
 
         if (! $error) {
             // We check that the field name does not contain any special character (only alphanumeric)
             if (isset($_POST["field"]) && preg_match("/^\w[a-zA-Z0-9-_]*$/",$_POST['field'])) {
                 // Calling the action function
                 if ($action == 'add') {
-                    $result=$customfields->addCustomField(strtolower($_POST['field']),$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql']);
+                    $result=$customfields->addCustomField(strtolower($_POST['field']),$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql'], null, $extra);
                 } elseif ($action == 'update') {
-                    $result=$customfields->updateCustomField($_POST['fieldid'], strtolower($_POST['field']),$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql']);
+                    $result=$customfields->updateCustomField($_POST['fieldid'], strtolower($_POST['field']),$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql'], $extra);
                 }
                 // Error ?
                 if ($result > 0 and !count($customfields->errors)) { // If no error, we refresh the page

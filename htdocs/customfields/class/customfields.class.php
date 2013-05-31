@@ -615,7 +615,7 @@ class CustomFields extends compatClass4 // extends CommonObject
 		$sql = "CREATE TABLE ".$this->extratable."(
                 table_name varchar(64),
 		column_name varchar(64), -- we need to use the column_name because the ordinal_position is automatically rearranged for all columns when a field is deleted, and we can't know it (unless we put a trigger or a foreign keys, but the goal here is to not rely on referential integrity because we want to be able to simulate it), thus it's better to use column_name, but be careful with the size limit!
-                extraoptions blob, -- better use a blob than a text, because: 1- text is deprecated in a lot of DBMS, blob has no encoding, so that it won't interfer with the JSON encoding when using UTF-8 characters
+                extraoptions blob, -- better use a blob than a text, because: 1- text is deprecated in a lot of DBMS; 2- blob has no encoding, so that it won't interfer with the JSON encoding when using UTF-8 characters
                 PRIMARY KEY (table_name, column_name)
 		);";
 
@@ -1296,7 +1296,7 @@ class CustomFields extends compatClass4 // extends CommonObject
             }
 
             // Cross-DBMS implementation of Upsert, see for more infos http://en.wikipedia.org/wiki/Upsert
-            $sqle1 = "UPDATE ".$this->extratable." SET table_name='".$this->moduletable."', column_name='".$fieldname."', extraoptions='".$fullextraoptions."' WHERE column_name='".$oldfieldname."';";
+            $sqle1 = "UPDATE ".$this->extratable." SET column_name='".$fieldname."', extraoptions='".$fullextraoptions."' WHERE table_name='".$this->moduletable."' AND column_name='".$oldfieldname."';";
             /* DOESN'T WORK! this SHOULD work, but it doesn't because MySQL put a lock on the composite primary keys, and it then produces an error that shouldn't happen. There exist other solutions, but none of them are standard.
             $sqle2 = "INSERT INTO ".$this->extratable." (table_name, column_name, extraoptions)
                             SELECT '".$this->moduletable."', '".$fieldname."', '".$fullextraoptions."'
