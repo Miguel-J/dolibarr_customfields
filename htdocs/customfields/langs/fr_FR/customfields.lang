@@ -6,14 +6,20 @@ CHARSET= UTF-8
 # Main title
 CustomFieldsSetup= Interface de configuration des champs personnalisés
 
+# Embedded tab
+CustomFields= Champs personnalisés
+
 # Description (on admin's modules list)
 Module8500Desc= Outil d'ajout de champs personnalisés
 
 # Long Description (to help user on first time usage)
 CustomFieldsLongDescriptionWithAd= Vous utilisez la version gratuite du module CustomFields. Une <a href="http://www.customfields.org" target="_blank">version Pro avec bien plus de fonctionnalités, de rapidité et d'onglets est également disponible ici.</a><br /><br />Ce module vous permet de facilement ajouter et gérer vos propres champs personnalisés, puis de les utiliser dans les documents PDF et ODT, ou de toute autre manière que vous voulez.<br /><br />Ici, vous pouvez ajouter vos propres champs dans les différents modules de Dolibarr: cliquez sur l'onglet correspondant au module que vous souhaitez, puis cliquez sur le bouton Nouveau champ dans le coin en bas à droite de cette page et remplir les données requises. Aussitôt le champ créé, il apparaitra et sera modifiable sur la page du module.<br />Si vous souhaitez gérer un champ, vous pouvez le modifier en cliquant sur la petite icône sur sa droite, ou le supprimer avec l'icône de suppression.<br /><br />Pour plus d'informations, consultez le fichier <a href="../README-CF.txt" target="_blank">README-CF.txt</a> inclus, ou <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_FR" target="_blank">jetez un oeil au wiki</a> (seulement pour CustomFields pro, mais la plupart des détails techniques sont les mêmes pour les versions gratuites et Pro). Vous pouvez également <a href="http://www.dolibarr.fr/forum/511-creation-dun-nouveau-module/28793-release-customfields-module-champs-personnalises" target="_blank">poser une question sur le forum</a>.<br /><br />Si vous voulez plus de fonctionnalités, vous pouvez vous <a href="http://www.customfields.org" target="_blank">mettre à jour vers CustomFields Pro (www.customfields.org)</a> à n'importe quel moment, vos champs personnalisés et les données associées seront gardées intactes, la mise à jour est automatique et transparente.
 
+# Error messages
+TableDoesNotExist= La table de champs personnalisés pour ce module n'existe pas encore! Veuillez créer la table avant de pouvoir créer des champs.<br />Voulez-vous la créer maintenant?
+
 # Modules tabs
-facture= Facture
+facture= Facture client
 propal= Proposition commerciale
 product= Produits/Services
 commande= Commandes client
@@ -24,6 +30,7 @@ Datatype= Type du champ
 Variable= Variable
 
 # Buttons
+CreateTable= Créer la table
 NewField= Nouveau champ
 
 # Attributes labels
@@ -32,7 +39,7 @@ Label= Libellé
 FieldName= Nom du champ
 AlphaNumOnlyCharsAndNoSpace= seulement caractères alphanumériques sans espaces
 Type= Type
-EnumValues= Valeurs pour le type Liste déroulante
+EnumValues= Valeurs pour la Liste déroulante
 CanBeNull?= Accepter les valeurs vides ?
 Constraint= Contrainte
 CustomSQLDefinition= Definition SQL personnalisée
@@ -55,7 +62,6 @@ True= Vrai
 False= Faux
 
 # Attributes descriptions and notes
-RequiredIfFieldCannotBeNull=requis si le champ n'accepte pas les valeurs vides
 SizeDesc=ex: 256 pour une zone de texte, <br />ou "premier","deuxio","tertio" AVEC les guillemets et virgules pour une liste déroulante
 SizeNote=Note: requis seulement pour Liste déroulante, pour les autres types vous pouvez laisser ceci vide.
 CustomSQLDefinitionDesc=la définition personnalisée du champ sera ajoutée à la suite de toutes les définitions au-dessus - Type, Taille, etc.

@@ -1,9 +1,9 @@
 ===================================================
 *				CUSTOMFIELDS MODULE				  *
 *			by Stephen Larroque (lrq3000)		  *
-*				version	2.23 (branch v2)		  *
+*				version	2.24 (branch v2)		  *
 *	    for Dolibarr >= 3.2.0 (3.3.x included)    *
-*			release date 2013/05/31				  *
+*			release date 2013/06/01				  *
 *			last update (see on github)			  *
 ===================================================
 

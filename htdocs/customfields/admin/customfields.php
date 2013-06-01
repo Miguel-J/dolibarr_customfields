@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2012   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2013   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,6 +51,7 @@ if (!(GETPOST("module"))) {
 
 $action = GETPOST("action");
 
+// Get and set default values otherwise for checkable options
 if (count($_POST["nulloption"]) == 1)  {$nulloption = true;} else {$nulloption = false;}
 
 // **** INIT CUSTOMFIELD CLASS ****
@@ -94,7 +95,7 @@ if ($action == 'add' or $action == 'update') {
 
         if (! $error) {
             // We check that the field name does not contain any special character (only alphanumeric)
-            if (isset($_POST["field"]) && preg_match("/^\w[a-zA-Z0-9-_]*$/",$_POST['field'])) {
+            if (isset($_POST["field"]) && preg_match("/^\w[a-zA-Z0-9-_]*$/i",$_POST['field'])) { // note that we also force the field name (which is the sql column name) to be lowercase
                 // Calling the action function
                 if ($action == 'add') {
                     $result=$customfields->addCustomField(strtolower($_POST['field']),$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql'], null, $extra);
@@ -183,8 +184,10 @@ llxHeader('',$langs->trans("CustomFieldsSetup"));
 
 $linkback='<a href="'.DOL_URL_ROOT.'/admin/modules.php">'.$langs->trans("BackToModuleList").'</a>';
 
+// print title
 print_fiche_titre($langs->trans("CustomFieldsSetup"),$linkback,'setup');
 
+// print long description (to help first time users and provide with a link to the wiki, kind of a contextual help) - but only if it's the customfields admin page
 dol_fiche_head();
 print($langs->trans('Description').":<br />".$langs->trans("CustomFieldsLongDescriptionWithAd"));
 dol_fiche_end();
@@ -205,7 +208,7 @@ $tableexists = $customfields->probeTable();
 
 // if the table for this module is not created, we ask user if he wants to create it
 if (!$tableexists) {
-    print $langs->trans('The customfields table for this module is not yet created! Please create the table before creating fields.<br />Do you want to create it now?');
+    print $langs->trans("TableDoesNotExist");
     print "<br /><center><a class=\"butAction\" href=\"".$_SERVER["PHP_SELF"]."?module=".$currentmodule."&action=init\">".$langs->trans("CreateTable")."</a></center>";
     dol_fiche_end();
 
@@ -323,14 +326,17 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
 
     // ** Variables initializing
     if ($action == 'create') {
-        $field_name = GETPOST('field'); // if GETPOST is defined, $field_name will reload the data submitted by the admin, else if there's none it will just be empty (blank creation of a custom field). This is a clever way to avoid too many conditionnal statements
+        $field_name = GETPOST('field'); // if GETPOST is defined, $field_name will reload the data submitted by the admin, else if there's none it will just be empty (blank creation of a custom field). This is a clever way to avoid too many conditionnal statements.
         $field_type = GETPOST('type');
         $field_size = GETPOST('size');
         $field_constraint = GETPOST('constraint');
         $field_customtype = GETPOST('customtype');
         $checked = '';
-        if ($action=='create') $checked = "checked=checked"; //  By default a field can be null (necessary to have the field either possibly null or to have a default value if the user add a new field while he already saved an invoice/propal/whatever with custom fields, these already saved records must know what to set by default for the new column)
-        if (count($_POST["nulloption"]) == 1) $checked = "checked=checked"; // if the user created the custom field but there was an error submitting it, we must be able to reload the settings so that the user can fix the problem and resubmit
+        if (empty($_POST)) {
+            $checked = "checked=checked"; //  By default a field can be null (necessary to have the field either possibly null or to have a default value if the user add a new field while he already saved an invoice/propal/whatever with custom fields, these already saved records must know what to set by default for the new column)
+        } elseif (count($_POST["nulloption"]) == 1) {
+            $checked = "checked=checked"; // if the user created the custom field but there was an error submitting it, we must be able to reload the settings so that the user can fix the problem and resubmit
+        }
     } elseif ($action == 'edit') {
         if (GETPOST('field')) $field_name = GETPOST('field'); else $field_name = $fieldobj->column_name;
         if (GETPOST('type')) $field_type = GETPOST('type'); else $field_type = $fieldobj->data_type;
@@ -339,7 +345,7 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
             $field_type = 'other';
         }
         if (GETPOST('size')) $field_size = GETPOST('size'); else $field_size = $fieldobj->size;
-        if (count($_POST["nulloption"]) == 1) $checked = "checked=checked"; else $checked = '';
+        if (count($_POST["nulloption"]) == 1) $checked = "checked=checked"; else $checked = (strtolower($fieldobj->is_nullable) == 'yes' ? "checked=checked" : '');
         if (GETPOST('defaultvalue')) $field_defaultvalue = GETPOST('defaultvalue'); else $field_defaultvalue = $fieldobj->column_default;
         if (GETPOST('constraint')) $field_constraint = GETPOST('constraint'); else $field_constraint = $fieldobj->referenced_table_name;
     }
@@ -362,11 +368,11 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
     print '<br>'.$langs->trans('Other').' ('.$langs->trans('CustomSQL').'): <input type="text" name="customtype" size="10" value="'.$field_customtype.'">';
     print '</td></tr>';
     // Size
-    print '<tr><td class="fieldrequired required">'.$langs->trans("Size").' '.$langs->trans("or").' '.$langs->trans("EnumValues").' ('.$langs->trans("SizeDesc").')<br />'.$langs->trans("SizeNote").'</td><td><input type="text" name="size" size="10" value="'.$field_size.'"></td></tr>';
+    print '<tr><td class="field">'.$langs->trans("Size").', '.$langs->trans("or").' '.$langs->trans("EnumValues").' ('.$langs->trans("SizeDesc").')<br />'.$langs->trans("SizeNote").'</td><td><input type="text" name="size" size="10" value="'.$field_size.'"></td></tr>';
     // Null?
-    print '<tr><td class="fieldrequired required">'.$langs->trans("CanBeNull?").'</td><td><input type="checkbox" name="nulloption[]" value="true" '.$checked.'></td></tr>';
+    print '<tr><td class="field">'.$langs->trans("CanBeNull?").'</td><td><input type="checkbox" name="nulloption[]" value="true" '.$checked.'></td></tr>';
     // Default value
-    print '<tr><td class="field">'.$langs->trans("DefaultValue").' ('.$langs->trans("RequiredIfFieldCannotBeNull").')</td><td class="valeur"><input type="text" name="defaultvalue" size="10" value="'.$field_defaultvalue.'"></td></tr>';
+    print '<tr><td class="field">'.$langs->trans("DefaultValue").'</td><td class="valeur"><input type="text" name="defaultvalue" size="10" value="'.$field_defaultvalue.'"></td></tr>';
 
     // SQL constraints
     print '<tr><td class="field">'.$langs->trans("Constraint").'</td><td class="valeur">';
@@ -388,6 +394,6 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
 // some other necessary footer and db closing
 $db->close();
 
-llxFooter('$Date: 2011/07/31 22:23:25 $ - $Revision: 0.1 $');
+llxFooter('$$');
 // end of necessary footers
 ?>
