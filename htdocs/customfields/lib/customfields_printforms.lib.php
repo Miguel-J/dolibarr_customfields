@@ -80,7 +80,11 @@ function customfields_print_creation_form($currentmodule, $id = null) {
     $customfields = new CustomFields($db, $currentmodule);
 
     if ($customfields->probeTable()) { // ... and if the table for this module exists, we show the custom fields
+        // Fetch custom fields' database structures
         $fields = $customfields->fetchAllFieldsStruct();
+        // quit if there's no custom field at all
+        if(empty($fields)) return;
+        // fetching the record - the values of the customfields for this id (if it exists)
         if (isset($id)) $datas = $customfields->fetch($id); // fetching the record - the values of the customfields for this id (if it exists)
         foreach ($fields as $field) {
             $name = $field->column_name;
@@ -118,10 +122,17 @@ function customfields_print_datasheet_form($currentmodule, $object, $action, $us
     if ($customfields->probeTable()) { // ... and if the table for this module exists, we show the custom fields
         //print '<table class="border" width="100%">';
 
+        if (!empty($object->rowid)) {
+            $objid = $object->rowid;
+        } else {
+            $objid = $object->id;
+        }
+
         // == Fetching customfields
         $fields = $customfields->fetchAllFieldsStruct(); // fetching the customfields list
-        $datas = $customfields->fetch($object->id); // fetching the record - the values of the customfields for this id (if it exists)
-        $datas->id = $object->id; // in case the record does not yet exist for this id, we at least set the id property of the datas object (useful for the update later on)
+        $datas = $customfields->fetch($objid); // fetching the record - the values of the customfields for this id (if it exists)
+        if (empty($datas)) $datas = new stdClass(); // avoid php > 5.3 warnings if there is not yet any customfields for this record
+        $datas->id = $objid; // in case the record does not yet exist for this id, we at least set the id property of the datas object (useful for the update later on)
 
         // == Checking rights
         // checking the user's rights for edition for all current module's customfields
@@ -163,7 +174,7 @@ function customfields_print_datasheet_form($currentmodule, $object, $action, $us
                     // Forging the new record
                     $newrecord = new stdClass(); // initializing the record object explicitly if empty (to avoid php > 5.3 warnings)
                     $newrecord->$name = $_POST_lower[$customfields->varprefix.$name]; // we create a new record object with the field and the id
-                    $newrecord->id = $object->id;
+                    $newrecord->id = $objid;
 
                     // Insert/update the record into the database by trigger
                     //$customfields->update($newrecord); // update or create the record in the database (will check automatically) - this does the same as the trigger below, but the trigger is more consistent with the rest (we need to use triggers for creation)
@@ -177,7 +188,7 @@ function customfields_print_datasheet_form($currentmodule, $object, $action, $us
                     // $datas->$name = $_POST[$customfields->varprefix.$name]; // we update the loaded record to the new value so that it gets printed asap
                     //$value = $datas->$name;
                     // Reloading the field from the database (we need to fetch from the database because there can be some not null fields with default values, and if we are creating the record, these will be filled it, and we have no way to know it when updating the database, so we need to fetch the record again)
-                    $datas = $customfields->fetch($object->id); // fetching the record - the values of the customfields for this id (if it exists)
+                    $datas = $customfields->fetch($objid); // fetching the record - the values of the customfields for this id (if it exists)
                     $value = $datas->$name;
                 }
 
@@ -186,12 +197,12 @@ function customfields_print_datasheet_form($currentmodule, $object, $action, $us
                 print '<tr><td>';
                 print $customfields->findLabel($name);
                 // print the edit button only if authorized
-                if (!($action == 'editcustomfields' && strtolower(GETPOST('field')) == $name) && !(isset($objet->brouillon) and $object->brouillon == false) && $rightok) print '<span align="right"><a href="'.$_SERVER["PHP_SELF"].'?'.$idvar.'='.$object->id.'&amp;action=editcustomfields&amp;field='.$field->column_name.'">'.img_edit("default",1).'</a></td>';
+                if (!($action == 'editcustomfields' && strtolower(GETPOST('field')) == $name) && !(isset($objet->brouillon) and $object->brouillon == false) && $rightok) print '<span align="right"><a href="'.$_SERVER["PHP_SELF"].'?'.$idvar.'='.$objid.'&amp;action=editcustomfields&amp;field='.$field->column_name.'">'.img_edit("default",1).'</a></td>';
                 print '</td>';
                 print '<td colspan="3">';
                 // print the editing form...
                 if ($action == 'editcustomfields' && strtolower(GETPOST('field')) == $name) {
-                    print $customfields->showInputForm($field, $value, $_SERVER["PHP_SELF"].'?'.$idvar.'='.$object->id);
+                    print $customfields->showInputForm($field, $value, $_SERVER["PHP_SELF"].'?'.$idvar.'='.$objid);
                 } else { // ... or print the field's value
                     print $customfields->printField($field, $value);
                 }
