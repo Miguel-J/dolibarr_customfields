@@ -233,6 +233,10 @@ class CustomFields extends compatClass4 // extends CommonObject
 					$record[$obj->id] = $obj; // add the record to our records' array
 				}
 				$this->records = $record; // and we as well store the records as a property of the CustomFields class
+
+                                // Workaround: on some systems, num_rows will return 2 when in fact there's only 1 row. Here we fix that by counting the number of elements in the final array: if only one, then we return only first element of the array to be compliant with the paradigm: one record = one value returned
+                                if ( !is_array($id) and count($record) == 1) $record = reset($record);
+
 			// Only one record returned = one object
 			} elseif ($num == 1) {
 				$record = $this->fetch_object($resql);
@@ -245,6 +249,7 @@ class CustomFields extends compatClass4 // extends CommonObject
 
 				$record->id = $id; // set the record's id
 				$this->id = $id;
+
 			// No record returned = null
 			} else {
 				$record = null;
@@ -771,6 +776,9 @@ class CustomFields extends compatClass4 // extends CommonObject
                                     $column_name = $obj->column_name; // we get the column name of the field
                                     $this->fields->$column_name = $obj; // and we as well store the field as a property of the CustomFields class (caching for quicker access next time)
                                 }
+
+                                // Workaround: on some systems, num_rows will return 2 when in fact there's only 1 row. Here we fix that by counting the number of elements in the final array: if only one, then we return only first element of the array to be compliant with the paradigm: one record = one value returned
+                                if (count($field) == 1) $field = reset($field);
 
 			// -- Only one field returned = one field object
 			} elseif ($num == 1) {
