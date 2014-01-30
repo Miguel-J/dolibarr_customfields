@@ -353,10 +353,21 @@ class CustomFields extends compatClass4 // extends CommonObject
 				$key = $field->column_name;
 			}
 
+            $object->$key = urldecode($object->$key); // New in Dolibarr 3.4.x: all data is url encoded, must decode before storing into db
+
 			//We need to fetch the correct value when we update a date field
 			if($field->data_type == 'date') {
-				$object->$key = $this->db->idate(dol_mktime(0, 0, 0, $object->{$key.'month'}, $object->{$key.'day'}, $object->{$key.'year'}));
-		       }
+                // Fetch day, month and year
+                if (isset($object->{$key.'day'}) and isset($object->{$key.'month'}) and isset($object->{$key.'year'})) { // for date fields, Dolibarr will produce 3 more associated POST fields: myfielddate, myfieldmonth and myfieldyear
+                    $dateday = trim($object->{$key.'day'});
+                    $datemonth = trim($object->{$key.'month'});
+                    $dateyear = trim($object->{$key.'year'});
+                } else { // else if they are not submitted (or if they weren't assigned inside $object), we try to split the date into 3 values
+                    list($dateday, $datemonth, $dateyear) = explode('/',$object->$key);
+                }
+                // Format the correct timestamp from the date for the database
+                $object->$key = $this->db->idate(dol_mktime(0, 0, 0, $datemonth, $dateday, $dateyear));
+           }
 
 			if ($object->$key) { // Only insert/update this field if it was submitted
                                 // Note: we separate fields and values because depending on whether we UPDATE or INSERT the record, the format is not the same (INSERT: values and fields are separated, UPDATE: both are submitted at the same place)
@@ -1406,12 +1417,12 @@ class CustomFields extends compatClass4 // extends CommonObject
 				$out.='<input type="text" name="'.$this->varprefix.$key.'" size="'.$showsize.'" maxlength="'.$size.'" value="'.$currentvalue.'"'.($moreparam?$moreparam:'').'>';
 			} elseif ($type == 'text') {
 				require_once(DOL_DOCUMENT_ROOT."/core/class/doleditor.class.php");
-				$doleditor=new DolEditor($this->varprefix.$key,$currentvalue,'',200,'dolibarr_notes','In',false,false,$conf->fckeditor->enabled && $conf->global->FCKEDITOR_ENABLE_SOCIETE,5,100);
+                $doleditor=new DolEditor($this->varprefix.$key,$currentvalue,'',200,'dolibarr_notes','In',false,false,$conf->fckeditor->enabled,5,100);
 				$out.=$doleditor->Create(1);
 			} elseif ($type == 'date') {
 				//$out.=' (YYYY-MM-DD)';
 				$html=new Form($db);
-				$out.=$html->select_date($currentvalue,$this->varprefix.$key,0,0,1,$this->varprefix.$key,1,1,1);
+                $out.=$html->select_date($currentvalue,$this->varprefix.$key,0,0,1,$this->varprefix.$key,1,1,1);
 			} elseif ($type == 'datetime') {
 				//$out.=' (YYYY-MM-DD HH:MM:SS)';
 				if (empty($currentvalue)) { $currentvalue = 'YYYY-MM-DD HH:MM:SS'; }
