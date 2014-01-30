@@ -1417,12 +1417,16 @@ class CustomFields extends compatClass4 // extends CommonObject
 				$out.='<input type="text" name="'.$this->varprefix.$key.'" size="'.$showsize.'" maxlength="'.$size.'" value="'.$currentvalue.'"'.($moreparam?$moreparam:'').'>';
 			} elseif ($type == 'text') {
 				require_once(DOL_DOCUMENT_ROOT."/core/class/doleditor.class.php");
-                $doleditor=new DolEditor($this->varprefix.$key,$currentvalue,'',200,'dolibarr_notes','In',false,false,$conf->fckeditor->enabled,5,100);
-				$out.=$doleditor->Create(1);
+                $randid = '_rand'.uniqid($key.rand(1,10000)); // Important to make sure that this field gets an unique ID, else the Javascript widget won't be able to locate the correct field if multiple fields have the same id (which is not correct anyway in X/HTML)
+                $doleditor=new DolEditor($this->varprefix.$key.$randid,$currentvalue,'',200,'dolibarr_notes','In',false,false,$conf->fckeditor->enabled,5,100);
+                $out.=$doleditor->Create(1);
+                $out = str_replace('name="'.$this->varprefix.$key.$randid.'"', 'name="'.$this->varprefix.$key.'"', $out); // Finally, replace the name by removing the random id part (because we need the name to be exactly the same as the field's name so that we can detect it and save it in customfields_printforms.lib.php)
 			} elseif ($type == 'date') {
 				//$out.=' (YYYY-MM-DD)';
 				$html=new Form($db);
-                $out.=$html->select_date($currentvalue,$this->varprefix.$key,0,0,1,$this->varprefix.$key,1,1,1);
+                $randid = '_rand'.uniqid($key.rand(1,10000)); // Important to make sure that this field gets an unique ID, else the Javascript widget won't be able to locate the correct field if multiple fields have the same id (which is not correct anyway in X/HTML)
+                $out.=$html->select_date($currentvalue,$this->varprefix.$key.$randid,0,0,1,$this->varprefix.$key.$randid,1,1,1);
+                $out = str_replace('name="'.$this->varprefix.$key.$randid.'"', 'name="'.$this->varprefix.$key.'"', $out); // Finally, replace the name by removing the random id part (because we need the name to be exactly the same as the field's name so that we can detect it and save it in customfields_printforms.lib.php)
 			} elseif ($type == 'datetime') {
 				//$out.=' (YYYY-MM-DD HH:MM:SS)';
 				if (empty($currentvalue)) { $currentvalue = 'YYYY-MM-DD HH:MM:SS'; }
