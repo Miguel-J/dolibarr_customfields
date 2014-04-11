@@ -82,7 +82,7 @@ class InterfaceSaveFields
 
     /**
      *      Function called when a Dolibarrr business event is done.
-     *      All functions "run_trigger" are triggered if file is inside directory htdocs/includes/triggers
+     *      All functions "run_trigger" are triggered if file is inside directory htdocs/includes/triggers or $modulepath/core/triggers
      *      @param      action      Code de l'evenement
      *      @param      object      Objet concerne
      *      @param      user        Objet user
@@ -95,17 +95,18 @@ class InterfaceSaveFields
         // Put here code you want to execute when a Dolibarr business events occurs.
         // Data and type of action are stored into $object and $action
 
-	//foreach ($_POST as $key=>$value) { // Generic way to fill all the fields to the object (particularly useful for triggers and customfields) - NECESSARY to get the fields' values
-    if (!empty($_POST)) {
-        foreach (explode('&', file_get_contents('php://input')) as $keyValuePair) { // Use this way to access all fields, even the ones with the same name (important for products lines where fields are duplicated for both free products and predefined products) // TODO: find a better way to manage this edge case (same form for both free and predefined products, thus the same name fields for two customfields since they are duplicated. Fix directly the Dolibarr code by implementing two different forms?)
-            list($key, $value) = explode('=', $keyValuePair);
-            if (!isset($object->$key)) { // Appending only: only add the property to the object if this property is not already defined
-                $object->$key = $value;
-            } elseif (empty($object->$key) && !empty($value)) {
-                $object->$key = $value;
+        // Generic way to fill all the fields to the object (particularly useful for triggers and customfields) - NECESSARY to get the fields' values
+        //foreach ($_POST as $key=>$value) { // Old less reliable way to do it (because it couldn't account for conflicting names: two fields having the same name)
+        if (!empty($_POST)) {
+            foreach (explode('&', file_get_contents('php://input')) as $keyValuePair) { // Use this way to access all fields, even the ones with the same name (important for products lines where fields are duplicated for both free products and predefined products) // TODO: find a better way to manage this edge case (same form for both free and predefined products, thus the same name fields for two customfields since they are duplicated. Fix directly the Dolibarr code by implementing two different forms?)
+                list($key, $value) = explode('=', $keyValuePair);
+                if (!isset($object->$key) and isset($value)) { // Appending only: only add the property to the object if this property is not already defined
+                    $object->$key = urldecode($value); // don't forget to urldecode since values are urlencoded in php://input, which is not the case with $_POST!
+                } elseif (empty($object->$key) and !empty($value)) {
+                    $object->$key = urldecode($value);
+                }
             }
         }
-    }
 
         // Products and services
         if($action == 'PRODUCT_CREATE') {
