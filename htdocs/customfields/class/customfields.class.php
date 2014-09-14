@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2011-2012   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2014   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -200,9 +200,9 @@ class CustomFields extends compatClass4 // extends CommonObject
 
 	/**
 	 *      Fetch a record (or all records) from the database (meaning an instance of the custom fields, the values if you prefer)
-	 *      @param	   id				id of the record to find (NOT customfields rowid but fk_moduleid, which is the same as the module's rowid) - can be left empty if you want to fetch all the records
+	 *      @param	   id				id of the record to find (NOT customfields rowid but fk_moduleid, which is the same as the module's rowid) OR an array of id - can be left empty if you want to fetch all the records
 	 *      @param      notrigger	    0=launch triggers after, 1=disable triggers
-	 *      @return     int/null/obj/obj[]        	<0 if KO, null if no record is found, a record if only one is found, an array of records if OK
+	 *      @return     int/null/obj/obj[]        	<0 if KO, null if no record is found, if OK: a record if only one is found, or an array of records otherwise (special case: if $id is an array of ids, then even if only one record is found, an array of records will always be returned)
 	 */
 	function fetch($id=null, $notrigger=0)
 	{
@@ -219,8 +219,9 @@ class CustomFields extends compatClass4 // extends CommonObject
 
 		$sql = "SELECT * FROM ".$this->moduletable;
 
-                if (is_array($id)) {
+                //if (is_array($id) and count($id) == 1) $id = reset($id); // If there is only one id in the array, we extract the first value from the array
 
+                if (is_array($id)) {
                     $sql .= " WHERE fk_".$this->module."=".implode(' or fk_'.$this->module.'=', $id);
                 } elseif ($id > 0) { // if we supplied an id, we fetch only this one record
 		    $sql .= " WHERE fk_".$this->module."=".$id." LIMIT 1";
@@ -253,6 +254,10 @@ class CustomFields extends compatClass4 // extends CommonObject
 					$record[$obj->id] = $obj; // add the record to our records' array
 				}
 				$this->records = $record; // and we as well store the records as a property of the CustomFields class
+
+                                // Workaround: on some systems, num_rows will return 2 when in fact there's only 1 row. Here we fix that by counting the number of elements in the final array: if only one, then we return only first element of the array to be compliant with the paradigm: one record = one value returned
+                                if ( !is_array($id) and count($record) == 1) $record = reset($record);
+
 			// Only one record returned = one object
 			} elseif ($num == 1) {
 				$record = $this->fetch_object($resql);
@@ -265,6 +270,7 @@ class CustomFields extends compatClass4 // extends CommonObject
 
 				$record->id = $id; // set the record's id
 				$this->id = $id;
+
 			// No record returned = null
 			} else {
 				$record = null;
@@ -383,17 +389,33 @@ class CustomFields extends compatClass4 // extends CommonObject
                         $sqlvalues[] = 'NULL'; // special case: if the value supplied is an empty string (even 0 returns 1 length), then we put this as NULL without quotes (else, it will supply a field with '' which can be rejected even on nullable sql fields)
                    } else {
                         //We need to fetch the correct value when we update a date field
-                        if($field->data_type == 'date') {
+                        if ($field->data_type == 'date') {
                             // Fetch day, month and year
                             if (isset($object->{$key.'day'}) and isset($object->{$key.'month'}) and isset($object->{$key.'year'})) { // for date fields, Dolibarr will produce 3 more associated POST fields: myfielddate, myfieldmonth and myfieldyear
-                                $dateday = $object->{$key.'day'};
-                                $datemonth = $object->{$key.'month'};
-                                $dateyear = $object->{$key.'year'};
+                                $dateday = trim($object->{$key.'day'});
+                                $datemonth = trim($object->{$key.'month'});
+                                $dateyear = trim($object->{$key.'year'});
                             } else { // else if they are not submitted (or if they weren't assigned inside $object), we try to split the date into 3 values
                                 list($dateday, $datemonth, $dateyear) = explode('/',$object->$key);
                             }
                             // Format the correct timestamp from the date for the database
                             $object->$key = $this->db->idate(dol_mktime(0, 0, 0, $datemonth, $dateday, $dateyear));
+
+                       } elseif ($field->data_type == 'datetime') {
+                            // Fetch day, month and year
+                            if (isset($object->{$key.'min'}) and isset($object->{$key.'hour'}) and isset($object->{$key.'day'}) and isset($object->{$key.'month'}) and isset($object->{$key.'year'})) { // for date fields, Dolibarr will produce 3 more associated POST fields: myfielddate, myfieldmonth and myfieldyear
+                                $datemin = trim($object->{$key.'min'});
+                                $datehour = trim($object->{$key.'hour'});
+                                $dateday = trim($object->{$key.'day'});
+                                $datemonth = trim($object->{$key.'month'});
+                                $dateyear = trim($object->{$key.'year'});
+                            } else { // else if they are not submitted (or if they weren't assigned inside $object), we try to split the date into 3 values. But the hour/minute isn't stored in the same field anyway...
+                                list($dateday, $datemonth, $dateyear) = explode('/',$object->$key);
+                                $datemin = 0;
+                                $datehour = 0;
+                            }
+                            // Format the correct timestamp from the date for the database
+                            $object->$key = $this->db->idate(dol_mktime($datehour, $datemin, 0, $datemonth, $dateday, $dateyear));
                        }
 
                         $sqlvalues[] = "'".$this->escape($object->$key)."'"; // escape and single-quote values (even if they are not strings, the database will automatically correct that depending on the column_type)
@@ -493,6 +515,7 @@ class CustomFields extends compatClass4 // extends CommonObject
 		$object = $this->fetch($id);
 
 		$object->id = $cloneid; // Affecting the new id
+                $object->rowid = $cloneid; // Affecting the new id
 
 		$rtncode = $this->create($object); // creating the new record
 
@@ -675,7 +698,7 @@ class CustomFields extends compatClass4 // extends CommonObject
 		$sql = "CREATE TABLE ".$this->extratable."(
                 table_name varchar(64),
 		column_name varchar(64), -- we need to use the column_name because the ordinal_position is automatically rearranged for all columns when a field is deleted, and we can't know it (unless we put a trigger or a foreign keys, but the goal here is to not rely on referential integrity because we want to be able to simulate it), thus it's better to use column_name, but be careful with the size limit!
-                extraoptions blob, -- better use a blob than a text, because: 1- text is deprecated in a lot of DBMS, blob has no encoding, so that it won't interfer with the JSON encoding when using UTF-8 characters
+                extraoptions blob, -- better use a blob than a text, because: 1- text is deprecated in a lot of DBMS; 2- blob has no encoding, so that it won't interfer with the JSON encoding when using UTF-8 characters
                 PRIMARY KEY (table_name, column_name)
 		);";
 
@@ -871,6 +894,9 @@ class CustomFields extends compatClass4 // extends CommonObject
                                         $cpath->$column_name = $obj; // and we as well store the field as a property of the CustomFields class (caching for quicker access next time)
                                     }
                                 }
+
+                                // Workaround: on some systems, num_rows will return 2 when in fact there's only 1 row. Here we fix that by counting the number of elements in the final array: if only one, then we return only first element of the array to be compliant with the paradigm: one record = one value returned
+                                if (count($field) == 1) $field = reset($field);
 
 			// -- Only one field returned = one field object
 			} elseif ($num == 1) {
@@ -1416,7 +1442,7 @@ class CustomFields extends compatClass4 // extends CommonObject
             }
 
             // Cross-DBMS implementation of Upsert, see for more infos http://en.wikipedia.org/wiki/Upsert
-            $sqle1 = "UPDATE ".$this->extratable." SET table_name='".$this->moduletable."', column_name='".$fieldname."', extraoptions='".$fullextraoptions."' WHERE column_name='".$oldfieldname."';";
+            $sqle1 = "UPDATE ".$this->extratable." SET column_name='".$fieldname."', extraoptions='".$fullextraoptions."' WHERE table_name='".$this->moduletable."' AND column_name='".$oldfieldname."';";
             /* DOESN'T WORK! this SHOULD work, but it doesn't because MySQL put a lock on the composite primary keys, and it then produces an error that shouldn't happen. There exist other solutions, but none of them are standard.
             $sqle2 = "INSERT INTO ".$this->extratable." (table_name, column_name, extraoptions)
                             SELECT '".$this->moduletable."', '".$fieldname."', '".$fullextraoptions."'
@@ -1465,11 +1491,7 @@ class CustomFields extends compatClass4 // extends CommonObject
             $size=$this->character_maximum_length;
             if ( !is_array($currentvalue) and (!isset($currentvalue) or !strlen($currentvalue)) ) { $currentvalue = $field->column_default;}
 
-            if ($type == 'date') {
-                $showsize=10;
-            } elseif ($type == 'datetime') {
-                $showsize=19;
-            } elseif ($type == 'int') {
+            if ($type == 'int') {
                 $showsize=10;
             } else {
                 $showsize=round($size);
@@ -1534,18 +1556,28 @@ class CustomFields extends compatClass4 // extends CommonObject
             } else {
                 if ($type == 'varchar') {
                     $out.='<input type="text" name="'.$this->varprefix.$key.'" size="'.$showsize.'" maxlength="'.$size.'" value="'.$currentvalue.'"'.($moreparam?$moreparam:'').'>';
+                } elseif ($type == 'text' and !empty($field->extra->nohtml)) {
+                    $out.='<textarea name="'.$this->varprefix.$key.'" size="'.$showsize.'" maxlength="'.$size.'"'.($moreparam?$moreparam:'').'>'.$currentvalue.'</textarea>';
                 } elseif ($type == 'text') {
                     require_once(DOL_DOCUMENT_ROOT."/core/class/doleditor.class.php");
-                    $doleditor=new DolEditor($this->varprefix.$key,$currentvalue,'',200,'dolibarr_notes','In',false,false,$conf->fckeditor->enabled && $conf->global->FCKEDITOR_ENABLE_SOCIETE,5,100);
+                    $randid = '_rand'.uniqid($key.rand(1,10000)); // Important to make sure that this field gets an unique ID, else the Javascript widget won't be able to locate the correct field if multiple fields have the same id (which is not correct anyway in X/HTML)
+                    $doleditor=new DolEditor($this->varprefix.$key.$randid,$currentvalue,'',200,'dolibarr_notes','In',false,false,$conf->fckeditor->enabled,5,100);
                     $out.=$doleditor->Create(1);
+                    $out = str_replace('name="'.$this->varprefix.$key.$randid, 'name="'.$this->varprefix.$key, $out); // Finally, replace the name by removing the random id part (because we need the name to be exactly the same as the field's name so that we can detect it and save it in customfields_printforms.lib.php)
                 } elseif ($type == 'date') {
                     //$out.=' (YYYY-MM-DD)';
                     $html=new Form($this->db);
-                    $out.=$html->select_date($currentvalue,$this->varprefix.$key,0,0,1,$this->varprefix.$key,1,1,1);
+                    $randid = '_rand'.uniqid($key.rand(1,10000)); // Important to make sure that this field gets an unique ID, else the Javascript widget won't be able to locate the correct field if multiple fields have the same id (which is not correct anyway in X/HTML)
+                    $out.=$html->select_date($currentvalue,$this->varprefix.$key.$randid,0,0,1,$this->varprefix.$key.$randid,1,1,1); // TODO: fix $currentvalue when it is in format day/month/year (when an error happens and we want to remember the field, for example in products lines)
+                    $out = str_replace('name="'.$this->varprefix.$key.$randid, 'name="'.$this->varprefix.$key, $out); // Finally, replace the name by removing the random id part (because we need the name to be exactly the same as the field's name so that we can detect it and save it in customfields_printforms.lib.php). We replace all occurrences, meaning that we also fix the names of the day, month and year fields that are created automatically in addition of our field (useful to correctly separate these fields because in the final field we can't know which is the day or month, which change according to the locale, eg: english month is first, french day is first).
                 } elseif ($type == 'datetime') {
                     //$out.=' (YYYY-MM-DD HH:MM:SS)';
-                    if (empty($currentvalue)) { $currentvalue = 'YYYY-MM-DD HH:MM:SS'; }
-                    $out.='<input type="text" name="'.$this->varprefix.$key.'" size="'.$showsize.'" maxlength="'.$size.'" value="'.$currentvalue.'"'.($moreparam?$moreparam:'').'>';
+                    if (empty($currentvalue)) { $currentvalue = 'YYYY-MM-DD HH:MM'; }
+                    //$out.='<input type="text" name="'.$this->varprefix.$key.'" size="'.$showsize.'" maxlength="'.$size.'" value="'.$currentvalue.'"'.($moreparam?$moreparam:'').'>';
+                    $html=new Form($this->db);
+                    $randid = '_rand'.uniqid($key.rand(1,10000)); // Important to make sure that this field gets an unique ID, else the Javascript widget won't be able to locate the correct field if multiple fields have the same id (which is not correct anyway in X/HTML)
+                    $out.=$html->select_date($currentvalue,$this->varprefix.$key.$randid,1,1,1,$this->varprefix.$key.$randid,1,1,1);
+                    $out = str_replace('name="'.$this->varprefix.$key.$randid, 'name="'.$this->varprefix.$key, $out); // Finally, replace the name by removing the random id part (because we need the name to be exactly the same as the field's name so that we can detect it and save it in customfields_printforms.lib.php). We replace all occurrences, meaning that we also fix the names of the day, month and year fields that are created automatically in addition of our field (useful to correctly separate these fields because in the final field we can't know which is the day or month, which change according to the locale, eg: english month is first, french day is first).
                 } elseif ($type == 'enum') {
                     $out.='<select name="'.$this->varprefix.$key.'">';
                     // cleaning out the enum values and exploding them into an array
@@ -1670,6 +1702,9 @@ class CustomFields extends compatClass4 // extends CommonObject
 					} else {
 						$out.=$outputlangs->trans('False');
 					}
+                // type textraw (TextArea with no html)
+                } elseif ($field->column_type == 'text' and !empty($field->extra->nohtml)) {
+                    $out.=str_replace("\n", '<br />', $value); 
 				// every other type
 				} else {
 					$out.=$value;

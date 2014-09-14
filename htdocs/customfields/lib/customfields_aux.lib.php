@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2012   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2014   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -179,6 +179,7 @@ function customfields_fill_object(&$object,$fromobject = null, $outputlangs = nu
     return $customfields;
 }
 
+
 /*  Fill a specified object with customfields of a specified second object (can be the same or another module's object, this allows to use customfields from other modules)
  *  @param $object              Object          to object (object where customfields will be stored)
  *  @param $fromobject     Object          from object (needs to at least contain 2 fields: table_element (module's name) and id (or $idvar, which contain the record's id you want to fetch)) - you can also create a dummy $fromobject with these only two fields to use this function
@@ -196,6 +197,221 @@ function customfields_fill_object(&$object,$fromobject = null, $outputlangs = nu
 */
 function customfields_fill_object_lines(&$object,$fromobject = null, $outputlangs = null, $prefix = null,$pdfformat = false) {
     return customfields_fill_object($object, $fromobject, $outputlangs, $prefix, $pdfformat, true);
+}
+
+
+/**
+ *  Recopy custom fields either selectively on conversion, or all fields without discrimination on cloning
+ *  Note: this function will automatically select the correct action depending on the from object and target object class.
+ *  @param $object              Object          target object (object where customfields will be copied to)
+ *  @param $fromobject     Object          source object (needs to at least contain 2 fields: table_element (module's name) and id (or $idvar, which contain the record's id you want to fetch)) - you can also create a dummy $fromobject with these only two fields to use this function
+ *  @param $action2            String           type of action: 'cloning' or 'conversion'
+ *
+ *  @return  Object[]   An array of two objects: $customfields and $customfields_lines, which are instances of the CustomFields class and can then be used to fetch the errors using $customfields->error.
+ */
+function customfields_clone_or_recopy($object, $fromobject, $action2 = null) {
+    global $db;
+    include_once(dirname(__FILE__).'/../class/customfields.class.php');
+
+    // Deduce the current action if not specified
+    if (empty($action2)) {
+        // If the source object and target object are instances of the same class, we are cloning
+        if ( !strcmp(get_class($object), get_class($fromobject)) ) {
+            $action2 = 'cloning';
+        // Else, the source object and target object are instances of different classes, we are converting
+        } else {
+            $action2 = 'conversion';
+        }
+    }
+
+    //------------------------------------------------------------------------------------
+    //== Clone or Recopy module's custom fields (not lines fields)
+    // Load the CustomFields class for the target object (the current $object that is being created)
+    $customfields = new CustomFields($db, $object->table_element);
+
+    // Check that there is something to do (there is an origin object and there is a customfields table for the target object)
+    if (isset($object->origin_id) && $customfields->probeTable()) {
+
+        //-- Clone module's custom fields (not lines fields)
+        if ($action2 === 'cloning') {
+            // Saving the data (creating a record)
+            $rtncode = $customfields->createFromClone($object->origin_id, $object->id);
+
+        //-- Recopy module's custom fields (not lines fields)
+        } elseif($action2 === 'conversion') {
+            // Fetch the target customfields structures (columns names)
+            $columns = $customfields->fetchAllFieldsStruct();
+
+            // Fetch the origin custom fields
+            if ($fromobject->table_element) $origin_table_element = $fromobject->table_element; else $origin_table_element = $object->origin; // get the origin table_element (if not defined, we set the origin name as the table_element)
+            $customfields_origin = new CustomFields($db, $origin_table_element);
+            if (isset($object->origin_id)) $originid = $object->origin_id; else $originid = $object->originid; // for backward compatibility
+            $records_origin = $customfields_origin->fetch($originid, 1); // fetch only the values, we don't need the structures of the origin custom fields
+
+            // For each target custom field, we will check if it has to be recopied from another object. If true, we
+            foreach ($columns as $field) {
+                // Get the original field to recopy from (by default and if empty, we use the same field name as the target field)
+                if (!empty($field->extra->recopy_field)) $field_origin = $field->extra->recopy_field; else $field_origin = $field->column_name;
+
+                // Check if the target field has to be recopied, and if the field exists in the origin object (because we may want to copy a field that appears only in client orders but not in propales, etc.. So depending on the origin object that was converted to the target object, the origin field may or not exist and we must check that)
+                if (!empty($field->extra->recopy) and isset($records_origin->$field_origin)) {
+
+                    // Forging the new record
+                    $newrecord = new stdClass(); // initializing the cache object explicitly (to avoid php > 5.3 warnings)
+                    $newrecord->{$field->column_name} = $records_origin->$field_origin; // we create a new record object with the field and the id
+                    $newrecord->id = $object->id;
+
+                    // Recopy the field value (commit into the database)
+                    $customfields->update($newrecord, 1);
+                }
+            }
+        }
+    }
+
+    //-----------------------------------------------------------------------------------
+    //== Clone or Recopy module's products lines' custom fields
+    // TODO: there's currently no way to find the correlation between a target line record and an origin line record, because target lines are created totally independently (you can check in Dolibarr's code, it simply creates new records in a loop for each origin record, without keeping a track of the origin line id), thus we here simply suppose that since every product line is created sequentially in a loop, the first target product line matchs the first origin product line, and so on.
+
+    // Create an empty object to return it
+    $customfields_lines = new stdClass();
+
+    // Proceed only if the object contains lines
+    if (!empty($object->table_element_line)) {
+        // Load the target products' lines
+        $lines = $object->lines;
+        // If the products' lines aren't loaded, we force loading them
+        if (empty($lines) && method_exists($object,'fetch_lines'))  {
+            // Load the products' lines in the object
+            $lines = $object->fetch_lines();
+            // Sometimes fetch_lines() returns the lines, sometimes it returns an int code error and the lines are directly loaded into the $object, so in this case we get $object->lines...
+            if (!is_array($lines) and isset($object->lines)) $lines = $object->lines;
+        }
+
+        // Load the source products' lines
+        $lines_origin = $fromobject->lines;
+        // If the products' lines aren't loaded, we force loading them
+        if (empty($lines_origin) && method_exists($fromobject,'fetch_lines'))  {
+            // Load the products' lines in the object
+            $lines_origin = $fromobject->fetch_lines();
+            // Sometimes fetch_lines() returns the lines, sometimes it returns an int code error and the lines are directly loaded into the $object, so in this case we get $object->lines...
+            if (!is_array($lines_origin) and isset($fromobject->lines)) $lines_origin = $fromobject->lines;
+        }
+
+        // Load the CustomFields class for the target object lines (the current $object that is being created)
+        $customfields_lines = new CustomFields($db, $object->table_element_line);
+
+        // Check that there is something to do (there is an origin object and there is a customfields table for the target object)
+        if (!empty($lines) && !empty($lines_origin) && isset($fromobject->table_element_line) && $customfields_lines->probeTable()) {
+
+            // Load the origin table_element_line
+            $origin_table_element_line = $fromobject->table_element_line;
+
+            // Load the CustomFields class for the source object lines
+            $customfields_lines_origin = new CustomFields($db, $origin_table_element_line);
+
+            // Fetching origin products lines ids
+            $lids = array();
+            foreach ($lines_origin as $line_origin) {
+                $lids[] = $line_origin->rowid;
+            }
+
+            /* Alternative way to get the origin products lines ids
+            if (isset($object->origin_id)) $originid = $object->origin_id; else $originid = $object->originid; // for backward compatibility
+
+            // Fetch the ids of every (product) lines for this object (because we only have the object's id, we need the lines' ids linked to this object)
+            $prifield = $customfields_lines_origin->fetchPrimaryField(MAIN_DB_PREFIX.$origin_table_element_line); // fetch the column name of the primary row for the lines table
+            $linesids = $customfields->fetchAny($prifield, MAIN_DB_PREFIX.$origin_table_element_line, $fromobject->fk_element.'='.$originid); // fetch the lines' ids linked to this object's id
+            // Preparing the lines' ids in an array
+            $lids = array();
+            if (!empty($linesids)) {
+                foreach($linesids as $lineid) {
+                    $lids[] = $lineid->$prifield;
+                }
+            }
+            */
+
+            if (!empty($lids)) { // Continue only if there is at least one product line
+
+                // Fetch the values of the origin custom fields lines
+                $records_origin = $customfields_lines_origin->fetch($lids, 1); // fetch only the values, we don't need the structures of the origin custom fields
+
+                if (empty($records_origin)) return null; // stop if there's no custom fields for this module (thus there are no parent custom fields even if there is a parent object)
+
+                //-- Match sequentially the origin custom fields with the origin products lines
+                // First, we set the keys of the customfields records to the products lines rowid
+                $tmp = array();
+                foreach ($records_origin as $r) {
+                    $tmp[$r->{'fk_'.$origin_table_element_line}] = $r;
+                }
+                $records_origin = $tmp;
+                unset($tmp);
+
+                // Then we match the customfields records to the sequential id of the products lines
+                $tmp = array();
+                foreach ($lines_origin as $id=>$line) {
+                    $tmp[$id] = $records_origin[$line->rowid];
+                }
+                $records_origin = $tmp;
+                unset($tmp);
+                // At this point, we should have all our customfields ordered from 0 to N (where N is the number of lines), the same as origin products lines, and we HOPE that this sequential id order is the same as the target products lines (because this is how the target lines are created: sequentially from the origin lines)
+
+                // Reset records keys (to begin from 0 instead of the line's rowid, since origin and target rowid can't match)
+                //ksort($records_origin);
+                //$records_origin = array_merge($records_origin);
+
+                //-- Clone module's products lines' custom fields
+                if ($action2 == 'cloning') {
+                    // We clone all custom fields for each product's line
+                    foreach ($lines as $id=>$line) {
+                        // Saving the data (creating a record)
+                        $rtncode = $customfields_lines->createFromClone($records_origin[$id]->{'fk_'.$origin_table_element_line}, $line->rowid);
+                    }
+
+                //-- Recopy module's products lines' custom fields
+                } elseif ($action2 == 'conversion') {
+
+                    // Fetch the target customfields structures (columns names)
+                    $columns_lines = $customfields_lines->fetchAllFieldsStruct();
+
+                    if (empty($columns_lines)) return null; // stop if there's no custom fields for this module (thus there are no parent custom fields even if there is a parent object)
+
+                    // For each target custom field, we will check if it has to be recopied from another object. If true, we
+                    foreach ($columns_lines as $field) {
+                        // Get the original field to recopy from (by default and if empty, we use the same field name as the target field)
+                        if (!empty($field->extra->recopy_field)) $field_origin = $field->extra->recopy_field; else $field_origin = $field->column_name;
+
+                        // Check if the target field has to be recopied, and if the field exists in the origin object (because we may want to copy a field that appears only in client orders but not in propales, etc.. So depending on the origin object that was converted to the target object, the origin field may or not exist and we must check that)
+                        if (!empty($field->extra->recopy)) {
+                            // We fill the recopy custom field for each product's line
+                            foreach ($lines as $id=>$line) {
+
+                                // If that the field exists in the origin line (the custom field may not exists in the origin module)
+                                if (isset($records_origin[$id]->$field_origin)) {
+
+                                    // Forging the new record
+                                    $newrecord = new stdClass(); // initializing the cache object explicitly (to avoid php > 5.3 warnings)
+                                    $newrecord->{$field->column_name} = $records_origin[$id]->$field_origin; // we create a new record object with the field and the id
+                                    $newrecord->id = $line->rowid;
+
+                                    // Recopy the field value (commit into the database)
+                                    $customfields_lines->update($newrecord, 1);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /* DEBUG
+    print_r($lines);
+    print_r($lines_origin);
+    die();
+    */
+
+    // Return both generated customfields objects (useful to extract the errors)
+    return array($customfields, $customfields_lines);
 }
 
 ?>

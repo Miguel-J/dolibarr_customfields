@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2011-2012   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2014   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,9 +55,11 @@ if (GETPOST("tabembedded")) $tabembedded = '&tabembedded=1';
 
 $action = GETPOST("action");
 
+// Get and set default values otherwise for checkable options
 if (count($_POST["nulloption"]) == 1)  {$nulloption = true;} else {$nulloption = false;}
 if (count($_POST["requiredoption"]) == 1)  {$requiredoption = true;} else {$requiredoption = false;}
 if (count($_POST["noteditableoption"]) == 1)  {$noteditableoption = true;} else {$noteditableoption = false;}
+if (count($_POST["recopy"]) == 1)  {$recopy = true;} else {$recopy = false;}
 
 // **** INIT CUSTOMFIELD CLASS ****
 $customfields = new CustomFields($db, $currentmodule);
@@ -99,6 +101,20 @@ if ($action == 'add' or $action == 'update') {
         $extra = new stdClass();
         if (!empty($requiredoption) and $requiredoption) $extra->required = true; else $extra->required = false;
         if (!empty($noteditableoption) and $noteditableoption) $extra->noteditable = true; else $extra->noteditable = false;
+        if (!empty($recopy) and $recopy) {
+            $extra->recopy = true;
+            $extra->recopy_field = $_POST['recopy_field'];
+        } else {
+            $extra->recopy = false;
+            $extra->recopy_field = '';
+        }
+        // Setting special types
+        if (!strcmp(strtolower($_POST['type']), 'textraw')) { // No HTML TextArea, we just set the extra nohtml parameter and set the sql type to text (variable length string)
+            $extra->nohtml = true;
+            $_POST['type'] = 'text';
+        } elseif (!strcmp(strtolower($_POST['type']), 'text')) { // TextArea with HTML, we must disable nohtml in case we edit the custom field and change its type from textraw to text.
+            $extra->nohtml = false;
+        }
 
         if (! $error) {
             // We check that the field name does not contain any special character (only alphanumeric)
@@ -207,9 +223,9 @@ if (isset($formconfirm)) print $formconfirm;
 $modarr = array_extract_recursive(array('table_element'=>$currentmodule), $modulesarray);
 $modarr = $modarr[0]; // extract the first result
 // extract the tab function if one is defined (so that CustomFields can be embedded into the admin panel of another module - optional, only for ergonomics)
-if ( isset($modarr['tabs']) and isset($modarr['tabs']['function']) and isset($modarr['tabs']['lib']) ) {
-    include_once($modarr['tabs']['lib']);
-    $admintabfunc = $modarr['tabs']['function'];
+if ( isset($modarr['tabs_admin']) and isset($modarr['tabs_admin']['function']) and isset($modarr['tabs_admin']['lib']) ) {
+    include_once($modarr['tabs_admin']['lib']);
+    $admintabfunc = $modarr['tabs_admin']['function'];
 } else {
     $admintabfunc = null;
 }
@@ -368,9 +384,13 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
         }
         $checkedr = '';
         $checkedne = '';
+        $checkedrecopy = '';
+        $recopy_field = GETPOST('recopy_field');
     } elseif ($action == 'edit') {
         if (GETPOST('field')) $field_name = GETPOST('field'); else $field_name = $fieldobj->column_name;
         if (GETPOST('type')) $field_type = GETPOST('type'); else $field_type = $fieldobj->data_type;
+        // special types
+        if (!strcmp(strtolower($field_type), 'text') and !empty($fieldobj->extra->nohtml)) $field_type = 'textraw';
         if (!array_key_exists($field_type, $sql_datatypes)) { // if the admin supplied a custom field type, we assign it to the right field ($field_customtype)
             $field_customtype = $field_type;
             $field_type = 'other';
@@ -381,6 +401,8 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
         if (GETPOST('constraint')) $field_constraint = GETPOST('constraint'); else $field_constraint = $fieldobj->referenced_table_name;
         if (count($_POST["requiredoption"]) == 1) $checkedr = "checked=checked"; else $checkedr = ($fieldobj->extra->required ? "checked=checked" : '');
         if (count($_POST["noteditableoption"]) == 1) $checkedne = "checked=checked"; else $checkedne = ($fieldobj->extra->noteditable ? "checked=checked" : '');
+        if (count($_POST["recopy"]) == 1) $checkedrecopy = "checked=checked"; else $checkedrecopy = ($fieldobj->extra->recopy ? "checked=checked" : '');
+        if (GETPOST('recopy_field')) $recopy_field = GETPOST('recopy_field'); else $recopy_field = ($fieldobj->extra->recopy_field ? $recopy_field = $fieldobj->extra->recopy_field : '');
     }
 
     // ** User Fields
@@ -417,6 +439,30 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
     // Custom SQL
     print '<tr><td class="field">'.$langs->trans("CustomSQLDefinition").' ('.$langs->trans("CustomSQLDefinitionDesc").')</td><td class="valeur"><input type="text" name="customdef" size="50" value="'.GETPOST('customdef').'"></td></tr>';
     print '<tr><td class="field">'.$langs->trans("CustomSQL").' ('.$langs->trans("CustomSQLDesc").')</td><td class="valeur"><input type="text" name="customsql" size="50" value="'.GETPOST('customsql').'"></td></tr>';
+
+    // Recopy On Conversion
+    print '<tr><td class="field">'.$langs->trans("RecopyOnConversion").'<br />'.$langs->trans("RecopyOnConversionDesc").'</td><td class="valeur">';
+    print $langs->trans("Enabled").' <input type="checkbox" name="recopy[]" value="true" '.$checkedrecopy.'>';
+    /* Show a table to link with (DEPRECATED, but may be reused in the future to link to any field in any database and any table by reference)
+    print $langs->trans('Table').': ';
+    // Get the list of modules supported by CustomFields
+    $table_element_arr = array_values_recursive('table_element', $modulesarray);
+    // Format the array (set the values as keys, and translate the values using CustomFields language file)
+    $tables = array();
+    foreach ($table_element_arr as $table) {
+        $tables[$table] = $langs->trans($table);
+    }
+    unset($tables[$currentmodule]); // remove current module (it's useless to recopy a field from the same module!)
+    sort($tables); // Sort alphabetically
+    // Add an empty option
+    $tables = array_merge(array('' => $langs->trans('None')), $tables); // Adding a none choice
+    // Print the select
+    print $html->selectarray('recopy_from',$tables,$recopy_from);
+    */
+    // Field to recopy from (may be empty, will be the same field name by default)
+    print '<br /> '.$langs->trans('SourceField').': ';
+    print '<input type="text" name="recopy_field" size="50" value="'.$recopy_field.'" placeholder="'.$langs->trans('RecopyFieldHelper').'">';
+    print '</td></tr>';
 
     // Other options
     print '<tr><td class="field">'.$langs->trans("OtherOptions").'<br />'.$langs->trans("Required").'<br />'.$langs->trans("NotEditable").'</td><td><br /><input type="checkbox" name="requiredoption[]" value="true" '.$checkedr.'><br /><input type="checkbox" name="noteditableoption[]" value="true" '.$checkedne.'></td></tr>';

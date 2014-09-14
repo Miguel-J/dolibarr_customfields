@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2011-2012   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2014   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -92,14 +92,32 @@ class InterfaceSaveFields
      */
 	function run_trigger($action,$object,$user,$langs,$conf)
     {
-        // Put here code you want to execute when a Dolibarr business events occurs.
         // Data and type of action are stored into $object and $action
 
-	foreach ($_POST as $key=>$value) { // Generic way to fill all the fields to the object (particularly useful for triggers and customfields) - NECESSARY to get the fields' values
-	    if (!isset($object->$key)) { // Appending only: only add the property to the object if this property is not only defined
-		$object->$key = $value;
-	    }
-	}
+        // Generic way to fill all the fields to the object (particularly useful for triggers and customfields) - NECESSARY to get the fields' values
+        //foreach ($_POST as $key=>$value) { // Old less reliable way to do it (because it couldn't account for conflicting names: two fields having the same name)
+        if (!empty($_POST)) {
+            $PHPINPUT = file_get_contents('php://input');
+            // if we can access the raw input, we prefer this (this allow to disambiguate when several fields have the same name, like for example the line predefined product fields and the freeform product fields, they will both get the same customfields HTML ID)
+            if (!empty($PHPINPUT)) {
+                $_POST_RAW = explode('&', $PHPINPUT);
+                foreach ($_POST_RAW as $keyValuePair) { // Use this way to access all fields, even the ones with the same name (important for products lines where fields are duplicated for both free products and predefined products) // TODO: find a better way to manage this edge case (same form for both free and predefined products, thus the same name fields for two customfields since they are duplicated. Fix directly the Dolibarr code by implementing two different forms?)
+                    list($key, $value) = explode('=', $keyValuePair);
+                    if (!isset($object->$key) and isset($value)) { // Appending only: only add the property to the object if this property is not already defined
+                        $object->$key = urldecode($value); // don't forget to urldecode since values are urlencoded in php://input, which is not the case with $_POST!
+                    } elseif (empty($object->$key) and !empty($value)) {
+                        $object->$key = urldecode($value);
+                    }
+                }
+            // Else if the raw input is empty, we will simple use the $_POST array
+            } else {
+                foreach ($_POST as $key=>$value) { // Generic way to fill all the fields to the object (particularly useful for triggers and customfields) - NECESSARY to get the fields' values
+                    if (!isset($object->$key)) { // Appending only: only add the property to the object if this property is not only defined
+                        $object->$key = $value;
+                    }
+                }
+            }
+        }
 
         // Products and services
         if($action == 'PRODUCT_CREATE') {
@@ -191,6 +209,7 @@ class InterfaceSaveFields
 
             // Init and main vars
             include_once(dirname(__FILE__).'/../../class/customfields.class.php');
+            if (file_exists(dirname(__FILE__).'/../../fields/customfields_fields_extend.lib.php')) include_once(dirname(__FILE__).'/../../fields/customfields_fields_extend.lib.php'); // to allow user's function overloading (eg: at printing, at edition, etc..)
             $customfields = new CustomFields($this->db, $currentmodule);
 
             // Check special options
@@ -199,18 +218,41 @@ class InterfaceSaveFields
 
             $err = 0; // error counter
             $actionw = GETPOST('action');
+            $count = 0; // count the number of custom fields that are to be saved
             foreach ($fields as $field) { // loop through every custom fields
                 $key = $customfields->varprefix.$field->column_name; // get the full name (cf_somename)
-                // Required fields
-                if ($field->extra->required and !$field->extra->noteditable and empty($object->$key) // check if a field is required, editable and empty, we stop processing
-                     and ( strcmp(substr($actionw, 0, 4), 'set_') or !strcmp(strtolower($actionw), 'set_'.$key) ) ) { // and check that if we are modifying a custom field (because CUSTOMFIELDS_MODIFY trigger is redirecting here), we only account for required field if it is the one we are currently editing (else without this check, any other required custom field will make the trigger fail since their value would be empty since we are not modifying those other custom fields!)
-                    setEventMessage($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv($customfields->findLabel($field->column_name, $langs))),'errors'); // show an error message telling that the field can't be empty
-                    $err++; // increment the error counter
+                
+                if (isset($object->$key)) {
+
+                    $count++;
+
+                    // Required fields
+                    if ($field->extra->required and !$field->extra->noteditable and empty($object->$key) // check if a field is required, editable and empty, we stop processing
+                         and ( strcmp(substr($actionw, 0, 4), 'set_') or !strcmp(strtolower($actionw), 'set_'.$key) ) ) { // and check that if we are modifying a custom field (because CUSTOMFIELDS_MODIFY trigger is redirecting here), we only account for required field if it is the one we are currently editing (else without this check, any other required custom field will make the trigger fail since their value would be empty since we are not modifying those other custom fields!)
+                        setEventMessage($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv($customfields->findLabel($field->column_name, $langs))),'errors'); // show an error message telling that the field can't be empty
+                        $err++; // increment the error counter
+                    }
+
+                    // Overloading "save" and "savefull" functions
+                    // Calling custom functions prior to submitting the data to the database
+                    $customfunc_save = 'customfields_field_save_'.$currentmodule.'_'.$field->column_name;
+                    $customfunc_savefull = 'customfields_field_savefull_'.$currentmodule.'_'.$field->column_name;
+                    $name = strtolower($field->column_name); // the name of the customfield (which is the property of the record)
+
+                    if (function_exists($customfunc_savefull)) { // here one can STOP CustomFields processing, and one can then do the processing by oneself
+                        $customfunc_savefull($currentmodule, $object, $actionw, $user, $customfields, $field, $name, $object->$key);
+                        unset($object->$key); // Delete this entry because the overloading function processed it, thus here we won't
+                        $count--;
+                    } else { // here the user can just modify the values and the field and then CustomFields will save them into the database
+                        if (function_exists($customfunc_save)) $customfunc_save($currentmodule, $object, $actionw, $user, $customfields, $field, $name, $object->$key);
+                    }
                 }
             }
 
             // If there was at least one error in the checking, we stop processing and return an error (if a trigger returns int < 0 then the whole processing will stop, here the object creation will be canceled)
             if ($err > 0) return -$err; // cancel the processing
+            // If there remain no custom field to save, we can just return
+            if ($count <= 0) return;
             // Else we can continue processing
 
             // Saving the customfields data (creating a record)
@@ -219,6 +261,13 @@ class InterfaceSaveFields
             // Print errors (if there are)
             if (!empty($customfields->error) and strpos(strtolower($customfields->error), "Table '".$customfields->moduletable."' doesn't exist")) { // if the error is that the table doesn't exists, we ignore it because it is probably because the user does not use CustomFields for this module
                 dol_print_error($this->db, $customfields->error);
+            } else {
+                // Else if no error, the custom fields were successfully committed
+                // Then we cleanup the POST data of custom fields. This fixes issues where the products lines custom fields are reloaded with data from the just inserted record (which is OK when the record was not inserted because of errors, we want to remember the last values of these fields for the user to not loose all his data he just typed; but if the record was inserted we want to cleanup all these datas).
+                foreach ($fields as $field) { // loop through every custom fields
+                    $key = $customfields->varprefix.$field->column_name; // get the full name (cf_somename)
+                    unset($_POST[$key]);
+                }
             }
 
             return $rtncode;
@@ -238,19 +287,40 @@ class InterfaceSaveFields
             // Vars
             $currentmodule = $object->currentmodule;
 
-            // Init and main vars
-            include_once(dirname(__FILE__).'/../../class/customfields.class.php');
-            $customfields = new CustomFields($this->db, $currentmodule);
+            // Include the simplified API
+            include_once(dirname(__FILE__).'/../../lib/customfields_aux.lib.php');
 
-            // Saving the data (creating a record)
-            $rtncode = $customfields->createFromClone($object->origin_id, $object->id);
-
-            // Print errors (if there are)
-            if (!empty($customfields->error) and strpos(strtolower($customfields->error), "Table '".$customfields->moduletable."' doesn't exist")) { // if the error is that the table doesn't exists, we ignore it because it is probably because the user does not use CustomFields for this module
-                dol_print_error($this->db, $customfields->error);
+            // Crafting the source object from the target object
+            $fromobject = clone $object; // Crafting a fake source object ...
+            $fromobject->id = $object->origin_id; // ... and affect the correct id (everything else will be done inside the clone_or_recopy func)
+            $fromobject->rowid = $object->origin_id;
+            // fetch the origin source lines
+            if (isset($fromobject->lines)) unset($fromobject->lines); // delete the lines (which are the target lines since we have cloned the source object from the target object)
+            if (empty($lines) && method_exists($fromobject,'fetch_lines'))  {
+                // Load the products' lines in the object
+                $lines = $fromobject->fetch_lines();
+                // Sometimes fetch_lines() returns the lines, sometimes it returns an int code error and the lines are directly loaded into the $object, so in this case we get $object->lines...
+                if (is_array($lines) and !isset($fromobject->lines)) $fromobject->lines = $lines;
+                unset($lines);
             }
 
-            return $rtncode;
+            // Cloning the custom fields from the source object to the target object
+            list($customfields, $customfields_lines) = customfields_clone_or_recopy($object, $fromobject);
+
+            // Print errors (if there are any)
+            $mesg = '';
+            try {
+                $mesg .= $customfields->error;
+                $mesg .= $customfields_lines->error;
+            } catch (Exception $e) { // catch errors and pass
+            }
+
+            if (!empty($mesg)) { // print the error if any and return an error code
+                dol_print_error($this->db, $mesg);
+                return 1;
+            } else { // else everything's alright
+                return 0;
+            }
         }
         elseif ($action == 'CUSTOMFIELDS_PREBUILDDOC') { // DEPRECATED: Build PDF doc and fill $object with customfields value
             dol_syslog("Trigger '".$this->name."' for action '$action' launched by ".__FILE__.". id=".$object->id);

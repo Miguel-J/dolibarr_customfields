@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2012   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2014   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ class ActionsCustomFields // extends CommonObject
             if (!isset($action)) $action = GETPOST('action'); // Get action var if it was not set
 
             // Preparing the CustomFields print arguments
-            if ($parameters->context == 'productcard' or $object->table_element == 'product') { // for products/services (can't be generic because rights differ between products and services, but the database is the same! Only the $object->type allows to make the difference...)
+            if (in_array('productcard', explode(':', $parameters->context)) or $object->table_element == 'product') { // for products/services (can't be generic because rights differ between products and services, but the database is the same! Only the $object->type allows to make the difference...)
                 $currentmodule = 'product';
                 $idvar = 'id';
                 // We use different rights depending on the product type (product or service?)
@@ -83,7 +83,7 @@ class ActionsCustomFields // extends CommonObject
                         }
 
                         if (count($tmpmod) > 0 // check that at least one result was returned (if misconfiguration in CF config file, it may happen that there's no result)
-                            and ( isset($tmpmod[0]['table_element']) and $object->table_element == $tmpmod[0]['table_element'] ) ) { // and that the table_element of the result is valid (if not, we will search by table_element, since table_element is MORE important than context for the rest of CustomFields code as well as Dolibarr since table_element is linked to the database)
+                            and ( isset($tmpmod[0]['table_element']) and ($object->table_element == $tmpmod[0]['table_element'] or $object->table_element_line == $tmpmod[0]['table_element']) ) ) { // and that the table_element of the result is valid (if not, we will search by table_element, since table_element is MORE important than context for the rest of CustomFields code as well as Dolibarr since table_element is linked to the database)
                             $currentmodule = $tmpmod[0]['table_element']; // Assign the module's name (table_element)
 
                             $found = true; // set found flag (if it's false, this will mean that the foreach loop has terminated without finding any valid context, and thus we will launch another search)
@@ -194,5 +194,22 @@ class ActionsCustomFields // extends CommonObject
         //$this->formObjectOptions($parameters, $object, $action);
     }
     */
+
+    // Manage recopy of custom fields from another linked/origin object to a target object that is being created, when an object is created using another (eg: order to invoice)
+    function createFrom($parameters, $object, $action) {
+        global $db;
+        include_once(dirname(__FILE__).'/../lib/customfields_aux.lib.php');
+        $srcobject = $parameters['objFrom']; // get the origin object (from which we clone/recopy from)
+
+        // If the source object and target object are instances of the same class, we are cloning
+        if ( !strcmp(get_class($object), get_class($srcobject)) ) {
+            $action2 = 'cloning';
+        // Else, the source object and target object are instances of different classes, we are converting
+        } else {
+            $action2 = 'conversion';
+        }
+
+        customfields_clone_or_recopy($object, $srcobject, $action2);
+    }
 
 }

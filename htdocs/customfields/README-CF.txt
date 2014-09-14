@@ -1,8 +1,8 @@
 =================================================
 *               CUSTOMFIELDS MODULE             *
 *           by Stephen Larroque (lrq3000)       *
-*                  version 3.1.25               *
-*             release date 2013/04/08           *
+*                  version 3.2.32               *
+*             release date 2014/09/15           *
 =================================================
 
 ===== DESCRIPTION =====

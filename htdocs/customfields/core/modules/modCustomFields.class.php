@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2011-2012   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2014   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -133,11 +133,11 @@ class modCustomFields extends DolibarrModules
             $this->tabs = array();
             // Special for CustomFields: automatically add tabs in admin panels of Dolibarr's modules following the specifications in config (this allows to configure customfields directly from invoices, or products, etc... instead of having to go to the CustomFields admin panel and search the right tab to configure the right module -> better ergonomics, but not necessary)
             foreach($modulesarray as $mod) { // for each module
-                if (isset($mod['tabs'])) { // if the tabs parameter has been specified
+                if (isset($mod['tabs_admin'])) { // if the tabs parameter has been specified
                     // We then proceed onto adding a tab for this module admin interface
-                    if (isset($mod['tabs']['tabname'])) $tabname = $mod['tabs']['tabname']; else $tabname = 'customfields';
-                    if (isset($mod['tabs']['tabtitle'])) $tabtitle = $mod['tabs']['tabtitle']; else $tabtitle = 'CustomFields';
-                    array_push($this->tabs, implode(':', array($mod['tabs']['objecttype'], '+'.$tabname, $tabtitle, 'customfields@customfields', '$user->admin', '/customfields/admin/customfields.php?module='.$mod['table_element'].'&tabembedded=1')));
+                    if (isset($mod['tabs_admin']['tabname'])) $tabname = $mod['tabs_admin']['tabname']; else $tabname = 'customfields';
+                    if (isset($mod['tabs_admin']['tabtitle'])) $tabtitle = $mod['tabs_admin']['tabtitle']; else $tabtitle = 'CustomFields';
+                    array_push($this->tabs, implode(':', array($mod['tabs_admin']['objecttype'], '+'.$tabname, $tabtitle, 'customfields@customfields', '$user->admin', '/customfields/admin/customfields.php?module='.$mod['table_element'].'&tabembedded=1')));
                 }
             }
 

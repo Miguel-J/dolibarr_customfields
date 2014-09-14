@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2011-2012   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2014   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,35 +34,39 @@ $langs->load('customfields-user@customfields'); // customfields language support
 // **** EXPANSION VARIABLES ****
 // Here you can edit the values to expand the functionnalities of CustomFields (it will try to automatically manage the changes, if not you can add special cases by yourselves, please refer to the Readme-CF.txt)
 
-$cfversion = '3.1.24'; // version of this module, useful for other modules to discriminate what version of CustomFields you are using (may be useful in case of newer features that are necessary for other modules to properly run)
+$cfversion = '3.2.32'; // version of this module, useful for other modules to discriminate what version of CustomFields you are using (may be useful in case of newer features that are necessary for other modules to properly run)
 
 $fieldsprefix = 'cf_'; // prefix that will be prepended to the variable name of a field for accessing the field's values
 $svsdelimiter = '_'; // separator for Smart Value Substitution for Constrained Fields (a constrained field will try to find similar column names in the referenced table, and you can specify several column names when using this separator)
 
 // $modulesarray contains the modules support and their associated contexts : contexts, table_element (= main module's name, the name of the module in the database like llx_product, product is the table_element), idvar
-// There are also a lot of other parameters, like (non-exhaustive list): context, table_element, idvar, rights, tabs=>array(objecttype, function, lib, tabname, tabtitle)
+// There are also a lot of other parameters, like (non-exhaustive list): context, table_element, idvar, rights, tabs_admin=>array(objecttype, function, lib, tabname, tabtitle), tabs=>array(objecttype, function, lib)
+// IMPORTANT: You will have to disable/reenable the customfields module in order for the changes to take effect (at least if you add a new context, all the other parameters will take effect immediately).
 // Note: table_element is the main identifier for a module (this is the basis of CustomFields and of most of Dolibarr's code), while context is only used for hooks (actions_customfields.class.php).
 // Note2: most of the keys follows the nomenclatura of Dolibarr, so if you do a search, you should find a similar usage of those keys in various Dolibarr core modules.
-$modulesarray = array( array('context'=>'invoicecard', 'table_element'=>'facture', 'idvar'=>'facid', 'rights'=>array('$user->rights->facture->creer')), // Client Invoice
-                                            array('context'=>'propalcard', 'table_element'=>'propal', 'rights'=>array('$user->rights->propal->creer')), // Client Propale //TODO: use propale for Dolibarr < 3.3
-                                            array('context'=>'productcard', 'table_element'=>'product', 'tabs'=>array('objecttype'=>'product_admin', 'function'=>'product_admin_prepare_head', 'lib'=>DOL_DOCUMENT_ROOT.'/core/lib/product.lib.php')), // Products and Services (nb: rights are managed in CF hook (actions) class, because the rights are different depending on whether it's a product or service, and it depends on another variable)
+// Note3: tabs_admin are used to show CustomFields in the admin panel of other modules, and tabs is used to show custom fields in the modules datasheet cards of other modules instead of showing on the main card page (not yet implemented because it requires a different function to prepare head everytime).
+$modulesarray = array( array('context'=>'invoicecard', 'table_element'=>'facture', 'idvar'=>'facid', 'rights'=>array('$user->rights->facture->creer'), 'tabs'=>array('objecttype'=>'invoice', 'function'=>'', 'lib'=>'')), // Client Invoice
+                                            array('context'=>'propalcard', 'table_element'=>'propal', 'rights'=>array('$user->rights->propal->creer'), 'tabs'=>array('objecttype'=>'propal', 'function'=>'', 'lib'=>'')), // Client Propale //TODO: use propale for Dolibarr < 3.3
+                                            array('context'=>'productcard', 'table_element'=>'product', 'tabs_admin'=>array('objecttype'=>'product_admin', 'function'=>'product_admin_prepare_head', 'lib'=>DOL_DOCUMENT_ROOT.'/core/lib/product.lib.php'), 'tabs'=>array('objecttype'=>'product', 'function'=>'', 'lib'=>'')), // Products and Services (nb: rights are managed in CF hook (actions) class, because the rights are different depending on whether it's a product or service, and it depends on another variable)
 
-                                            array('context'=>'ordercard', 'table_element'=>'commande', 'rights'=>array('$user->rights->commande->creer')), // Clients orders
-                                            array('context'=>'thirdpartycard', 'table_element'=>'societe', 'idvar'=>'socid', 'rights'=>array('$user->rights->societe->creer'), 'tabs'=>array('objecttype'=>'company_admin', 'function'=>'societe_admin_prepare_head', 'lib'=>DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php')), // Tiers / Society
-                                            array('context'=>'contactcard', 'table_element'=>'socpeople', 'rights'=>array('$user->rights->societe->contact->creer')), // Contact
+                                            array('context'=>'ordercard', 'table_element'=>'commande', 'rights'=>array('$user->rights->commande->creer'), 'tabs'=>array('objecttype'=>'order', 'function'=>'', 'lib'=>'')), // Clients orders
+                                            array('context'=>'thirdpartycard', 'table_element'=>'societe', 'idvar'=>'socid', 'rights'=>array('$user->rights->societe->creer'), 'tabs_admin'=>array('objecttype'=>'company_admin', 'function'=>'societe_admin_prepare_head', 'lib'=>DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php'), 'tabs'=>array('objecttype'=>'thirdparty', 'function'=>'', 'lib'=>'')), // Tiers / Society
+                                            array('context'=>'contactcard', 'table_element'=>'socpeople', 'rights'=>array('$user->rights->societe->contact->creer'), 'tabs'=>array('objecttype'=>'contact', 'function'=>'', 'lib'=>'')), // Contact
 
-                                            array('context'=>'ordersuppliercard', 'table_element'=>'commande_fournisseur', 'rights'=>array('$user->rights->fournisseur->commande->creer')), // Supplier orders
-                                            array('context'=>'invoicesuppliercard', 'table_element'=>'facture_fourn', 'idvar'=>'facid', 'rights'=>array('$user->rights->fournisseur->facture->creer')), // Supplier invoices
-                                            array('context'=>'membercard', 'table_element'=>'adherent', 'idvar'=>'rowid', 'rights'=>array('$user->rights->adherent->creer'), 'tabs'=>array('objecttype'=>'member_admin', 'function'=>'member_admin_prepare_head', 'lib'=>DOL_DOCUMENT_ROOT.'/core/lib/member.lib.php')), // Members / Adherents
-                                            array('context'=>'actioncard', 'table_element'=>'actioncomm', 'rights'=>array('$user->rights->agenda->allactions->create')), // Agenda
-                                            array('context'=>'projectcard', 'table_element'=>'projet', 'rights'=>array('$user->rights->projet->all->creer')), // Project
-                                            array('context'=>'projecttaskcard', 'table_element'=>'projet_task', 'rights'=>array('$user->rights->projet->all->creer')), // Project Task
-                                            array('context'=>'contractcard', 'table_element'=>'contrat', 'rights'=>array('$user->rights->contrat->creer')), // Contract
-                                            array('context'=>'interventioncard', 'table_element'=>'fichinter', 'rights'=>array('$user->rights->ficheinter->creer')), // Interventions
-                                            array('context'=>'doncard', 'table_element'=>'don', 'idvar'=>'rowid', 'rights'=>array('$user->rights->don->creer')), // Dons
-                                            array('context'=>'tripsandexpensescard', 'table_element'=>'deplacement', 'rights'=>array('$user->rights->deplacement->creer')), // Trips and Expenses
-                                            array('context'=>'taxvatcard', 'table_element'=>'tva', 'rights'=>array('$user->rights->tax->charges->creer')), // Trips and Expenses
-                                            array('context'=>'expeditioncard', 'table_element'=>'expedition', 'rights'=>array('$user->rights->expedition->creer')), // Expeditions (sendings)
+                                            array('context'=>'ordersuppliercard', 'table_element'=>'commande_fournisseur', 'rights'=>array('$user->rights->fournisseur->commande->creer'), 'tabs'=>array('objecttype'=>'order_supplier', 'function'=>'', 'lib'=>'')), // Supplier orders
+                                            array('context'=>'invoicesuppliercard', 'table_element'=>'facture_fourn', 'idvar'=>'facid', 'rights'=>array('$user->rights->fournisseur->facture->creer'), 'tabs'=>array('objecttype'=>'invoice_supplier', 'function'=>'', 'lib'=>'')), // Supplier invoices
+                                            array('context'=>'membercard', 'table_element'=>'adherent', 'idvar'=>'rowid', 'rights'=>array('$user->rights->adherent->creer'), 'tabs_admin'=>array('objecttype'=>'member_admin', 'function'=>'member_admin_prepare_head', 'lib'=>DOL_DOCUMENT_ROOT.'/core/lib/member.lib.php'), 'tabs'=>array('objecttype'=>'member', 'function'=>'', 'lib'=>'')), // Members / Adherents
+                                            array('context'=>'actioncard', 'table_element'=>'actioncomm', 'rights'=>array('$user->rights->agenda->allactions->create'), 'tabs'=>array('objecttype'=>'agenda', 'function'=>'', 'lib'=>'')), // Agenda
+                                            array('context'=>'projectcard', 'table_element'=>'projet', 'rights'=>array('$user->rights->projet->all->creer'), 'tabs'=>array('objecttype'=>'project', 'function'=>'', 'lib'=>'')), // Project
+                                            array('context'=>'projecttaskcard', 'table_element'=>'projet_task', 'rights'=>array('$user->rights->projet->all->creer'), 'tabs'=>array('objecttype'=>'project_task', 'function'=>'', 'lib'=>'')), // Project Task
+                                            array('context'=>'contractcard', 'table_element'=>'contrat', 'rights'=>array('$user->rights->contrat->creer'), 'tabs'=>array('objecttype'=>'contract', 'function'=>'', 'lib'=>'')), // Contract
+                                            array('context'=>'interventioncard', 'table_element'=>'fichinter', 'rights'=>array('$user->rights->ficheinter->creer'), 'tabs'=>array('objecttype'=>'intervention', 'function'=>'', 'lib'=>'')), // Interventions
+                                            array('context'=>'doncard', 'table_element'=>'don', 'idvar'=>'rowid', 'rights'=>array('$user->rights->don->creer'), 'tabs'=>array('objecttype'=>'don', 'function'=>'', 'lib'=>'')), // Dons
+                                            array('context'=>'tripsandexpensescard', 'table_element'=>'deplacement', 'rights'=>array('$user->rights->deplacement->creer'), 'tabs'=>array('objecttype'=>'deplacement', 'function'=>'', 'lib'=>'')), // Trips and Expenses
+                                            array('context'=>'taxvatcard', 'table_element'=>'tva', 'rights'=>array('$user->rights->tax->charges->creer'), 'tabs'=>array('objecttype'=>'tax', 'function'=>'', 'lib'=>'')), // VAT taxes
+                                            array('context'=>'expeditioncard', 'table_element'=>'expedition', 'rights'=>array('$user->rights->expedition->creer'), 'tabs'=>array('objecttype'=>'expedition', 'function'=>'', 'lib'=>'')), // Expeditions (sendings)
+
+                                            array('context'=>'orderstoinvoice', 'table_element'=>'facture', 'idvar'=>'facid', 'rights'=>array('$user->rights->facture->creer')), // Client orders to Client invoice (Facturer les commandes)
 
 
                                             // LINES!
@@ -76,17 +80,21 @@ $modulesarray = array( array('context'=>'invoicecard', 'table_element'=>'facture
 
 // Triggers to attach to commit actions
 // Format: key=>value = triggername=>table_element (same table_element as in $modulesarray)
+// Note: You don't need to disable/reenable the customfields module to refresh, the changes in the triggers take effect immediately.
 // TODO: move this to the $modulesarray variable (but would need to make a specific function to search and retrieve triggers)
 $triggersarray = array('order_create'=>'commande',
                                             'order_prebuilddoc'=>'commande',
                                             'company_create'=>'societe',
+                                            'company_modify'=>'societe',
                                             'contact_create'=>'socpeople',
                                             //'order_supplier_create'=>'commande_fournisseur', // special case, we don't need it for the moment because suppliers orders are immediately created (no create page), so we only need to be able to edit fields, no need for this create trigger (this may change in a future version of Dolibarr)
                                             'bill_supplier_create'=>'facture_fourn',
                                             'member_create'=>'adherent',
                                             'action_create'=>'actioncomm',
                                             'project_create'=>'projet',
+                                            'project_modify'=>'projet',
                                             'task_create'=>'projet_task',
+                                            'task_modify'=>'projet_task',
                                             'contract_create'=>'contrat',
                                             'ficheinter_create'=>'fichinter',
                                             'don_create'=>'don',
@@ -113,6 +121,7 @@ $triggersarray = array('order_create'=>'commande',
 // sqldatatype => long_name_you_choose_to_show_to_user
 $sql_datatypes = array( 'varchar' => $langs->trans("Textbox"),
                                              'text' => $langs->trans("Areabox"),
+                                             'textraw' => $langs->trans("AreaboxNoHTML"),
                                              'enum(\'Yes\',\'No\')' => $langs->trans("YesNoBox"),
                                              'boolean' => $langs->trans("TrueFalseBox"),
                                              'enum' => $langs->trans("DropdownBox"),
@@ -123,3 +132,5 @@ $sql_datatypes = array( 'varchar' => $langs->trans("Textbox"),
                                             'double' => $langs->trans("Double"),
                                              'other' => $langs->trans("Other").'/'.$langs->trans("Constraint"),
                                                 );
+
+?>

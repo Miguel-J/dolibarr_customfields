@@ -64,11 +64,16 @@ CanBeNull?= Accepter les valeurs vides ?
 Constraint= Contrainte
 CustomSQLDefinition= Definition SQL personnalisée
 CustomSQL= Requête SQL personnalisée
+RecopyOnConversion= Recopie lors de la conversion
+Required= Requis
+NotEditable= Non modifiable
+SourceField= Champ d'origine
 
 # Fields values
 PleaseEditLangFile= Veuillez éditer le ficher de langue
 Textbox= Zone de texte simple
 Areabox= Zone de texte étendue HTML
+AreaboxNoHTML= Zone de texte étendue (sans HTML)
 YesNoBox= Choix Oui/Non
 TrueFalseBox= Choix Vrai/Faux
 DropdownBox= Liste déroulante
@@ -85,7 +90,10 @@ False= Faux
 SizeDesc=ex: 256 pour une zone de texte, <br />ou "premier","deuxio","tertio" AVEC les guillemets et virgules pour une liste déroulante
 SizeNote=Note: requis seulement pour Liste déroulante, pour les autres types vous pouvez laisser ceci vide.
 CustomSQLDefinitionDesc=la définition personnalisée du champ sera ajoutée à la suite de toutes les définitions au-dessus - Type, Taille, etc.
-CustomSQLDesc=sera executée après la création/modification du champ selon les paramètres au-dessus
+CustomSQLDesc=sera executée (UNE seule fois!) après la création/modification du champ selon les paramètres au-dessus
+RecopyOnConversionDesc= (ex: d'une proposition commerciale en une facture)
+RecopyFieldHelper= Vide = même nom du champ
+RecopyCanBeEmptyHelper= Vous pouvez laisser ce champ vide, il devrait être recopié depuis l'objet précédent dès la création.
 
 # Confirm forms
 ConfirmDeleteCustomField=Voulez-vous vraiment supprimer le champ suivant: 

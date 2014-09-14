@@ -1,0 +1,40 @@
+CHANGELOG
+==========
+
+2014
+-------
+* fix: edge case when php://input was empty when a trigger was activated (for example with company_modify). Thus now the Modify button now correctly saves customfields in the Third-Party / Society tab.
+* fix: modify button now saves customfields correctly in Project and Task modules.
+* add: new field type textraw (TextArea NoHTML) to save multiline text without any html formatting (great for PDF!).
+* fix: conf_customfields.lib.php was not even a php file, the end tag ?> was missing!
+* fix: warning in trigger because of using [] instead of array() (damn Python habits!).
+* add: datetime now uses a nice widget to select the date in a calendar and the time in dropdown lists.
+* fix: product lines customfields are now correctly remembered (when an error happens) and correctly forgotten when the line is added (fields are cleared).
+* fix: a regression with date customfield type which prevented the day, month and year fields to be correctly read. This means that date that weren't in french locale may have suffered incorrect storage issues.
+* fix: save and savefull should now work also at creation (not only at edition), and on creation/edition of lines customfields.
+* fix: save and savefull overloading functions should now be called _prior_ saving edition, not after as they did before.
+* fix: warnings when recopying/converting an object where no customfield was setup (eg: propal -> invoice and no customfields set for propal or invoice).
+* fix: weird encoding of textarea fields (because of new way to populate $object with customfields in customfields's trigger file: all inputs are urlencoded, thus they must be urldecoded before inserting into db).
+* fix: issue with duplicated customfields of types textarea or date on free and predefined products, the JS widgets (calendar and CKeditor) did not work correctly and values were not consistently saved.
+
+2013 (up to v3.2.16)
+----------------------------
+* fix: show SQL default value for not editable fields (unless there is an overloading function)
+* fix: workaround for some systems where num_count returns 2 instead of 1 row when there's only 1 row (which prevented the creation of constrained custom fields on those systems).
+* add: notice on creation of a new object (eg: a new invoice, converted from a commercial offer) when RecopyOnConversion is enabled for the fields where the option is enabled
+* add: translations for Other Options and RecopyOnConversion
+* add: recopy on cloning for products' lines
+* add: recopy on cloning is now supported (and enabled by default for all custom fields), fixed the copying of rowid field
+* add: support for orderstoinvoice (Facturer les commandes)
+* fix: task creation page now correctly shows tasks custom fields (instead of project custom fields)
+* fix: small speed enhancement when editing/saving a field
+* fix: sql columns case compatibility enhanced
+* fix: recopy now should correctly copy the fields in the correct order for the products lines
+* add: recopy on conversion and recopy_field
+* fix: setextra() when upserting a field with the same name as another from another module, the other fields with the same name were having their extra options completely deleted and only the latest upserted remained
+* fix: locale bugs when PDF printing foreign characters not supported by ISO-8859-1
+* add: required custom fields
+* add: not editable custom fields
+* add: reordering of custom fields
+* add: confirm box when deleting a custom field and associated content
+* add: extra options. It should now be possible to add a lot of extra functionalities that just weren't possible before using only standard SQL metadata.

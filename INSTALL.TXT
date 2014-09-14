@@ -10,7 +10,7 @@ NOTE: you should DISABLE then RENABLE the module if already enabled (this allow 
 
 If you already had an earlier version of CustomFields installed, you should first delete all CustomFields files.
 
-1- Backup your CustomFields folder (/htdocs/customfields) and also your whole database. Making a backup of these two things is easy, fast and will ensure that you can completely go back in case you encounter a problem.
+1- Backup your CustomFields folder (/htdocs/customfields) and your overloading functions (/htdocs/customfields/fields/customfields_fields_extend.lib.php) and also your whole database. Making a backup of these two things is easy, fast and will ensure that you can completely go back in case you encounter a problem.
 For more informations on the backup procedure, please read the Dolibarr's wiki: http://wiki.dolibarr.org/index.php/Backups
  
 2- Delete all previous files: Simply search from /htdocs/ for all files containing "customfields" in the name and delete them.
