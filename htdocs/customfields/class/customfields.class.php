@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2011-2013   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2014   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -711,33 +711,59 @@ class CustomFields extends compatClass4 // extends CommonObject
        function fetchFieldStruct($id=null, $nohide=false, $notrigger=0) {
 
 		// Forging the SQL statement
-		$whereaddendum = '';
+                $whereaddendum = '';
+		$whereaddendumid = '';
+                $whereextra = '';
                 $whereextraaddendum = '';
+                // If an ID is set, we will fetch only this column, else if empty we will fetch all columns from the table
 		if (isset($id)) {
-			if (is_numeric($id) and $id > 0) { // if we supplied an id, we fetch only this one record
-                            $whereaddendum .= " AND c.ordinal_position = ".$id;
-			} elseif (is_string($id) and !empty($id)) {
-                            $whereaddendum .= " AND c.column_name = '".$id."'";
-			}
+                    // If the ID is numeric, we search the field with the ordinal position (id of the column in the SQL meta database) - !is_string is not sufficient here, we must check with is_numeric AND if it's above 0
+                    if (is_numeric($id) and $id > 0) { // if we supplied an id, we fetch only this one record
+                        $whereaddendumid .= " AND ordinal_position = ".$id; // ordinal_position does NOT exist in statistics table, so we must avoid putting this in the where clause for that join (see below in the $sql request)
+                    // Else if it's a string, we search for a column name
+                    } elseif (is_string($id) and !empty($id)) {
+                        $whereaddendum .= " AND column_name = '".$id."'";
+                        $whereextraaddendum .= " AND column_name = '".$id."'"; // Not necessary for the SQL request to be performed, but if available, it will accelerate a bit the result
+                    }
 		}
 
-		if (!$nohide) {
-			$whereaddendum .= " AND c.column_name != 'rowid' AND c.column_name != 'fk_".$this->module."'";
+		if (!$nohide) { // We filter the reserved columns so that the user  cannot alter them, even by mistake and we get only the specified field by id (unless it is specified that we need them, generally used internally in this class)
+			$whereaddendum .= " AND column_name != 'rowid' AND column_name != 'fk_".$this->module."'";
 		}
 
+                // Forging Where
+                $where = "table_schema = '".$this->db->database_name."'";
+                if (empty($table)) {
+                    $where .= " AND table_name = '".$this->moduletable."'";
+                    $whereextra = "table_name = '".$this->moduletable."'";
+                } else {
+                    $where .= " AND table_name = '".$table."'";
+                    $whereextra = "table_name = '".$table."'";
+                }
+                $where .= " ".$whereaddendum;
+
+                // Forging SQL Request
+                // Description: we fetch the SQL structure (but NOT the values) of the custom fields (information_schema.COLUMNS) along with foreign key and table if the field is constrained (information_schema.key_column_usage) and constraint index (information_schema.statistics).
+                // These datas are then used to properly print the field and manage them (eg: date field will be show as a date and with a calendar pickup to edit the date, etc...).
+                // Optimisation note: To optimize the query and limit the number of returned lines, we need to use a WHERE clause for every table BEFORE the join (if you do it after, the time to process the request will increase by 50x, so BEWARE!). Normally this shouldn't happen (the query optimizer should automatically do it), but with MyISAM and InnoDB it does...
+                // Outer join note: we need an outer join because most fields won't be constrained, and so they will not even appear in key_column and statistics tables, so we need an OUTER JOIN to keep columns table rows even if in the other tables the result is null.
+                // Alternative note: alternatively, it should be possible to break this request into 3 requests, because we can detect fields that are linked to a foreign key by looking at the column_key = 'mul', if that's the case we can then issue another sql request for constrained fields. But I find this SQL query quick enough, and I'm not sure if this alternative way would work faster.
+                // About id note: the column_name is the same for all information_schema tables, but ordinal_position is not the same between .columns and .key_column_usage, and it simply doesn't exist for statistics, hence why we create a specific $whereaddendumid variable to handle this special case.
+                // TODO? NOT IN takes less resources than LEFT JOIN. A commenter in that article mentions using NOT EXISTS is best. Ref: http://blog.sqlauthority.com/2008/04/22/sql-server-better-performance-left-join-or-not-in/
+                // TODO? LEFT OUTER JOIN can also be rewritten with UNION operator (but would this really be faster? In my tests, not necessarily significantly better, while it makes the query a lot heavier and unreadable...)
 		$sql = "SELECT c.ordinal_position,c.column_name,c.column_default,c.is_nullable,c.data_type,c.column_type,c.character_maximum_length,
 		k.referenced_table_name, k.referenced_column_name, k.constraint_name,
                 s.index_name,
                 e.extraoptions
-		FROM information_schema.COLUMNS as c
-		LEFT JOIN information_schema.key_column_usage as k
-		ON (k.column_name=c.column_name AND k.table_name=c.table_name AND k.table_schema=c.table_schema)
-                LEFT JOIN information_schema.statistics as s
-                ON (s.column_name=c.column_name AND s.table_name=c.table_name AND s.table_schema=c.table_schema)
-                LEFT JOIN ".$this->extratable." as e
-                ON (e.table_name=c.table_name AND e.column_name=c.column_name)
-		WHERE c.table_schema = '".$this->db->database_name."' AND c.table_name = '".$this->moduletable."' ".$whereaddendum."
-		ORDER BY c.ordinal_position;"; // We filter the reserved columns so that the user  cannot alter them, even by mistake and we get only the specified field by id
+		FROM (SELECT * FROM information_schema.columns
+                  WHERE ".$where.$whereaddendumid.") as c
+		LEFT OUTER JOIN (SELECT * FROM information_schema.key_column_usage
+                  WHERE ".$where.") as k USING(table_schema, table_name, column_name)
+                LEFT OUTER JOIN (SELECT * FROM information_schema.statistics
+                  WHERE ".$where.") as s USING(table_schema, table_name, column_name)
+                LEFT OUTER JOIN (SELECT * FROM ".$this->extratable."
+                  WHERE ".$whereextra.$whereextraaddendum.") as e ON(e.table_name=c.table_name AND e.column_name=c.column_name)
+		ORDER BY c.ordinal_position;";
 
 		// Trigger or not?
 		if ($notrigger) {

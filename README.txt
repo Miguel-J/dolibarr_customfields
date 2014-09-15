@@ -1,9 +1,9 @@
 ===================================================
 *				CUSTOMFIELDS MODULE				  *
 *			by Stephen Larroque (lrq3000)		  *
-*				version	2.30 (branch v2)		  *
-*	    for Dolibarr >= 3.4.0 (3.7.x included)    *
-*			release date 2014/09/14				  *
+*				version	2.40 (branch v2)		  *
+*	    for Dolibarr >= 3.4.0 (up to 3.7.x included)    *
+*			release date 2014/09/15				  *
 *			last update (see on github)			  *
 ===================================================
 
@@ -317,7 +317,7 @@ You need to place a hook at all the places where you want the customfields to ap
 
 If you are trying to implement the customfields support for a core Dolibarr module, chances are that this hook is already implemented (and it's a good idea to read these already implemented codes so that you can see a clear example of what it should be).
 
-If you are implementing CF for a third-party module (your own module?), then you will have to add the following hook to your code:
+If you are implementing CF for a third-party module (or your own module), then you will have to add the following hook to your code:
 	// Initialize technical object to manage hooks of thirdparties. Note that conf->hooks_modules contains array array
 	include_once(DOL_DOCUMENT_ROOT.'/core/class/hookmanager.class.php');
 	$hookmanager=new HookManager($db);
@@ -341,7 +341,7 @@ Done!
 Result: Now you should see the custom fields in the datasheet or at the creation form, and there should be an edit button on the datasheet to be able to edit the datas.
 However, editing a custom field should not work yet. You can now directly jump to the triggers (this is what will manage the saving actions).
 
-2/ Show the fields in the creation page. DEPRECATED - FOR DOLIBARR <= 3.1.x ONLY
+2/ Show the fields in the creation page. DEPRECATED - FOR DOLIBARR <= 3.1.x ONLY
 Why: The goal here is to find the place where the modules print the creation form, so that we can append our own custom fields at the end (or near the end)
 
 Add the creation code into the php file that creates new propals from nothing : in /htdocs/comm/addpropal.php, search for // Model, then just _above_ copy/paste the following :
@@ -364,7 +364,7 @@ Please try to do so before proceeding to the next step.
 
 Now we will proceed to show them on the main page (datasheet) of the module.
 
-3/ Add the main code required to show and edit the records of customfields. DEPRECATED - FOR DOLIBARR <= 3.1.x ONLY
+3/ Add the main code required to show and edit the records of customfields. DEPRECATED - FOR DOLIBARR <= 3.1.x ONLY
 Why: The goal here is to show the customfields in the main page of the module (the datasheet generally) and permit the edition of the values.
 
 Add the main management code into the php file that manages every propals (the module that show the infos of a propal and enables to edit them) : in /htdocs/comm/propal.php, search for /* Lines and copy paste the following code _above_ :
@@ -449,7 +449,7 @@ Result: You should now have a fully fonctional customfields support : try to edi
 If things don't go as expected but all previous steps were successful, then proceed onto the next optional steps. Else, if everything works well, you're done.
 
 ===== PORTING THE CODE AND CHANGES =====
-If dolibarr's core files gets updated in the future without including the changes I made to these, you can easily find what codes I added by just searching for "customfields" (without the quotes), because I tried to comment every code I added for this purpose, so you can consider it to be a sort of tag to easily find what have been changed and port the code.
+If dolibarr's core files gets updated in the future without including the changes I made to these, you can easily find what codes I added by just searching for "customfields" (without the quotes), because I tried to comment every code I added for this purpose, so you can consider it to be a sort of tag to easily find what have been changed and port the code.
 
 ===== HOW TO ADD A NEW DATA TYPE MANAGED NATIVELY =====
 
@@ -537,7 +537,7 @@ files that are necessary for the CustomFields to work, they contains the core fu
 /htdocs/admin/customfields.php --- Administrator's configuration panel : this is where you create and manage the custom fields definitions
 /htdocs/customfields/class/actions_customfields.class.php --- Hooks class : used to hook into Dolibarr core modules without altering any core file (can be used to hook into your own modules too)
 /htdocs/customfields/class/customfields.class.php --- Core class : every database action is made here in this class. You can find some printing functions because they are very generic.
-/htdocs/customfields/conf/conf_customfields.lib.php --- Configuration file : contains the main configurable variables to adapt CustomFields to your needs or to expand its support to other modules and more native sql types.
+/htdocs/customfields/conf/conf_customfields.lib.php --- Configuration file : contains the main configurable variables to adapt CustomFields to your needs or to expand its support to other modules and more native sql types.
 /htdocs/customfields/langs/code_CODE/customfields.lang --- Core language file : this is where you can translate the admin config panel (data types names, labels, descriptions, etc.)
 /htdocs/customfields/langs/code_CODE/customfields-user.lang --- User defined language file : this is where you can store the labels and values of your custom fields (see the related chapter)
 /htdocs/customfields/lib/customfields_printforms.lib.php --- Core printing library for records : contains only printing functions, there's no really core functions but it permits to manage the printing of the custom fields records and their editing
@@ -567,7 +567,7 @@ everything is handled in the hooks class of CustomFields and config file.
 
 ===== TROUBLESHOOTING =====
 
-= Q: I'm trying to edit a constrained customfield parameters in the admin configuration page, but everytime I change the constraint it goes back to None ?
+= Q: I'm trying to edit a constrained customfield parameters in the admin configuration page, but everytime I change the constraint it goes back to None ?
 A: This is behaviour is probably due to some of your records containing an illegal value for the new constraint. For example, if you switch your customfield's constraint from your products' table containing 100 products to your you choose the llx_users table containing 2 users, the database won't know what to do with the illegal values higher than 2, so it won't accept the new constraint and set to None.
 In this case, just edit yourself the illegal values, either by fixing them or just deleting all the values for this customfields (but in this case you can just delete the customfields and recreate it).
 
@@ -584,7 +584,7 @@ Should do :
 Known bugs :
 * in product and service modules, if you edit a field, the proposals and other fields below won't be shown, you need to refresh the page. This problem resides in Dolibarr I think (since we are simply using a hook).
 
-Never/Maybe one day :
+Never/Maybe one day :
 * Add Upload field type (almost useless since we can attach files).
 * Add support for repeatable (predefined) invoices (the way it is currently managed makes it very difficult to manage this without making a big exception, adding specific functions in customfields modules that would not at all will be reusable anywhere else, when customfields has been designed to be as generic as possible to support any module and any version of dolibarr, because it's managed by a totally different table while it's still managed by the same module, CustomFields work with the paradigm: one module, one table).
 * Add support for clonable propal at creation (same as for repeatable invoices).
