@@ -43,6 +43,7 @@ propaldet= Ligne proposition commerciale
 commandedet= Ligne commande client
 commande_fournisseurdet=  Ligne commande fournisseur
 facture_fourn_det= Ligne facture fournisseur
+user= Utilisateur
 
 # Table headers
 Fieldname= Nom du champ
@@ -68,6 +69,15 @@ RecopyOnConversion= Recopie lors de la conversion
 Required= Requis
 NotEditable= Non modifiable
 SourceField= Champ d'origine
+CascadingField= Cascade de champs
+CascadeCustom= Cascade manuelle
+CascadeParentField= Champ parent
+CascadeJoinFrom= Joindre depuis la colonne
+CascadeJoinOn= Joindre sur la colonne du champ parent
+Hide= Invisible
+Duplicate= Dupliquer
+DuplicateFrom= Dupliquer depuis le champ
+LeaveEmptyToDisable= laisser vide pour désactiver
 
 # Fields values
 PleaseEditLangFile= Veuillez éditer le ficher de langue
@@ -93,10 +103,27 @@ CustomSQLDefinitionDesc=la définition personnalisée du champ sera ajoutée à 
 CustomSQLDesc=sera executée (UNE seule fois!) après la création/modification du champ selon les paramètres au-dessus
 RecopyOnConversionDesc= (ex: d'une proposition commerciale en une facture)
 RecopyFieldHelper= Vide = même nom du champ
-RecopyCanBeEmptyHelper= Vous pouvez laisser ce champ vide, il devrait être recopié depuis l'objet précédent dès la création.
+RecopyCanBeEmptyHelper= Recopie activée: vous pouvez laisser ce champ vide, il devrait être recopié depuis l'objet précédent dès la création.
+CascadingFieldDesc= Propage la valeur du champ parent pour limiter les valeurs de ce champ. Cela permet de construire une chaine de listes déroulantes en cascade. La cascade sera gérée automatiquement, sauf si vous choisissez l'option Cascade Manuelle, auquel cas vous devrez vous-même implémenter une fonction pour gérer la cascade (plus d'infos dans fields/customfields_fields_ajax_custom.lib.php.example).
+CascadeCustomHelper= voir fields/customfields_fields_ajax_custom.lib.php
+CascadeJoinFromHelper= Contrainte enfant ex, fk_pays
+CascadeJoinOnHelper= Contrainte parent ex, rowid
+HideHelper= utilisez Cascade Manuelle et une fonction AJAX manuelle et de surcharge pour gérer dynamiquement la visibilité conditionnellement au parent
+SeparatorHelper= la séparation sera placée en haut
+DuplicateDesc= Duplique la valeur d'un autre champ (standard ou custom field) depuis $object (ex: client->rowid sera traduit en $object->client->rowid).
+DuplicateFromHelper= ex: client->rowid ou mycustomfield
+DuplicateCanBeEmptyHelper= Duplication activée: vous pouvez laisser ce champ vide, il sera rempli au moment de la création/modification de l'objet en cours.
 
 # Confirm forms
 ConfirmDeleteCustomField=Voulez-vous vraiment supprimer le champ suivant: 
 CautionDataLostForever=ATTENTION: toutes les données stockés dans ce champ seront perdues et irrécupérables!
 DeleteCustomField=Supprimer un champ personnalisé
+
+# AutoUpdate messages
+ModuleVersion=Version du module
+AutoUpdateClickHere=Cliquez ici pour vérifier les mises à jour.
+AutoUpdateCheckingStatusPleaseWait=Vérification des mises à jour en ligne, veuillez patienter quelques secondes...
+AutoUpdateCheckingUnreachable=Impossible de vérifier les mises à jour (le serveur n'est pas disponible). Veuillez réessayer plus tard.
+AutoUpdateCheckingOK=Vous avez la dernière version!
+
 ##### COMMENT #####

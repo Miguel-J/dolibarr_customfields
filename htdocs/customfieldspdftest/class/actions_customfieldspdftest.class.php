@@ -22,6 +22,13 @@
  *		\author		Stephen Larroque
  */
 
+// include main Dolibarr file in case it's not already done by caller script
+$res=0;
+if (! $res && file_exists(dirname(__FILE__)."/../main.inc.php")) $res=@include_once(dirname(__FILE__)."/../main.inc.php");			// for root directory
+if (! $res && file_exists(dirname(__FILE__)."/../../main.inc.php")) $res=@include_once(dirname(__FILE__)."/../../main.inc.php");		// for level1 directory ("custom" directory)
+if (! $res && file_exists(dirname(__FILE__)."/../../../main.inc.php")) $res=@include_once(dirname(__FILE__)."/../../../main.inc.php");	// for level2 directory
+if (! $res) die("Include of main fails");
+
 /**
  *      \class      actions_customfieldspdftest
  *      \brief      Hook file for CustomFields to print on PDF a test page with all customfields
@@ -35,8 +42,8 @@ class ActionsCustomFieldsPDFTest // extends CommonObject
         global $conf;
 
         // Include config and functions to parse (only used to detect if the current module is supported by customfields)
-        $resi = include(DOL_DOCUMENT_ROOT.'/customfields/conf/conf_customfields.lib.php'); // we need to do a manual include because there's no dol_include(), if it fails with the normal root, we try the alternative root
-        if (!$resi) include(DOL_DOCUMENT_ROOT_ALT.'/customfields/conf/conf_customfields.lib.php');
+        // DEPRECATED: DOL_DOCUMENT_ROOT_ALT does not exist anymore since Dolibarr v3.5: http://nongnu.13855.n7.nabble.com/DOL-URL-ROOT-ALT-removed-td175588.html
+        include(dol_buildpath('/customfields/conf/conf_customfields.lib.php')); // we need to do a manual include because there's no dol_include(), if it fails with the normal root, we try the alternative root
         dol_include_once('/customfields/conf/conf_customfields_func.lib.php');
 
         // Init vars (consistent nomenclatura with pdf templates)

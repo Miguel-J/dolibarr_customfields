@@ -1,0 +1,124 @@
+<?php
+/* Copyright (C) 2011-2015   Stephen Larroque <lrq3000@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * at your option any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+
+/**** PART OF CUSTOMFIELDS MODULE FOR DOLIBARR
+ * Description:
+ * Here you can define your own dynamic interactive manipulation of the customfields on create pages, which will then be sent back to user's browser via AJAX.
+ * For example, you can dynamically show/hide fields, change the inner HTML of any field (including non-CustomFields as long as the name attribute is set), and manage manually the cascading.
+ *
+ * Guidelines:
+ * You can use and modify any variable, CustomFields will then use them afterwards (except for 'full' functions which completely overload CustomFields, so that you must take care of everything on your own).
+ * To modify dynamically the HTML fields using AJAX, you just need to return an array $result which contain an entry for each of your customfields, and inside the manipulation you want. Eg: $result = array('cf_mycustomfieldname' => array('options'=>array('option1'=>'optiontitle1', 'option2'=>'optiontitle2'));
+ * If using a full method, CustomFields will stop any post automatic processing (meaning that automatic cascading will be disabled: you will have to set the options yourself).
+ * If you're not using a full method, CustomFields will still do its automagic (eg: cascading values), but YOUR returned $result will take precedence over CustomFields (meaning that you can overwrite the values that will be set by CustomFields: your $result will always prevail, except if a subsequent field overwrites your entry).
+ *
+ * The $result array works this way:
+ * - At the first array level, the keys define which customfield's HTML field will be modified. The value contains an array defining the changes that will be done (see 2nd array level).
+ * - At the second array level, the keys define what kind of change you will do, and the value is the value of the change. Available change actions are:
+ *   + 'options' to just define the options for a select dropdown list type (the value must be an array where the keys will be the html value, and the value will be the title displayed for this option),
+ *   + 'html' change the whole html,
+ *   + 'value' change the currently selected value,
+ *   + 'alert' shows an error message to the user.
+ *   + 'css' to change the CSS,
+ *   + 'attr' to change any HTML attribute.
+ *
+ * You can also store all your alert messages directly at first level, in an array of messages to show, they will all be shown, eg: $results['alert'][] = 'Error message1'; $results['alert'][] = 'Error message2';
+ *
+ * To access the database using Dolibarr's core functions, you can use:
+ * global $db;
+ * then you can: $db->query('SELECT * FROM table'); or use the equivalent $customfields->fetchAny('*', 'table') for added security against injection.
+ *
+ * $_POST is sanitized and available in the variable $data, but you still should sanitize your inputs if it's coming from users, so please resanitize $_POST depending on your usage (eg, by typing your variables with filter_var() or filter_var_array()).
+ *
+ * You can also access a variety of other things via globals, like:
+ * $conf - contain all Dolibarr's config
+ * $user - current user's loggued (can access his rights to check security)
+ * $langs - current language of the user (for internationalization)
+ *
+ * Lastly, you can access the raw GET and POST variables using:
+ * $myvar = GETPOST('myvar');
+ *
+ *
+ * Format for the name of your functions:
+ * All ajax custom functions must be named with the following convention ($fieldname is the field's name without the prefix 'cf_'):
+ * customfields_field_ajax_$module_$fieldname
+ *
+ * You can also make a generic function that will be called for all fields of the module if there's no specific function for the current customfield
+ * customfields_field_ajax_$module_all
+ *
+ * And if you don't want CustomFields to do any automatic processing, you can take full control over the result by using a full function:
+ * customfields_field_ajaxfull_$module_$fieldname
+ *
+ * For example, for the module invoice (called 'facture' in Dolibarr, see conf_customfields.lib.php) and a field named 'myfield', you can use:
+ * customfields_field_ajax_facture_myfield
+ *
+ * And a generic function for the invoice module:
+ * customfields_field_ajax_facture_all
+ *
+ * This generic function will be called for all customfields in the invoice module, except for myfield which will use the specific function defined just above.
+ *
+ * A list of modules can be found in conf_customfields.lib.php in the $modulesarray variable.
+ *
+ * IMPORTANT: for a field to call a function here, the option cascade MUST be enabled for this field in the CustomFields admin panel. Also note that these functions will only be called at creation sheet, for editing sheet (when editing a customfield on an object already created), you should also create a custom overloading function of type 'edit'.
+ *
+ */
+
+// A few examples:
+/*
+function customfields_field_ajax_product_region_nom (&$customfields, &$currentmodule, $fields, &$child_field, &$child_field_name, &$parent_field, &$parent_field_name, &$parent_current_value, &$data) {
+    global $db; // allow to access database functions
+    // do your SQL stuff here
+
+    $result = array();
+
+    // Example of result array to return to change options dynamically via AJAX
+    $result['cf_region_nom'] = array('value' => '119', // change the current value to this one
+                                                    'html' => '<option value=""></option><option value="119">LMAO1</option><option value="2">LMAO2</option>', // change the whole inner html with this
+                                                    'options' => array('', 'lala', 119 => 'lolo', 'lili')); // change only the available options (for a dropdown list type). This is equivalent to the html code above, CustomFields will automatically convert this options array into HTML options.
+
+    return $result;
+}
+*/
+
+// An example of a field that will be hidden/displayed depending on parent's value
+/*
+function customfields_field_ajax_product_dep_nom (&$customfields, &$currentmodule, $fields, &$child_field, &$child_field_name, &$parent_field, &$parent_field_name, &$parent_current_value, &$data) {
+    global $db; // allow to access database functions
+    // do your SQL stuff here
+
+    $result = array();
+
+    if (empty($parent_current_value)) {
+        $result['cf_dep_nom'] = array('css' => array('display'=>'none'),
+                                                    'attr' => array('style'=>'display: none'));
+        $result['cf_dep_nom_label'] = array('css' => array('display'=>'none'),
+                                                    'attr' => array('style'=>'display: none'));
+    } else {
+        $result['cf_dep_nom'] = array('css' => array('display'=>'block'),
+                                                    'attr' => array('style'=>'display: block'));
+        $result['cf_dep_nom_label'] = array('css' => array('display'=>'block'),
+                                                    'attr' => array('style'=>'display: block'));
+    }
+
+    return $result;
+}
+*/
+
+
+?>

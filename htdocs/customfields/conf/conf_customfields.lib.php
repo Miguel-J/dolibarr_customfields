@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2011-2014   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2015   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,10 +34,14 @@ $langs->load('customfields-user@customfields'); // customfields language support
 // **** EXPANSION VARIABLES ****
 // Here you can edit the values to expand the functionnalities of CustomFields (it will try to automatically manage the changes, if not you can add special cases by yourselves, please refer to the Readme-CF.txt)
 
-$cfversion = '3.2.32'; // version of this module, useful for other modules to discriminate what version of CustomFields you are using (may be useful in case of newer features that are necessary for other modules to properly run)
+$cfversion = '3.3.32'; // version of this module, useful for other modules to discriminate what version of CustomFields you are using (may be useful in case of newer features that are necessary for other modules to properly run)
 
 $fieldsprefix = 'cf_'; // prefix that will be prepended to the variable name of a field for accessing the field's values
 $svsdelimiter = '_'; // separator for Smart Value Substitution for Constrained Fields (a constrained field will try to find similar column names in the referenced table, and you can specify several column names when using this separator)
+
+$cfcheckupdates = true; // automatically check for updates? (you need to enable CURL on your webhost and to install dolibarr on an internet webhost and NOT on a local test server like XAMPP, because else the request will fail because of security measures).
+
+$cfdebug = false; // add more debug outputs (like AJAX infos by alert and console)
 
 // $modulesarray contains the modules support and their associated contexts : contexts, table_element (= main module's name, the name of the module in the database like llx_product, product is the table_element), idvar
 // There are also a lot of other parameters, like (non-exhaustive list): context, table_element, idvar, rights, tabs_admin=>array(objecttype, function, lib, tabname, tabtitle), tabs=>array(objecttype, function, lib)
@@ -65,6 +69,7 @@ $modulesarray = array( array('context'=>'invoicecard', 'table_element'=>'facture
                                             array('context'=>'tripsandexpensescard', 'table_element'=>'deplacement', 'rights'=>array('$user->rights->deplacement->creer'), 'tabs'=>array('objecttype'=>'deplacement', 'function'=>'', 'lib'=>'')), // Trips and Expenses
                                             array('context'=>'taxvatcard', 'table_element'=>'tva', 'rights'=>array('$user->rights->tax->charges->creer'), 'tabs'=>array('objecttype'=>'tax', 'function'=>'', 'lib'=>'')), // VAT taxes
                                             array('context'=>'expeditioncard', 'table_element'=>'expedition', 'rights'=>array('$user->rights->expedition->creer'), 'tabs'=>array('objecttype'=>'expedition', 'function'=>'', 'lib'=>'')), // Expeditions (sendings)
+                                            array('context'=>'usercard', 'table_element'=>'user', 'rights'=>array('$user->rights->user->user->creer'), 'tabs'=>array('objecttype'=>'user', 'function'=>'', 'lib'=>'')), // Users management (where we can add Dolibarr users such as admins, not Third Parties!)
 
                                             array('context'=>'orderstoinvoice', 'table_element'=>'facture', 'idvar'=>'facid', 'rights'=>array('$user->rights->facture->creer')), // Client orders to Client invoice (Facturer les commandes)
 

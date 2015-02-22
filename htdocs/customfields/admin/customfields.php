@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2011-2014   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2015   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,7 +59,12 @@ $action = GETPOST("action");
 if (count($_POST["nulloption"]) == 1)  {$nulloption = true;} else {$nulloption = false;}
 if (count($_POST["requiredoption"]) == 1)  {$requiredoption = true;} else {$requiredoption = false;}
 if (count($_POST["noteditableoption"]) == 1)  {$noteditableoption = true;} else {$noteditableoption = false;}
+if (count($_POST["hideoption"]) == 1)  {$hideoption = true;} else {$hideoption = false;}
+if (count($_POST["show_on_cascade"]) == 1)  {$show_on_cascade = true;} else {$show_on_cascade = false;}
+if (count($_POST["separatoroption"]) == 1)  {$separatoroption = true;} else {$separatoroption = false;}
 if (count($_POST["recopy"]) == 1)  {$recopy = true;} else {$recopy = false;}
+if (count($_POST["cascade"]) == 1)  {$cascade = true;} else {$cascade = false;}
+if (count($_POST["cascade_custom"]) == 1)  {$cascade_custom = true;} else {$cascade_custom = false;}
 
 // **** INIT CUSTOMFIELD CLASS ****
 $customfields = new CustomFields($db, $currentmodule);
@@ -98,32 +103,56 @@ if ($action == 'add' or $action == 'update') {
             }
         }
         // Setting extra options
-        $extra = new stdClass();
-        if (!empty($requiredoption) and $requiredoption) $extra->required = true; else $extra->required = false;
-        if (!empty($noteditableoption) and $noteditableoption) $extra->noteditable = true; else $extra->noteditable = false;
+        $extra = array();
+        if (!empty($requiredoption) and $requiredoption) $extra['required'] = true; else $extra['required'] = false;
+        if (!empty($noteditableoption) and $noteditableoption) $extra['noteditable'] = true; else $extra['noteditable'] = false;
+        if (!empty($hideoption) and $hideoption) $extra['hide'] = true; else $extra['hide'] = false;
+        if (!empty($show_on_cascade) and $show_on_cascade) $extra['show_on_cascade'] = true; else $extra['show_on_cascade'] = false;
+        if (!empty($separatoroption) and $separatoroption) $extra['separator'] = true; else $extra['separator'] = false;
         if (!empty($recopy) and $recopy) {
-            $extra->recopy = true;
-            $extra->recopy_field = $_POST['recopy_field'];
+            $extra['recopy'] = true;
+            $extra['recopy_field'] = $_POST['recopy_field'];
         } else {
-            $extra->recopy = false;
-            $extra->recopy_field = '';
+            $extra['recopy'] = false;
+            $extra['recopy_field'] = '';
         }
+        // Cascading field options
+        if (!empty($cascade) and $cascade and (!empty($_POST['cascade_parent_field']) or !empty($cascade_custom))) { // if all necessary fields are filled, we go on
+            $extra['cascade'] = true;
+            $extra['cascade_parent_field'] = $_POST['cascade_parent_field'];
+            $extra['cascade_parent_join_on'] = $_POST['cascade_parent_join_on'];
+            $extra['cascade_parent_join_from'] = $_POST['cascade_parent_join_from'];
+            if (!empty($cascade_custom) and $cascade_custom) $extra['cascade_custom'] = true; else $extra['cascade_custom'] = false;
+        } else { // else the necessary fields are not (all) filled, we disable the functionality
+            $cascade = false;
+            $cascade_custom = false;
+            $extra['cascade'] = false;
+            $extra['cascade_parent_field'] = '';
+            $extra['cascade_parent_join_on'] = '';
+            $extra['cascade_parent_join_from'] = '';
+            $extra['cascade_custom'] = false;
+        }
+
         // Setting special types
         if (!strcmp(strtolower($_POST['type']), 'textraw')) { // No HTML TextArea, we just set the extra nohtml parameter and set the sql type to text (variable length string)
-            $extra->nohtml = true;
+            $extra['nohtml'] = true;
             $_POST['type'] = 'text';
         } elseif (!strcmp(strtolower($_POST['type']), 'text')) { // TextArea with HTML, we must disable nohtml in case we edit the custom field and change its type from textraw to text.
-            $extra->nohtml = false;
+            $extra['nohtml'] = false;
         }
+
+        // Duplicate from another field? (whether it's a custom field or any Dolibarr object's field)
+        $extra['duplicate_from'] = isset($_POST['duplicate_from']) ? $_POST['duplicate_from'] : false;
 
         if (! $error) {
             // We check that the field name does not contain any special character (only alphanumeric)
             if (isset($_POST["field"]) && preg_match("/^\w[a-zA-Z0-9-_]*$/i",$_POST['field'])) { // note that we also force the field name (which is the sql column name) to be lowercase
-                // Calling the action function
+                $result = 0;
+                // Insert/update the custom field's infos into the database
                 if ($action == 'add') {
-                    $result=$customfields->addCustomField(strtolower($_POST['field']),$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql'], null, $extra);
+                    $result+=$customfields->addCustomField(strtolower($_POST['field']),$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql'], null, $extra);
                 } elseif ($action == 'update') {
-                    $result=$customfields->updateCustomField($_POST['fieldid'], strtolower($_POST['field']),$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql'], $extra);
+                    $result+=$customfields->updateCustomField($_POST['fieldid'], strtolower($_POST['field']),$_POST['type'],$_POST['size'],$nulloption,$_POST['defaultvalue'],$_POST['constraint'],$_POST['customtype'],$_POST['customdef'],$_POST['customsql'], $extra);
                 }
                 // Error ?
                 if ($result > 0 and !count($customfields->errors)) { // If no error, we refresh the page
@@ -179,12 +208,12 @@ if ($action == 'move' and !empty($_GET['offset']) and is_numeric($_GET['offset']
         $offset = $_GET['offset'];
         $fieldid = $_GET["fieldid"];
 
-        $extra = new stdClass();
+        $extra = array();
         $field = $customfields->fetchFieldStruct($_GET["fieldid"]);
-        if (!isset($field->extra->position)) {
-            $extra->position = $field->ordinal_position + $offset;
+        if (!isset($field->extra['position'])) {
+            $extra['position'] = $field->ordinal_position + $offset;
         } else {
-            $extra->position = $field->extra->position + $offset;
+            $extra['position'] = $field->extra['position'] + $offset;
         }
         $result = $customfields->setExtra($fieldid, $extra);
 
@@ -216,6 +245,51 @@ if (!$tabembedded) {
     print($langs->trans('Description').":<br />".$langs->trans("CustomFieldsLongDescription"));
     dol_fiche_end();
 }
+
+// auto-update notification: print if we have the latest version of the module
+dol_fiche_head();
+print($langs->trans('ModuleVersion').': '.$cfversion.'.');
+if ($cfcheckupdates) { // do not show this if we are doing manipulations on custom fields (we don't want to do a thousands remote requests for nothing...). TODO: memorize the latest check and value (once a day?).
+    print(' <span id="cf_update_status"><a href="#">'.$langs->trans('AutoUpdateClickHere').'</a></span>');
+    print( '<script type="text/javascript">
+    // Check the module version via ajax to avoid slowing down the whole page (waiting for remote webpage to reply)
+    $("#cf_update_status").on("click", function() { // when document is ready to be shown
+        // Prepare field
+        var field = $("#cf_update_status");
+
+        // Update with a waiting message
+        field.html("'.$langs->trans('AutoUpdateCheckingStatusPleaseWait').'");
+        
+        // Prepare get data
+        serializedData = new Array();
+        serializedData.push({name: "cf_autoupdate_check_version", value: "true"});
+
+        // fire off the request
+        request = $.ajax({
+            url: "'.DOL_URL_ROOT.'/customfields/admin/customfields_admin_ajax.php",
+            type: "get",
+            data: serializedData
+        });
+
+        // callback handler that will be called on success
+        request.done(function (data, textStatus, jqXHR){
+            // log a message to the console
+            '.($cfdebug?'console.log("Customfields Admin: Auto-Update Ajax data received");':'').'
+            '.($cfdebug?'alert(data);':'').'
+            if ($.trim(data)) { // check if returned data is not empty, else we wont do anything
+                dataArr = JSON.parse(data);
+                if (!jQuery.isEmptyObject(dataArr)) { // check if data is empty again
+                    if (dataArr["html"] != undefined) {
+                        field.html(dataArr["html"]);
+                    }
+                }
+            }
+        });
+    });
+    </script>');
+}
+dol_fiche_end();
+// end of auto-update notification
 
 if (isset($formconfirm)) print $formconfirm;
 
@@ -300,7 +374,7 @@ if (!$tableexists) {
                     print '<a href="'.$_SERVER["PHP_SELF"].'?module='.$currentmodule.$tabembedded.'&action=move&offset=-1&fieldid='.$obj->ordinal_position.'">'.img_up().'</a>';
                     print '<a href="'.$_SERVER["PHP_SELF"].'?module='.$currentmodule.$tabembedded.'&action=move&offset=1&fieldid='.$obj->ordinal_position.'">'.img_down().'</a>';
                     print '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                    print '<a href="'.$_SERVER["PHP_SELF"].'?module='.$currentmodule.$tabembedded.'&action=edit&fieldid='.$obj->ordinal_position.'">'.img_edit().'</a>';
+                    print '<a href="'.$_SERVER["PHP_SELF"].'?module='.$currentmodule.$tabembedded.'&action=edit&fieldid='.$obj->ordinal_position.'#editcreateform">'.img_edit().'</a>';
                     print '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
                     print '<a href="'.$_SERVER["PHP_SELF"].'?module='.$currentmodule.$tabembedded.'&action=delete&fieldid='.$obj->ordinal_position.'">'.img_delete().'</a>';
                     print '</td>';
@@ -319,7 +393,7 @@ if (!$tableexists) {
 
 ?>
 
-<br>
+<br />
 
 <?php
     dol_fiche_end();
@@ -333,19 +407,20 @@ if (!$tableexists) {
     if ($action != 'create')
     {
         print '<div class="tabsAction">';
-        print "<a class=\"butAction\" href=\"".$_SERVER["PHP_SELF"]."?module=".$currentmodule.$tabembedded."&action=create\">".$langs->trans("NewField")."</a>";
+        print "<a class=\"butAction\" href=\"".$_SERVER["PHP_SELF"]."?module=".$currentmodule.$tabembedded."&action=create#editcreateform\">".$langs->trans("NewField")."</a>";
         print "</div>";
     }
 }
 
 /* ************************************************************************** */
 /*                                                                            */
-/* Creation d'un champ optionnel
+/* Custom field creation / edition form
  /*                                                                            */
 /* ************************************************************************** */
 ;
 if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
-    print "<br>";
+    print '<br />';
+    print '<a name="editcreateform"></a>';
 
     // ** Page header title and field fetching from db
     if ($action == 'create') {
@@ -384,13 +459,22 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
         }
         $checkedr = '';
         $checkedne = '';
+        $checkedhide = '';
+        $show_on_cascade = '';
+        $checkedsep = '';
         $checkedrecopy = '';
         $recopy_field = GETPOST('recopy_field');
+        $checkedcascade = '';
+        $checkedcascade_custom = '';
+        $cascade_parent_field = GETPOST('cascade_parent_field');
+        $cascade_parent_join_on = GETPOST('cascade_parent_join_on');
+        $cascade_parent_join_from = GETPOST('cascade_parent_join_from');
+        $duplicate_from = GETPOST('duplicate_from');
     } elseif ($action == 'edit') {
         if (GETPOST('field')) $field_name = GETPOST('field'); else $field_name = $fieldobj->column_name;
         if (GETPOST('type')) $field_type = GETPOST('type'); else $field_type = $fieldobj->data_type;
         // special types
-        if (!strcmp(strtolower($field_type), 'text') and !empty($fieldobj->extra->nohtml)) $field_type = 'textraw';
+        if (!strcmp(strtolower($field_type), 'text') and !empty($fieldobj->extra['nohtml'])) $field_type = 'textraw';
         if (!array_key_exists($field_type, $sql_datatypes)) { // if the admin supplied a custom field type, we assign it to the right field ($field_customtype)
             $field_customtype = $field_type;
             $field_type = 'other';
@@ -399,10 +483,19 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
         if (count($_POST["nulloption"]) == 1) $checked = "checked=checked"; else $checked = (strtolower($fieldobj->is_nullable) == 'yes' ? "checked=checked" : '');
         if (GETPOST('defaultvalue')) $field_defaultvalue = GETPOST('defaultvalue'); else $field_defaultvalue = $fieldobj->column_default;
         if (GETPOST('constraint')) $field_constraint = GETPOST('constraint'); else $field_constraint = $fieldobj->referenced_table_name;
-        if (count($_POST["requiredoption"]) == 1) $checkedr = "checked=checked"; else $checkedr = ($fieldobj->extra->required ? "checked=checked" : '');
-        if (count($_POST["noteditableoption"]) == 1) $checkedne = "checked=checked"; else $checkedne = ($fieldobj->extra->noteditable ? "checked=checked" : '');
-        if (count($_POST["recopy"]) == 1) $checkedrecopy = "checked=checked"; else $checkedrecopy = ($fieldobj->extra->recopy ? "checked=checked" : '');
-        if (GETPOST('recopy_field')) $recopy_field = GETPOST('recopy_field'); else $recopy_field = ($fieldobj->extra->recopy_field ? $recopy_field = $fieldobj->extra->recopy_field : '');
+        if (count($_POST["requiredoption"]) == 1) $checkedr = "checked=checked"; else $checkedr = ($fieldobj->extra['required'] ? "checked=checked" : '');
+        if (count($_POST["noteditableoption"]) == 1) $checkedne = "checked=checked"; else $checkedne = ($fieldobj->extra['noteditable'] ? "checked=checked" : '');
+        if (count($_POST["hideoption"]) == 1) $checkedhide = "checked=checked"; else $checkedhide = ($fieldobj->extra['hide'] ? "checked=checked" : '');
+        if (count($_POST["show_on_cascade"]) == 1) $checkedshow_on_cascade = "checked=checked"; else $checkedshow_on_cascade = ($fieldobj->extra['show_on_cascade'] ? "checked=checked" : '');
+        if (count($_POST["separatoroption"]) == 1) $checkedsep = "checked=checked"; else $checkedsep = ($fieldobj->extra['separator'] ? "checked=checked" : '');
+        if (count($_POST["recopy"]) == 1) $checkedrecopy = "checked=checked"; else $checkedrecopy = ($fieldobj->extra['recopy'] ? "checked=checked" : '');
+        if (GETPOST('recopy_field')) $recopy_field = GETPOST('recopy_field'); else $recopy_field = ($fieldobj->extra['recopy_field'] ? $recopy_field = $fieldobj->extra['recopy_field'] : '');
+        if (count($_POST["cascade"]) == 1) $checkedcascade = "checked=checked"; else $checkedcascade = ($fieldobj->extra['cascade'] ? "checked=checked" : '');
+        if (count($_POST["cascade_custom"]) == 1) $checkedcascade_custom = "checked=checked"; else $checkedcascade_custom = ($fieldobj->extra['cascade_custom'] ? "checked=checked" : '');
+        if (GETPOST('cascade_parent_field')) $cascade_parent_field = GETPOST('cascade_parent_field'); else $cascade_parent_field = ($fieldobj->extra['cascade_parent_field'] ? $cascade_parent_field = $fieldobj->extra['cascade_parent_field'] : '');
+        if (GETPOST('cascade_parent_join_on')) $cascade_parent_join_on = GETPOST('cascade_parent_join_on'); else $cascade_parent_join_on = ($fieldobj->extra['cascade_parent_join_on'] ? $cascade_parent_join_on = $fieldobj->extra['cascade_parent_join_on'] : '');
+        if (GETPOST('cascade_parent_join_from')) $cascade_parent_join_from = GETPOST('cascade_parent_join_from'); else $cascade_parent_join_from = ($fieldobj->extra['cascade_parent_join_from'] ? $cascade_parent_join_from = $fieldobj->extra['cascade_parent_join_from'] : '');
+        if (GETPOST('duplicate_from')) $duplicate_from = GETPOST('duplicate_from'); else $duplicate_from = ($fieldobj->extra['duplicate_from'] ? $duplicate_from = $fieldobj->extra['duplicate_from'] : '');
     }
 
     // ** User Fields
@@ -420,7 +513,7 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
     // Type and custom type
     print '<tr><td class="fieldrequired required">'.$langs->trans("Type").'</td><td class="valeur">';
     print $html->selectarray('type',$sql_datatypes,$field_type);
-    print '<br>'.$langs->trans('Other').' ('.$langs->trans('CustomSQL').'): <input type="text" name="customtype" size="10" value="'.$field_customtype.'">';
+    print '<br />'.$langs->trans('Other').' ('.$langs->trans('CustomSQL').'): <input type="text" name="customtype" size="10" value="'.$field_customtype.'">';
     print '</td></tr>';
     // Size
     print '<tr><td class="field">'.$langs->trans("Size").', '.$langs->trans("or").' '.$langs->trans("EnumValues").' ('.$langs->trans("SizeDesc").')<br />'.$langs->trans("SizeNote").'</td><td><input type="text" name="size" size="10" value="'.$field_size.'"></td></tr>';
@@ -464,8 +557,67 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
     print '<input type="text" name="recopy_field" size="50" value="'.$recopy_field.'" placeholder="'.$langs->trans('RecopyFieldHelper').'">';
     print '</td></tr>';
 
+    // Cascading dropdown lists fields (aka dynamically linked lists)
+    print '<tr><td class="field">'.$langs->trans("CascadingField").'<br /><br />'.$langs->trans("CascadingFieldDesc").'</td><td class="valeur">';
+    print $langs->trans("Enabled").' <input type="checkbox" name="cascade[]" value="true" '.$checkedcascade.'>';
+    print '<br /> '.$langs->trans('CascadeParentField').': ';
+    $cascade_fields = array_values_recursive('column_name', (array)$fieldsarray);
+    $cascade_fields = array_combine($cascade_fields, $cascade_fields); // copy values to keys, to get something like array("cf1" => "cf1", "cf2" => "cf2", ...); this is necessary so that selectarray() sets the correct value (which is the keys of our array) for each option
+    $cascade_fields = array_merge(array('' => $langs->trans('None')), $cascade_fields); // Adding a none choice (to avoid choosing a target field or just to delete one)
+    print $html->selectarray('cascade_parent_field',$cascade_fields,$cascade_parent_field);
+    print '<br />';
+    print $langs->trans("CascadeCustom").' <input type="checkbox" name="cascade_custom[]" id="cascade_custom" value="true" '.$checkedcascade_custom.'> ('.$langs->trans("CascadeCustomHelper").')';
+    print '<br /> '.$langs->trans('CascadeJoinFrom').': ';
+    print '<input type="text" name="cascade_parent_join_from" id="cascade_parent_join_from" size="20" value="'.$cascade_parent_join_from.'" placeholder="'.$langs->trans('CascadeJoinFromHelper').'">';
+    print '<br /> '.$langs->trans('CascadeJoinOn').': ';
+    print '<input type="text" name="cascade_parent_join_on" id="cascade_parent_join_on" size="20" value="'.$cascade_parent_join_on.'" placeholder="'.$langs->trans('CascadeJoinOnHelper').'">';
+    // Some JS to disable/enable the relevant fields upon clicking on the CascadeCustom checkbox
+/*
+    print( '<script type="text/javascript">
+$(document).ready(function(){ // when document is ready to be shown
+    // At page loading, check the value to disable inputs if necessary
+    var cascade_custom = $("#cascade_custom");
+    var fields = $("*[name=cascade_parent_join_from], *[name=cascade_parent_join_on]");
+    if ($(cascade_custom).is(":checked")) {
+        fields.prop("disabled", true);
+    } else {
+        fields.prop("disabled", false);
+    }
+
+    // When clicked, disable/renable the relevant fields
+    $("#cascade_custom").on("change", function() {
+        var fields = $("*[name=cascade_parent_join_from], *[name=cascade_parent_join_on]");
+        if ($(this).is(":checked")) {
+            fields.prop("disabled", true);
+        } else {
+            fields.prop("disabled", false);
+        }
+    });
+});
+</script>');
+*/
+    print '</td></tr>';
+    print $customfields->showInputFieldAjax("cascade_parent_field", "/customfields/admin/customfields_admin_ajax.php", "change", "get");
+
+    // Duplicate from another field (whether it's a custom field or any Dolibarr standard object's field)
+    print '<tr><td class="field">'.$langs->trans("Duplicate").'<br /><br />'.$langs->trans("DuplicateDesc").'</td><td class="valeur">';
+    // Field to duplicate from (may be empty to disable duplication)
+    print '<br /> '.$langs->trans('DuplicateFrom').' ('.$langs->trans('LeaveEmptyToDisable').'): ';
+    print '<input type="text" name="duplicate_from" size="50" value="'.$duplicate_from.'" placeholder="'.$langs->trans('DuplicateFromHelper').'">';
+    print '</td></tr>';
+
     // Other options
-    print '<tr><td class="field">'.$langs->trans("OtherOptions").'<br />'.$langs->trans("Required").'<br />'.$langs->trans("NotEditable").'</td><td><br /><input type="checkbox" name="requiredoption[]" value="true" '.$checkedr.'><br /><input type="checkbox" name="noteditableoption[]" value="true" '.$checkedne.'></td></tr>';
+    print '<tr><td class="field">'.$langs->trans("OtherOptions").':<br />';
+    print '<br />'.$langs->trans("Required");
+    print '<br />'.$langs->trans("NotEditable");
+    print '<br />'.$langs->trans("Hide").' ('.$langs->trans("HideHelper").')';
+    print '<br />'.$langs->trans("Separator").' ('.$langs->trans("SeparatorHelper").')';
+    print '</td><td class="valeur"><br />';
+    print '<br /><input type="checkbox" name="requiredoption[]" value="true" '.$checkedr.'>';
+    print '<br /><input type="checkbox" name="noteditableoption[]" value="true" '.$checkedne.'>';
+    print '<br /><input type="checkbox" name="hideoption[]" value="true" '.$checkedhide.'> - Show on cascade? <input type="checkbox" name="show_on_cascade[]" value="true" '.$checkedshow_on_cascade.'>';
+    print '<br /><input type="checkbox" name="separatoroption[]" value="true" '.$checkedsep.'>';
+    print '</td></tr>';
 
     print '<tr><td colspan="2" align="center"><input type="submit" name="button" class="button" value="'.$langs->trans("Save").'"> &nbsp; ';
     print '<input type="submit" name="button" class="button" value="'.$langs->trans("Cancel").'"></td></tr>';

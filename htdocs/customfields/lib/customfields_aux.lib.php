@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2011-2014   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2015   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@
 
 /**
  *  Fill a specified object with customfields of a specified second object (can be the same or another module's object, this allows to use customfields from other modules)
+ *  NOTE: most of the functionnalities here cannot be implemented directly inside the CustomFields class because they require to instanciate several different CustomFields objects (one for each module that we want to request), and it's impossible in PHP to instanciate a class from within itself.
+ *  Also, this function will automatically apply Smart Value Substitution and Recursive Remote Fields Access for constrained fields (fetching referenced fields from remote tables, and recursively if the referenced table itself contains a constrained field).
  *  @param $object              Object          to object (object where customfields will be stored)
  *  @param $fromobject     Object          from object (needs to at least contain 2 fields: table_element (module's name) and id (or $idvar, which contain the record's id you want to fetch)) - you can also create a dummy $fromobject with these only two fields to use this function
  *  @param $prefix               string         store customfields in a subobject (eg: $prefix = 'mycategory' will store customfield cf_myfield inside $object->customfields->mycategory->cf_myfield)
@@ -34,7 +36,6 @@
  *
  *  Note: values are returned formatted and translated (by default normal, or PDF wise or not formatted if specified), but labels (keys) are NOT returned formatted (not translated by default because a field should always be accessible by a base name, whatever the translation is). You can always translate them by using $langs->load('customfields-user@customfields'); $key=array_keys(get_object_vars($object->customfields)); $langs->trans($key[xxx]);
  */
-
 function customfields_fill_object(&$object,$fromobject = null, $outputlangs = null, $prefix = null,$pdfformat = false,$linemode=false) {
     global $conf, $db;
 
@@ -149,10 +150,12 @@ function customfields_fill_object(&$object,$fromobject = null, $outputlangs = nu
 
             //print("name: $name - trname: $translatedname - field: {$field->column_name} - value: $fmvalue\n"); // debugline
 
-            // Constraints substitution
-            // if the customfield has a constraint, we fetch all the datas from this constraint in the referenced table (so that related field to a customfield with constraints will also be substitutable)
-            if (!empty($field->referenced_table_name)) {
-                $fkrecord = $customfields->fetchAny('*', $field->referenced_table_name, $field->referenced_column_name."='".$value."'"); // we fetch the record in the referenced table
+            // Constraints substitution (easy remote fields access)
+            // if the customfield has a constraint, we fetch all the datas from this constraint in the referenced table (so that related field to a customfield with constraints will also be substituable)
+            if (!empty($field->referenced_table_name) and !empty($value)) { // and only if a value was selected, else it makes little sense to fetch the remote fields (except with AJAX Cascade call where we want to fetch all referenced records, but this is managed in the ajax wrapper lib without using this facade api).
+                //$fkrecord = $customfields->fetchAny('*', $field->referenced_table_name, $field->referenced_column_name."='".$value."'"); // we fetch the record in the referenced table. Equivalent to the fetchReferencedValuesList command below using $id=$value and $allcolumns=true.
+                //$fkrecord = $customfields->fetchReferencedValuesList($field, $value, null, true); // works correctly but is not recursive. Use fetchReferencedValuesRec() for a recursive fetching.
+                $fkrecord = fetchReferencedValuesRec($customfields, $field, $value); // we fetch the record in the referenced table. This is equivalent to the fetchAny command above.
 
                 if (!empty($fkrecord[0])) { // normally, this should never happen since a constrained customfield is always linked to a foreign record, but in case that happens, we skip to avoid errors...
                     foreach ($fkrecord[0] as $column_name => $value) { // for each foreign record, we add the value to an odt variable (format eg: base field: cf_user, constrants fields: cf_user_name, cf_user_firstname, etc..)
@@ -206,10 +209,11 @@ function customfields_fill_object_lines(&$object,$fromobject = null, $outputlang
  *  @param $object              Object          target object (object where customfields will be copied to)
  *  @param $fromobject     Object          source object (needs to at least contain 2 fields: table_element (module's name) and id (or $idvar, which contain the record's id you want to fetch)) - you can also create a dummy $fromobject with these only two fields to use this function
  *  @param $action2            String           type of action: 'cloning' or 'conversion'
+ *  @param $store_object  Bool           store result in $object, or in database directly (default to database if false)
  *
  *  @return  Object[]   An array of two objects: $customfields and $customfields_lines, which are instances of the CustomFields class and can then be used to fetch the errors using $customfields->error.
  */
-function customfields_clone_or_recopy($object, $fromobject, $action2 = null) {
+function customfields_clone_or_recopy($object, $fromobject, $action2 = null, $store_object = false) {
     global $db;
     include_once(dirname(__FILE__).'/../class/customfields.class.php');
 
@@ -243,26 +247,39 @@ function customfields_clone_or_recopy($object, $fromobject, $action2 = null) {
             $columns = $customfields->fetchAllFieldsStruct();
 
             // Fetch the origin custom fields
-            if ($fromobject->table_element) $origin_table_element = $fromobject->table_element; else $origin_table_element = $object->origin; // get the origin table_element (if not defined, we set the origin name as the table_element)
+            if (isset($fromobject) and !empty($fromobject->table_element)) $origin_table_element = $fromobject->table_element; else $origin_table_element = $object->origin; // get the origin table_element (if not defined, we set the origin name as the table_element)
             $customfields_origin = new CustomFields($db, $origin_table_element);
-            if (isset($object->origin_id)) $originid = $object->origin_id; else $originid = $object->originid; // for backward compatibility
-            $records_origin = $customfields_origin->fetch($originid, 1); // fetch only the values, we don't need the structures of the origin custom fields
+            if (isset($object->origin_id)) {
+                $originid = $object->origin_id;
+            } elseif (isset($object->originid)) { // for backward compatibility
+                $originid = $object->originid;
+            } elseif (isset($fromobject->id)) {
+                $originid = $fromobject->id;
+            } elseif (isset($fromobject->rowid)) {
+                $originid = $fromobject->rowid;
+            }
+            $records_origin = $customfields_origin->fetch($originid, null, 1); // fetch only the values, we don't need the structures of the origin custom fields
 
             // For each target custom field, we will check if it has to be recopied from another object. If true, we
             foreach ($columns as $field) {
                 // Get the original field to recopy from (by default and if empty, we use the same field name as the target field)
-                if (!empty($field->extra->recopy_field)) $field_origin = $field->extra->recopy_field; else $field_origin = $field->column_name;
+                if (!empty($field->extra['recopy_field'])) $field_origin = $field->extra['recopy_field']; else $field_origin = $field->column_name;
 
                 // Check if the target field has to be recopied, and if the field exists in the origin object (because we may want to copy a field that appears only in client orders but not in propales, etc.. So depending on the origin object that was converted to the target object, the origin field may or not exist and we must check that)
-                if (!empty($field->extra->recopy) and isset($records_origin->$field_origin)) {
+                if (!empty($field->extra['recopy']) and isset($records_origin->$field_origin)) {
 
-                    // Forging the new record
-                    $newrecord = new stdClass(); // initializing the cache object explicitly (to avoid php > 5.3 warnings)
-                    $newrecord->{$field->column_name} = $records_origin->$field_origin; // we create a new record object with the field and the id
-                    $newrecord->id = $object->id;
+                    // Store the recopied value ...
+                    if ($store_object) { // ... into the $object
+                        $object->{$customfields->varprefix.$field->column_name} = $records_origin->$field_origin;
+                    } else { // ... or into database
+                        // Forging the new record
+                        $newrecord = new stdClass(); // initializing the cache object explicitly (to avoid php > 5.3 warnings)
+                        $newrecord->{$field->column_name} = $records_origin->$field_origin; // we create a new record object with the field and the id
+                        $newrecord->id = $object->id;
 
-                    // Recopy the field value (commit into the database)
-                    $customfields->update($newrecord, 1);
+                        // Commit recopied value into the database
+                        $customfields->update($newrecord, 1);
+                    }
                 }
             }
         }
@@ -333,7 +350,7 @@ function customfields_clone_or_recopy($object, $fromobject, $action2 = null) {
             if (!empty($lids)) { // Continue only if there is at least one product line
 
                 // Fetch the values of the origin custom fields lines
-                $records_origin = $customfields_lines_origin->fetch($lids, 1); // fetch only the values, we don't need the structures of the origin custom fields
+                $records_origin = $customfields_lines_origin->fetch($lids, null, 1); // fetch only the values, we don't need the structures of the origin custom fields
 
                 if (empty($records_origin)) return null; // stop if there's no custom fields for this module (thus there are no parent custom fields even if there is a parent object)
 
@@ -378,23 +395,30 @@ function customfields_clone_or_recopy($object, $fromobject, $action2 = null) {
                     // For each target custom field, we will check if it has to be recopied from another object. If true, we
                     foreach ($columns_lines as $field) {
                         // Get the original field to recopy from (by default and if empty, we use the same field name as the target field)
-                        if (!empty($field->extra->recopy_field)) $field_origin = $field->extra->recopy_field; else $field_origin = $field->column_name;
+                        if (!empty($field->extra['recopy_field'])) $field_origin = $field->extra['recopy_field']; else $field_origin = $field->column_name;
 
                         // Check if the target field has to be recopied, and if the field exists in the origin object (because we may want to copy a field that appears only in client orders but not in propales, etc.. So depending on the origin object that was converted to the target object, the origin field may or not exist and we must check that)
-                        if (!empty($field->extra->recopy)) {
+                        if (!empty($field->extra['recopy'])) {
                             // We fill the recopy custom field for each product's line
                             foreach ($lines as $id=>$line) {
 
                                 // If that the field exists in the origin line (the custom field may not exists in the origin module)
                                 if (isset($records_origin[$id]->$field_origin)) {
 
-                                    // Forging the new record
-                                    $newrecord = new stdClass(); // initializing the cache object explicitly (to avoid php > 5.3 warnings)
-                                    $newrecord->{$field->column_name} = $records_origin[$id]->$field_origin; // we create a new record object with the field and the id
-                                    $newrecord->id = $line->rowid;
+                                    // Store the recopied value ...
+                                    // ... in the $object
+                                    if ($store_object) {
+                                        $object->customfields->lines->{$line->rowid} = $records_origin[$id]->$field_origin;
+                                    // ... or in the database
+                                    } else {
+                                        // Forging the new record
+                                        $newrecord = new stdClass(); // initializing the cache object explicitly (to avoid php > 5.3 warnings)
+                                        $newrecord->{$field->column_name} = $records_origin[$id]->$field_origin; // we create a new record object with the field and the id
+                                        $newrecord->id = $line->rowid;
 
-                                    // Recopy the field value (commit into the database)
-                                    $customfields_lines->update($newrecord, 1);
+                                        // Recopy the field value (commit into the database)
+                                        $customfields_lines->update($newrecord, 1);
+                                    }
                                 }
                             }
                         }
@@ -413,5 +437,122 @@ function customfields_clone_or_recopy($object, $fromobject, $action2 = null) {
     // Return both generated customfields objects (useful to extract the errors)
     return array($customfields, $customfields_lines);
 }
+
+/*  Fetch referenced values of a constrained field recursively, aka Recursive Remote Fields Access (fetching referenced fields from remote tables, and recursively if the referenced table itself contains a constrained field).
+*   This function relies on CustomFields->fetchReferencedValuesList(), and is in fact mostly a recursive implementation of this function.
+ *  Also applies Smart Value Substitution.
+ *  Note that for recursively fetched referenced fields, the name of these fields will be appended by all parents fields. For example, if a constrained field "cf_username" links to llx_user, and llx_user has a constrained field "cf_invoice" linked to llx_facture, then the final value will be stored inside $fkrecord[0]["cf_username_cf_invoice"].
+ *
+ *  @param $customfields Object     CustomFields class instance for the target field (necessary to know which table_element we are working one).
+ *  @param $field               Object     Field object (from a call to CustomFields->fetchFieldStruct()).
+ *  @param $id                   int            Rowid of the record we want to fetch (this is the rowid of the Dolibarr's module object, ie: object->rowid, NOT CustomFields record id).
+ *  @param $recursive      false/true Recursively fetch the constrained field ? (by default true, this enable Recursive Remote Fields Access).
+ *  @param $blacklist         array[]     private variable, this tracks the table_element (database tables) we already visited, to avoid an infinite recursion loop.
+ *  @param $level              int             private variable, to track the recursion depth level.
+ *
+ *  @return  null/int(-1)/array       either null if there's nothing found, either -1 if an error happened, either an associative array $fkrecord where $fkrecord[0] contains each referenced field and its value.
+ */
+function fetchReferencedValuesRec($customfields, $field, $id, $recursive=true, $blacklist=null, $level=0) {
+    global $db;
+
+    // Include required libs
+    include_once(dirname(__FILE__).'/../class/customfields.class.php'); // to fetch customfields database and referenced remote fields
+    include_once(dirname(__FILE__).'/../conf/conf_customfields_func.lib.php'); // to use auxiliary functions to merge arrays
+
+    $fkrecord = null;
+
+    // If the specified custom field has a constraint
+    if (!empty($field->referenced_table_name) and !empty($id)) {
+
+        // -- Fetch the referenced fields (the standard fields first, here there's no custom field yet) for the current constrained field.
+        $fkrecord = $customfields->fetchReferencedValuesList($field, $id, null, true);
+
+        /* DEBUG
+        print_r($blacklist);
+        if ($level > 0) {
+            print('<pre>Level:'.$level);
+            print_r($fkrecord);
+            if ($fkrecord == -1) $customfields->printErrors();
+            print('</pre>');
+        }
+        */
+
+        // If there's no referenced field or if it's empty or the current constrained field has no value (thus it doesn't point to a particular referenced record yet), we quit (by returning an empty array so that recursivity works)
+        if ($fkrecord === -1) return array();
+        // Else, the referenced fields were fetched successfully.
+
+        // Strip the table prefix to extract only the table_name
+        $remote_cf_table = $customfields->stripPrefix($field->referenced_table_name, MAIN_DB_PREFIX);
+        // Infinite recursion loop prevention: if the current table_element is in the $blacklist array (meaning we already visited this table in another recursion level), we stop this recursion.
+        if (!empty($blacklist) and in_array($remote_cf_table, $blacklist, true)) return array();
+
+        // -- Fetch the custom fields for the referenced table (eg: referenced table is "llx_user", we check if there is a table "llx_user_customfields" to fetch custom fields for the referenced table "llx_user")
+        $customfields_remote = new CustomFields($db, $remote_cf_table); // Instanciate a CustomFields object for the referenced table
+        // Check if the referenced table has a customfields table (CustomFields was initialized for the referenced table).
+        if ($customfields_remote->probeTable()) {
+            // Referenced table possess custom fields: fetch them for the current record rowid
+            $cf_fkrecord = $customfields_remote->fetch($id);
+
+            // If custom fields were created for the current record, we will extract them and merge them to the list of records (and maybe recursively fetch the constrained field if option is enabled)
+            if (!empty($cf_fkrecord)) {
+                // Add cf_ prefix to stay consistent and avoid collisions (Dolibarr's object fields with the same names as some custom fields, thus one of them will be overwritten).
+                $cf_fkrecord_prefixed = addPrefixArr($cf_fkrecord, $customfields->varprefix);
+                // Merge the two records: referenced table's fields with referenced table's custom fields (but give the precedence to the Dolibarr's object's record over the custom fields, to avoid replacing the id and stuff like that)
+                $fkrecord[0] = (object)array_replace_recursive((array)$cf_fkrecord_prefixed, (array)$fkrecord[0]); // the last array is always given precedence over the first one (the second one will overwrite values from the first one)
+
+                // -- Recursively fetch sub-referenced fields (current constrained field -> referenced fields -> referenced custom fields, with constrained fields -> subreferenced fields from referenced constrained fields -> subreferenced custom fields etc...)
+                if ($recursive === true) {
+                    // Get the structure and extra options of referenced custom fields
+                    $r_fields = $customfields_remote->fetchAllFieldsStruct();
+
+                    // For each remote custom field, we will check if it's a constrained field
+                    foreach ($r_fields as $r_field) {
+                        $r_value = $cf_fkrecord->{$r_field->column_name}; // value of the remote custom field. Will contain the id of a second referenced table if it's a constrained field.
+                        $r_key = $customfields->varprefix.$r_field->column_name; // remote custom field key
+
+                        // If this remote custom field is constrained (and there is a record id to point to), we recursively fetch the subreferenced fields
+                        if (!empty($r_field->referenced_table_name) and !empty($r_value)) {
+                            // Infinite recursion loop prevention: initialize and add current referenced table to the blacklist, to avoid infinite recursion
+                            if (empty($blacklist)) $blacklist = array();
+                            $blacklist[] = $remote_cf_table;
+
+                            // Recursively fetch the subreferenced fields
+                            $fkrecord_rec = fetchReferencedValuesRec($customfields_remote, $r_field, $r_value, $recursive, $blacklist, ++$level);
+
+                            // If there's any subreferenced fields for this record, merge them with the list of records we will return
+                            if (!empty($fkrecord_rec)) {
+                                // Recursive Smart Value Substitution: update the constrained custom field with the substitued value (else the id will be shown, but since we recursively fetched the subreferenced fields, we can update here without any additional cost). Just be sure to conform to the prefixes we added.
+                                $fkrecord[0]->$r_key = $fkrecord_rec[0]->{$r_field->column_name};
+                                // Remove the Smart Value Substituted variable from the recursively subreferenced fields, because else it will be duplicated, and there can be collisions (eg: this referenced table has a custom field named "lastname" and the subreferenced  table also has a custom field named "lastname": we can't know which one is what, thus the rule we use here is that the svs substituted field is stored at the parent referenced table, not at the subreferenced table).
+                                unset($fkrecord_rec[0]->{$r_field->column_name});
+
+                                // Prefix each key with the current custom field's name to avoid any confusion and collision with other custom fields that may fetch from the same referenced table
+                                $rec_prefix = $r_key.$customfields->svsdelimiter;
+                                $fkrecord_rec[0] = addPrefixArr($fkrecord_rec[0], $rec_prefix);
+
+                                // Merge the two records: the currently referenced record with the subreferenced record referenced by the current reference record's custom field (a bit complicated to explain isn't it?) (but give the precedence to the Dolibarr's object's record over the recursively fetched referenced fields)
+                                $fkrecord[0] = (object)array_replace_recursive((array)$fkrecord_rec[0], (array)$fkrecord[0]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Return the extracted referenced records (at level 0 this is the final record merged with all recursively extracted subrecords; else at other levels this array of records will be merged at the level above)
+    return $fkrecord;
+}
+
+// Prefix each key with the referenced table's name to avoid any confusion
+function addPrefixArr($array, $prefix) {
+    $array2 = array();
+    foreach ($array as $k=>$v) {
+        $array2[$prefix.$k] = $v;
+    }
+    if (is_object($array)) $array2 = (object)$array2;
+    return $array2;
+}
+
 
 ?>

@@ -1,4 +1,4 @@
-# Dolibarr language file - en_US - customfields standard labels - do not delete this accentuated letter: â
+# Dolibarr language file - en_US - customfields standard labels - do not delete this accentuated letter (allows to maintain the UTF-8 without BOM encoding): â
 CHARSET= UTF-8
 
 #### ADMIN CONFIG INTERFACE ####
@@ -43,6 +43,7 @@ propaldet= Line commercial proposals
 commandedet= Line customer orders
 commande_fournisseurdet=  Line supplier orders
 facture_fourn_det= Line supplier invoices
+user= User
 
 # Table headers
 Fieldname= Field Name
@@ -68,6 +69,15 @@ RecopyOnConversion= Recopy on conversion
 Required= Required
 NotEditable= Not Editable
 SourceField= Source Field
+CascadingField= Cascading field
+CascadeCustom= Custom cascade function
+CascadeParentField= Parent field
+CascadeJoinFrom= Join from current field's column
+CascadeJoinOn= Join on parent's column
+Hide= Hide
+Duplicate= Duplicate
+DuplicateFrom= Duplicate from field
+LeaveEmptyToDisable= leave empty to disable
 
 # Fields values
 PleaseEditLangFile= Please edit the language file
@@ -93,10 +103,27 @@ CustomSQLDefinitionDesc=custom definition of the field to be appended after the 
 CustomSQLDesc=to be triggered (only ONCE!) after the creation/edition of the field
 RecopyOnConversionDesc= (eg: from commercial offer to invoice)
 RecopyFieldHelper= Empty = Same field name
-RecopyCanBeEmptyHelper= You can leave this field empty, it should be recopied from the previous object upon creation.
+RecopyCanBeEmptyHelper= Recopy enabled: you can leave this field empty, it should be recopied from the previous object upon creation.
+CascadingFieldDesc= Cascade parent field's value to limit the range of current field's values. This allows for cascaded dropdown lists. Cascading will be automatic, unless you choose the CascadeCustom option, in which case you will need to implement the cascading by yourself (more infos inside fields/customfields_fields_ajax_custom.lib.php.example).
+CascadeCustomHelper= see fields/customfields_fields_ajax_custom.lib.php
+CascadeJoinFromHelper= Current constraint eg, fk_pays
+CascadeJoinOnHelper= Parent's constraint eg, rowid
+HideHelper= enable cascade and use custom ajax functions and overloading functions to manage dynamic display of this field conditionally to parent field
+SeparatorHelper= will be placed above the field
+DuplicateDesc= Duplicate the value of another $object field (standard or custom field, eg: client->rowid will be translated as $object->client->rowid).
+DuplicateFromHelper= eg: client->rowid or mycustomfield
+DuplicateCanBeEmptyHelper= Duplication enabled: you can leave this field empty, it will be filled upon creation/modification of this object.
 
 # Confirm forms
 ConfirmDeleteCustomField=Do you really want to delete the following custom field: 
 CautionDataLostForever=CAUTION: all data stored in this custom field will be lost forever!
 DeleteCustomField=Delete a custom field
+
+# AutoUpdate messages
+ModuleVersion=Module's version
+AutoUpdateClickHere=Click here to check for updates.
+AutoUpdateCheckingStatusPleaseWait=Checking online if it\'s the latest, hang on...
+AutoUpdateCheckingUnreachable=Can't check updates (remote update website is unavailable). Please retry later.
+AutoUpdateCheckingOK=You have the latest version!
+
 ##### COMMENT #####

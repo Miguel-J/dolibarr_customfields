@@ -18,9 +18,178 @@
 /**
  *	\file       htdocs/customfields/core/modules/modCustomFields.class.php
  * 	\defgroup   customfields     Module CustomFields
- *     \brief      Dolibarr's module definition file for CustomFields (meta-informations file)
+ *     \brief      Dolibarr's module definition file for CustomFields (meta-informations file) and also implements the export injection (injecting custom fields when exporting other modules via the native Dolibarr's Export module)
  */
 include_once(DOL_DOCUMENT_ROOT ."/core/modules/DolibarrModules.class.php");
+
+// == Export and Import injection of custom fields
+// CustomFields cannot define its own export/import procedure since custom fields are, by definition, attached to other objects, and thus should be exported at the same time as the parent object.
+// The key idea is to dynamically inject CustomFields in the export object, because export object must call every modXXXX.class.php prior to exporting, and thus we can inject this way.
+// There's currently no other way to add custom fields to the export process, as the export module does not support any hook (ie: each module can define its own export process via the modXXX.class.php, but it wasn't expected that some modules would like to inject into other modules to export at the same time).
+//global $modules;
+//$modules = $this->array_export_module;
+if ($conf->global->MAIN_MODULE_CUSTOMFIELDS and isset($this) and is_object($this)) {
+    $currentmodule = strtolower(get_class($this));
+
+    // -- Export injection
+    if ( !empty($currentmodule) and (!strcmp($currentmodule, 'export') and !empty($_REQUEST['datatoexport'])) ) { // Activate the export injection only on the export module page (in any other page, we don't want to incur additional processing time when it's not needed)
+        global $db;
+        include_once DOL_DOCUMENT_ROOT . '/customfields/class/customfields.class.php';
+
+        $exportmod = &$this;
+        $export_modules_mapping = array_flip($exportmod->array_export_code);
+
+        $exportedmodkey = $export_modules_mapping[$_REQUEST['datatoexport']];
+        $exported_module = &$exportmod->array_export_module[$exportedmodkey];
+        $exported_module_name = strtolower($exported_module->name);
+
+        // Get the sql request that will fetch the export content
+        $exportsql1 = &$this->array_export_sql_end[$exportedmodkey]; // this one contains more statements than the exportsql2 (because it's a concatenation of all sub sql requests)
+        //$exportsql2 = &$this->array_export_module[$exportedmodkey]->export_sql_end[$r];
+        
+        // Search through this sql request to find each table that will be loaded, and if that table has a CustomFields table attached, we will JOIN the CustomFields table and load the structures of the custom fields
+        // We do it this way because this is the most reliable way to find all modules that are loaded for the export. The other way would be to access $this->array_export_entities, but the nomenclatura of the modules names in this array is different from the rest of Dolibarr (and thus from the table's name), thus it would require to add a new config array in CustomFields to translate array_export_entities modules names into tables names. Here with the regexp, we directly have the tables names and the aliases (which anyway we MUST get else we can't inject properly).
+        if (preg_match_all('#\s+('.MAIN_DB_PREFIX.'(\w+))\s+as\s+(\w+)(\s+on\s+[(\w\.\s=]+[)]?)?#i', $exportsql1, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE)) { // Find via regular expression any table loading/joining as well as the alias, eg: 'FROM llx_facture as f' will be matched, 'LEFT JOIN llx_product as p ON (p.rowid=fd.productid)' will also be catched.
+            foreach (array_reverse($matches) as $match) { // iterate over each match (table) to see if we can inject CustomFields. We must iterate in reverse order to first modify the end of the string before the beginning of the string, so that we don't change the offset for subsequent matches.
+                // Extract some interesting statements from the sql request
+                $fk_table = $match[1][0]; // parent table on which we will hook CustomFields
+                $fk_module = $match[2][0]; // parent module name
+                $fk_alias = $match[3][0]; // parent table alias in the current sql request
+                $fk_key = $fk_alias.'.rowid'; // parent table primary key, so that we can join CustomFields's table
+                $pos_to_inject = $match[0][1] + strlen($match[0][0]); // Position in the sql request string where we will append the CustomFields JOIN statement (at the end of the table loading/joining)
+
+                $customfields = new CustomFields($db, $fk_module);
+                $customfieldsDefined = $customfields->probeTable();
+                if ($customfieldsDefined) { // if custom fields were created for this module...
+
+                    // -- Export fields content injection
+                    // add a join with the customfields table to tell the export module how to fetch the customfields data (this exports the content, while the code above exported the fields definitions).
+                    $cf_alias = $fk_alias.'cf';
+                    $cf_table = $fk_table.'_customfields';
+                    $exportsqlcf = ' LEFT JOIN '.$cf_table.' as '.$cf_alias.' ON '.$fk_key.' = '.$cf_alias.'.fk_'.$customfields->module; // customfields sql join request to inject into the module's export
+                    $exportsql1 = substr($exportsql1, 0, $pos_to_inject).$exportsqlcf.substr($exportsql1, $pos_to_inject, strlen($exportsql1));
+                    //print($exportsql1.'<br />');
+
+                    // -- Export fields structures injection
+                    // This will add the list of custom fields, but not their content! (this defines the names and types of each custom field, the content is retrieved via the sql request $this->export_sql_start below)
+                    $cf_fields = $customfields->fetchAllFieldsStruct();
+                    if (!empty($cf_fields)) {
+                        foreach ($cf_fields as $field) {
+                            $key = $customfields->varprefix.$field->column_name; // column key that will be set in the final output file
+                            $dbkey = $cf_alias.'.'.$field->column_name; // define the database key (depends on the sql request below, we chose to name the table "cf" in the join)
+
+                            // Define the field type
+                            if (!empty($field->referenced_table_name)) { // if constrained field, we will show this field as type list (instead of int)
+                                $reftable = $customfields->stripPrefix($field->referenced_table_name, MAIN_DB_PREFIX); // must remove the db prefix "llx_" for the list to work in the export module
+                                $svs_fields = $customfields->smartValueSubstitutionOnly($field);
+                                $svs_fields = $svs_fields[0];
+                                $reftablecolumn2show = explode(' as ', $svs_fields); // select the column to show (use smart value substitution to show human readable entries instead of the rowid)
+                                $typeFilter = 'List:'.$reftable.':'.$reftablecolumn2show[0]; // format = List:table_without_prefix:column_to_show
+                            } elseif (!strcmp($field->data_type, 'varchar')) {
+                                $typeFilter = 'Text';
+                            } else { // else for any other type, the sql data type should perfectly fit
+                                $typeFilter = ucfirst($field->data_type);
+                            }
+
+                            // Register into the export the field's definition
+                            $r = 1;
+                            $this->array_export_module[$exportedmodkey]->export_fields_array[$r][$dbkey] = $key; // define the field name in the output export file
+                            $this->array_export_module[$exportedmodkey]->export_TypeFields_array[$r][$dbkey] = $typeFilter; // define the field type
+                            $this->array_export_module[$exportedmodkey]->export_entities_array[$r][$dbkey] = $fk_module; // define the module of the field
+                            // Same as above, but these are the real keys to modify, these are the ones that the export module will consider (this is a compilation of all submodules lists of fields - the final list in short)
+                            $this->array_export_fields[$exportedmodkey][$dbkey] = $key;
+                            $this->array_export_TypeFields[$exportedmodkey][$dbkey] = $typeFilter;
+                            $this->array_export_entities[$exportedmodkey][$dbkey] = $fk_module;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    // -- Import injection
+    elseif ( !empty($currentmodule) and (!strcmp($currentmodule, 'import') and !empty($_REQUEST['datatoimport'])) ) { // Activate the export injection only on the export module page (in any other page, we don't want to incur additional processing time when it's not needed)
+        global $db;
+        include_once DOL_DOCUMENT_ROOT . '/customfields/class/customfields.class.php';
+
+        $importmod = &$this;
+        $import_modules_mapping = array_flip($importmod->array_import_code);
+
+        $importedmodkey = $import_modules_mapping[$_REQUEST['datatoimport']];
+        $imported_module = &$importmod->array_import_module[$importedmodkey];
+        $imported_module_name = strtolower($imported_module->name);
+
+        // Search through all importable tables
+        foreach ($this->array_import_tables[$importedmodkey] as $fk_alias=>$fk_table) { // iterate over each match (table) to see if we can inject CustomFields. We must iterate in reverse order to first modify the end of the string before the beginning of the string, so that we don't change the offset for subsequent matches.
+            // Extract some interesting statements from the sql request
+            $ctemp = new CustomFields($db, '');
+            $fk_module = $ctemp->stripPrefix($fk_table, MAIN_DB_PREFIX); // parent module name
+            $fk_key = $fk_alias.'.rowid'; // parent table primary key, so that we can join CustomFields's table
+
+            $customfields = new CustomFields($db, $fk_module);
+            $customfieldsDefined = $customfields->probeTable();
+            if ($customfieldsDefined) { // if custom fields were created for this module...
+
+                // -- Import fields content injection
+                // add a join with the customfields table to tell the import module how to fetch the customfields data (this imports the content, while the code above imported the fields definitions).
+                $cf_alias = $fk_alias.'cf';
+                $cf_table = $fk_table.'_customfields';
+
+                // -- import fields structures injection
+                // This will add the list of custom fields, but not their content! (this defines the names and types of each custom field, the content is retrieved via the sql request $this->import_sql_start below)
+                $cf_fields = $customfields->fetchAllFieldsStruct();
+                if (!empty($cf_fields)) {
+                    $this->array_import_tables[$importedmodkey][$cf_alias] = $cf_table;
+                    $this->array_import_fieldshidden[$importedmodkey][$cf_alias.'.fk_'.$customfields->module] = 'lastrowid-'.$fk_table;
+                    $this->array_import_module[$importedmodkey]->import_fieldshidden_array[1][$cf_alias.'.fk_'.$customfields->module] = 'lastrowid-'.$fk_table;
+
+                    foreach ($cf_fields as $field) {
+                        $key = $customfields->varprefix.$field->column_name; // column key that will be set in the final output file
+                        $dbkey = $cf_alias.'.'.$field->column_name; // define the database key (depends on the sql request below, we chose to name the table "cf" in the join)
+
+                        // Define the field type
+                        if (!empty($field->referenced_table_name)) { // if constrained field, we will show this field as type list (instead of int)
+                            $reftable = $customfields->stripPrefix($field->referenced_table_name, MAIN_DB_PREFIX); // must remove the db prefix "llx_" for the list to work in the import module
+                            $svs_fields = $customfields->smartValueSubstitutionOnly($field);
+                            $svs_fields = $svs_fields[0];
+                            $reftablecolumn2show = explode(' as ', $svs_fields); // select the column to show (use smart value substitution to show human readable entries instead of the rowid)
+                            $typeFilter = 'List:'.$reftable.':'.$reftablecolumn2show[0]; // format = List:table_without_prefix:column_to_show
+                        } elseif (!strcmp($field->data_type, 'varchar')) {
+                            $typeFilter = 'Text';
+                        } else { // else for any other type, the sql data type should perfectly fit
+                            $typeFilter = ucfirst($field->data_type);
+                        }
+
+                        // Register into the import the field's definition
+                        $r = 1;
+                        $this->array_import_module[$importedmodkey]->import_fields_array[$r][$dbkey] = $key; // define the field name in the output import file
+                        $this->array_import_module[$importedmodkey]->import_examplevalues_array[$r][$dbkey] = $typeFilter; // define the field type
+                        //$this->array_import_module[$importedmodkey]->import_entities_array[$r][$dbkey] = $fk_module; // define the module of the field
+                        // Same as above, but these are the real keys to modify, these are the ones that the import module will consider (this is a compilation of all submodules lists of fields - the final list in short)
+                        $this->array_import_fields[$importedmodkey][$dbkey] = $key;
+                        $this->array_import_examplevalues[$importedmodkey][$dbkey] = $typeFilter;
+                        //$this->array_import_entities[$importedmodkey][$dbkey] = $fk_module;
+                    }
+                }
+            }
+        }
+    }
+
+    // DEBUG
+    //print('<pre>');
+    //print_r($exported_module);
+    //print_r($modules);
+    //print_r(get_defined_vars());
+    //print_r($_SERVER);
+    //print_r($GLOBALS);
+    //print_r($GLOBALS['objexport']);
+    //print_r($this);
+    //print('</pre>');
+    //die();
+}
+// End of CustomFields Export injection
+
+
+//-------------------------------------------------------------------------------------------------------
 
 
 /**

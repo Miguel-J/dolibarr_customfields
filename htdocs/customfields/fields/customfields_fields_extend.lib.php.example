@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2011-2014   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2015   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,6 +52,7 @@
  * createfull: in creation page, CF stops and you do the rest of the processing/printing.
  * save: just before saving a custom field in database, you can change the values that will be stored in the database, and then CF will commit them (you don't have to, just change the values).
  * savefull: just before saving a custom field in database, CF stops the processing and you do the rest of the commit to the database (WARNING: CF will not store the data, you have to do it!).
+ * aftersave: just after saving a custom field in database. Great to call various Dolibarr refresh functions (like $object->update_price() to refresh the total price).
  * BONUS: if you want to change values saving at creation and stop CF to do the processing and commit, you can use a TRIGGER in the customfield's trigger file (eg: FACTURE_CREATE, and then you can filter which field you want to process specifically, as soon as you do a return this will stop CF to process the fields at creation).
  *
  * Format:
@@ -68,18 +69,18 @@
 
 
 /*
-function customfields_field_create_mymodule_myfield (&$currentmodule, &$object, &$parameters, &$action, &$id, &$customfields, &$field, &$name, &$value) {
+function customfields_field_create_mymodule_myfield (&$currentmodule, &$object, &$parameters, &$action, &$id, &$customfields, &$field, &$name, &$value, $fields) {
     global $db; // allow to access database functions
     // do your SQL stuff here
 }
 
 
-function customfields_field_createfull_mymodule_myfield (&$currentmodule, &$object, &$parameters, &$action, &$id, &$customfields, &$field, &$name, &$value) {
+function customfields_field_createfull_mymodule_myfield (&$currentmodule, &$object, &$parameters, &$action, &$id, &$customfields, &$field, &$name, &$value, $fields) {
     global $db; // allow to access database functions
     // do your SQL stuff here
 }
 
-function customfields_field_editview_mymodule_myfield (&$currentmodule, &$object, &$parameters, &$action, &$user, &$idvar, &$rightok, &$customfields, &$field, &$name, &$value) {
+function customfields_field_editview_mymodule_myfield (&$currentmodule, &$object, &$parameters, &$action, &$user, &$idvar, &$rightok, &$customfields, &$field, &$name, &$value, $fields) {
     global $db; // allow to access database functions
 
     // do your SQL stuff here
@@ -95,17 +96,17 @@ function customfields_field_editview_mymodule_myfield (&$currentmodule, &$object
     $value = $myarray; // just return an array of the format above
 }
 
-function customfields_field_editviewfull_mymodule_myfield (&$currentmodule, &$object, &$parameters, &$action, &$user, &$idvar, &$rightok, &$customfields, &$field, &$name, &$value) {
+function customfields_field_editviewfull_mymodule_myfield (&$currentmodule, &$object, &$parameters, &$action, &$user, &$idvar, &$rightok, &$customfields, &$field, &$name, &$value, $fields) {
     global $db; // allow to access database functions
     // do your SQL stuff here
 }
 
-function customfields_field_view_mymodule_myfield (&$currentmodule, &$object, &$parameters, &$action, &$user, &$idvar, &$rightok, &$customfields, &$field, &$name, &$value) {
+function customfields_field_view_mymodule_myfield (&$currentmodule, &$object, &$parameters, &$action, &$user, &$idvar, &$rightok, &$customfields, &$field, &$name, &$value, $fields) {
     global $db; // allow to access database functions
     // do your SQL stuff here
 }
 
-function customfields_field_viewfull_mymodule_myfield (&$currentmodule, &$object, &$parameters, &$action, &$user, &$idvar, &$rightok, &$customfields, &$field, &$name, &$value) {
+function customfields_field_viewfull_mymodule_myfield (&$currentmodule, &$object, &$parameters, &$action, &$user, &$idvar, &$rightok, &$customfields, &$field, &$name, &$value, $fields) {
     global $db;
     // do your SQL things here
 
@@ -120,14 +121,21 @@ function customfields_field_viewfull_mymodule_myfield (&$currentmodule, &$object
     print $myarray[$value][1];
 }
 
-function customfields_field_save_mymodule_myfield (&$currentmodule, &$object, &$action, &$user, &$customfields, &$field, &$name, &$value) {
+function customfields_field_save_mymodule_myfield (&$currentmodule, &$object, &$action, &$user, &$customfields, &$field, &$name, &$value, $fields) {
     global $db; // allow to access database functions
     // do your SQL stuff here
 }
 
-function customfields_field_savefull_mymodule_myfield (&$currentmodule, &$object, &$action, &$user, &$customfields, &$field, &$name, &$value) {
+function customfields_field_savefull_mymodule_myfield (&$currentmodule, &$object, &$action, &$user, &$customfields, &$field, &$name, &$value, $fields) {
     global $db; // allow to access database functions
     // do your SQL stuff here
+}
+
+function customfields_field_aftersave_mymodule_myfield (&$currentmodule, &$object, &$action, &$user, &$customfields, &$field, &$name, &$value, $fields) {
+    // Force refreshing total price
+    $object->update_price(0, 'auto');
+    // Force refresh the page to update prices that were printed before the custom field aftersave was triggered
+    print('<script type="text/javascript">window.location.href = window.location.pathname + window.location.search;</script>');
 }
 
 */

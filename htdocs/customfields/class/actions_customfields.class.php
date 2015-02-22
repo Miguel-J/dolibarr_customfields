@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2011-2014   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2015   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
  *      \file       htdocs/customfields/class/actions_customfields.class.php
  *      \ingroup    customfields
  *      \brief      Hook file for CustomFields to manage printing and editing in module's forms and datasheets
- *		\author		Stephen Larroque
+ *      \author     Stephen Larroque
  */
 
 /**
@@ -107,7 +107,7 @@ class ActionsCustomFields // extends CommonObject
             }
 
             include_once(dirname(__FILE__).'/../lib/customfields_printforms.lib.php');
-            print '<br>';
+            print '<br />';
 
             // Print the customfields forms
             if ($printtype == 'create') { // Creation page: all customfields are editable at once
@@ -160,6 +160,10 @@ class ActionsCustomFields // extends CommonObject
         print('<table>'); // need to pre-create a table here since the hook is contained inside a div instead of table
         $this->customfields_print_forms($printtype, $parameters, $object, $action);
         print('</table>');
+    }
+    // Special case: when enabling HTML field for supplier order line, another hook is called, but it is totally equivalent to formCreateProductOptions, thus we just redirect
+    function formCreateProductSupplierOptions($parameters, $object, $action) {
+        return $this->formCreateProductOptions($parameters, $object, $action);
     }
 
     // Add customfields in forms that edit product lines (eg: products/services lines in invoices, etc..)

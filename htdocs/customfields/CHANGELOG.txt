@@ -1,8 +1,50 @@
 CHANGELOG
 ==========
 
-2014
+2015
 -------
+* fix: CustomFields and CustomFieldsPDFTest now works again correctly without warnings when placed inside an alternative plugins folder (eg: /htdocs/custom), because DOL_DOCUMENT_ROOT_ALT was removed since Dolibarr 3.5 ( replace by dol_include_once or include dol_buildpath() ).
+* add: preliminary work for import support (it should work but some things aren't yet automated, and the whole importing process wasn't thoroughly tested).
+* fix: modCustomFields.class.php compatibility with PHP4 (Parse error: syntax error, unexpected '[' in /dolibarr/htdocs/customfields/core/modules/modCustomFields.class.php on line 75).
+* fix: date and datetime types custom fields will now show locale date format instead of universal one (as per the Dolibarr standard).
+* fix: regression: broken hour and minute saving in datetime type custom fields, which regression was introduced with "issue with duplicated customfields of types textarea or date on free and predefined products".
+* fix: a few potential issues with AJAX automatic management (collisions between children fields updates).
+* add: show_on_cascade option for hidden fields.
+* add: notice on fields with duplication enabled in creation form.
+* fix: warning on module's administration page (caused by export injection attempt in the wrong context).
+* fix: on creation form with edit action (when user clicks on Modify), cascading didn't filter values of children fields relative to an already set parent field (had to reselect the parent's value to filter children). This is now fixed, cascading children fields are filtered.
+* add: export injection (custom fields will now be exported using the Dolibarr's native export module). Import is not (yet) implemented. Export filtering also works, and constrained fields will show the nice smart value substituted values at filtering (in the resulting exported file, only the rowid will be shown).
+* fix: edge case that prevented custom fields from appearing in supplier orders lines starting from Dolibarr 3.6.
+* add: failsafe for recopy option in case the target module does not implement the createFrom hook.
+* add: autoupdate now show a nice changelog diff with highlight colors to quickly see what's been added.
+* fix: potential security issue: duplication now uses varvar() auxiliary function instead of eval().
+* add: duplication extra option: this allows to force a custom field to always duplicate another field's value (whether it's a custom field or any Dolibarr standard field).
+* update: compatible with new call_trigger() for Dolibarr > 3.7.0.
+* add: Recursive Remote Fields Access in ODT, PDF and any PHP code using customfields_fill_object() (managed by customfields_fill_object() and fetchReferencedValuesRec()).
+* fix: $object->parent_object has been removed from overloading functions, replaced by $object which now directly references the original object (this uniformizes at creation and at edition: the CustomFields trigger now always get a full $object in arguments, and pass it onto overloading functions).
+* add: support for custom fields in User module.
+* add: $object->parent_object to access parent object methods and properties inside overloading functions type "save", "savefull" and "aftersave" (before, the parent object was unaccessible from thes overloading types but was accessible with other types).
+* add: overloading function type "aftersave" to trigger commands after a custom field is saved into the database.
+
+2014 (up to v3.3.10)
+-------
+* update: auto-updating can now be disabled + checks updates only on-demand by clicking (avoids too many requests).
+* add: auto-updating mini facility on admin panel (doesn't update automatically yet, but it shows the latest version available and the changelog).
+* update: CustomFields admin panel anchor and automatically scrolls down to custom fields creation / edit form.
+* fix: unbalanced display of fields below a separator.
+* add: separator between fields as an extra option.
+* update: custom Ajax functions behaviour have been modified: normal functions will still allow CustomFields automatic management afterwards (this way it allows to do additional processing like conditionally hiding/showing fields), and full custom functions stop CustomFields automatic management (allowing to manually set the values), but the returned value should now always be an associative array, full functions should not print anymore (they still can and die() after anyway).
+* add: showInputFieldAjax() now supports two more attributes types: 'css' to change the CSS, and 'attr' to change any HTML attribute.
+* add: extra option: hide.
+* add: $fields (all fields structures) are now systematically supplied for all overloading and custom ajax functions.
+* update: completely converted $extra object into a fully associative array, this allows to avoid JSON decoding mismatching (will now always decode as an associative array instead of guessing), and allows to easily append/replace keys and values recursively in $extra (concretely, it's easy for an user to update the $extra options).
+* update: provide multiple cascade children fields possibility by flipping upside down the way automatic cascading is managed (before: stored in parent, now: stored in children and parent stores a list of children). Custom ajax functions also are changed: they now have more parameters and they are to be named following the child field (before it was the parent field's name).
+* fix: typo in colspan management on create sheets.
+* update: fetchReferencedValuesList() has been enhanced to provide an easy way to fetch linked records of constrained fields.
+* add: cascading dropdown lists with AJAX support.
+* add: AJAX support in CustomFields.
+* fix: more input sanitization in CustomFields class to prevent XSS and SQL injections.
+* fix: select types now has the class "flat" and thus an uniformized look with other Dolibarr select boxes.
 * fix: edge case when php://input was empty when a trigger was activated (for example with company_modify). Thus now the Modify button now correctly saves customfields in the Third-Party / Society tab.
 * fix: modify button now saves customfields correctly in Project and Task modules.
 * add: new field type textraw (TextArea NoHTML) to save multiline text without any html formatting (great for PDF!).

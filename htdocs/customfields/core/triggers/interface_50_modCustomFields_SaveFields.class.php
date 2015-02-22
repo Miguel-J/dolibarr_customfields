@@ -221,13 +221,34 @@ class InterfaceSaveFields
             $count = 0; // count the number of custom fields that are to be saved
             foreach ($fields as $field) { // loop through every custom fields
                 $key = $customfields->varprefix.$field->column_name; // get the full name (cf_somename)
-                
+
+                // Duplication option: if this custom field has the duplication option, we will copy the value from another field of $object, totally automatically and transparently!
+                if (!empty($field->extra['duplicate_from'])) {
+                    // Get the property name (or path) that we want to extract from $object (eg: $object->client->rowid)
+                    $dkey = $field->extra['duplicate_from'];
+
+                    // DANGEROUS: this is the most flexible, but using eval() can lead to serious security issues (eg: when using CustomFields on a demo server with admin panel open to everyone, some could abuse the eval!)
+                    // Prefix with "cf_" if it's a custom field? (we just check if $dkey isn't set, in this case we try with "cf_".$dkey)
+                    //eval("if (!isset(\$object->$dkey)) \$dkey = \$customfields->varprefix.\$dkey;");
+                    // Duplicate! $object->$key will be automatically saved by CustomFields below, as long as it's set
+                    //eval("if (isset(\$object->$dkey)) \$object->\$key = \$object->$dkey;"); // this is the only way to access subproperties of $object (eg: $object->client->name), because PHP variable variables names do not work here (alternative: varvar() func in conf_customfields_func.lib.php but it is not as reliable for example if we try to access a mixed path with arrays inside objects).
+
+                    // Fetch the specified source field for the duplication
+                    $dval = varvar($object, $dkey); // varvar() will return null if the key is not set
+                    // Prefix with "cf_" if it's a custom field? (we just check if $dkey isn't set, in this case we try with "cf_".$dkey)
+                    if (!isset($dval)) $dval = varvar($object, $customfields->varprefix.$dkey);
+                    // Duplicate! $object->$key will be automatically saved by CustomFields below, as long as it's set
+                    if (!empty($dval)) $object->$key = $dval;
+
+                    //print('<pre>'); print("DUPFIELD:\n"); print($dkey.' => '.$key."\n"); print('New val: '.$object->$key."\n"); print_r($object); print('</pre>');
+                }
+
                 if (isset($object->$key)) {
 
                     $count++;
 
                     // Required fields
-                    if ($field->extra->required and !$field->extra->noteditable and empty($object->$key) // check if a field is required, editable and empty, we stop processing
+                    if ($field->extra['required'] and !$field->extra['noteditable'] and empty($object->$key) // check if a field is required, editable and empty, we stop processing
                          and ( strcmp(substr($actionw, 0, 4), 'set_') or !strcmp(strtolower($actionw), 'set_'.$key) ) ) { // and check that if we are modifying a custom field (because CUSTOMFIELDS_MODIFY trigger is redirecting here), we only account for required field if it is the one we are currently editing (else without this check, any other required custom field will make the trigger fail since their value would be empty since we are not modifying those other custom fields!)
                         setEventMessage($langs->trans('ErrorFieldRequired', $langs->transnoentitiesnoconv($customfields->findLabel($field->column_name, $langs))),'errors'); // show an error message telling that the field can't be empty
                         $err++; // increment the error counter
@@ -240,11 +261,11 @@ class InterfaceSaveFields
                     $name = strtolower($field->column_name); // the name of the customfield (which is the property of the record)
 
                     if (function_exists($customfunc_savefull)) { // here one can STOP CustomFields processing, and one can then do the processing by oneself
-                        $customfunc_savefull($currentmodule, $object, $actionw, $user, $customfields, $field, $name, $object->$key);
+                        $customfunc_savefull($currentmodule, $object, $actionw, $user, $customfields, $field, $name, $object->$key, $fields);
                         unset($object->$key); // Delete this entry because the overloading function processed it, thus here we won't
                         $count--;
                     } else { // here the user can just modify the values and the field and then CustomFields will save them into the database
-                        if (function_exists($customfunc_save)) $customfunc_save($currentmodule, $object, $actionw, $user, $customfields, $field, $name, $object->$key);
+                        if (function_exists($customfunc_save)) $customfunc_save($currentmodule, $object, $actionw, $user, $customfields, $field, $name, $object->$key, $fields);
                     }
                 }
             }
@@ -255,7 +276,8 @@ class InterfaceSaveFields
             if ($count <= 0) return;
             // Else we can continue processing
 
-            // Saving the customfields data (creating a record)
+            // Saving the customfields data (creating a record or update an already existant one, this is the same function)
+            // Note: as long as $object->cf_customfieldname is declared (and a custom field named "customfieldname" exists for this module), it will be automatically saved/updated into the database.
             $rtncode = $customfields->create($object);
 
             // Print errors (if there are)
@@ -263,6 +285,19 @@ class InterfaceSaveFields
                 dol_print_error($this->db, $customfields->error);
             } else {
                 // Else if no error, the custom fields were successfully committed
+
+                // Overloading "aftersave" functions
+                // Calling custom functions after submitting the data to the database
+                foreach ($fields as $field) { // loop through every custom fields
+                    $key = $customfields->varprefix.$field->column_name; // get the full name (cf_somename)
+                
+                    if (isset($object->$key)) {
+                        $customfunc_aftersave = 'customfields_field_aftersave_'.$currentmodule.'_'.$field->column_name;
+                        $name = strtolower($field->column_name); // the name of the customfield (which is the property of the record)
+                        if (function_exists($customfunc_aftersave)) $customfunc_aftersave($currentmodule, $object, $actionw, $user, $customfields, $field, $name, $object->$key, $fields);
+                    }
+                }
+
                 // Then we cleanup the POST data of custom fields. This fixes issues where the products lines custom fields are reloaded with data from the just inserted record (which is OK when the record was not inserted because of errors, we want to remember the last values of these fields for the user to not loose all his data he just typed; but if the record was inserted we want to cleanup all these datas).
                 foreach ($fields as $field) { // loop through every custom fields
                     $key = $customfields->varprefix.$field->column_name; // get the full name (cf_somename)
