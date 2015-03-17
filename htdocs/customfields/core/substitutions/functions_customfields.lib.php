@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2011-2014   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2015   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,11 +79,18 @@ function customfields_completesubstitutionarray(&$substitutionarray,$langs,$obje
         // -- Begin to populate the substitution array with customfields data
         foreach ($object->customfields as $key=>$value) { // One field at a time
 
+            if ($key == 'lines') continue; // skip if it's the lines subobject (this is not a custom field but the list of lines custom fields!)
             if ($key == 'raw') continue; // if it's the 'raw' subarray, we skip
-            // Add this customfield's data to the substitution array (will automatically be replaced inside the ODT, eg: {cf_user} becomes 'John Doe')
-            $substitutionarray[$key] = $value; // adding this value to an odt variable (format: {cf_customfield} by default if varprefix = default 'cf_' )
-            $substitutionarray[$key.'_raw'] = $object->customfields->raw->$key; // adding the raw value in the _raw variable (format: {cf_customfield_raw})
 
+            if (!is_scalar($value)) { // If the value is not a scalar (so it cannot just be printed out because it's a complex object or array or resource), then we replace the value with an error to signal to the user that there's a problem
+                $substitutionarray[$key] = 'ErrorNotAScalar';
+                $substitutionarray[$key.'_raw'] = 'ErrorNotAScalar';
+            } else { // Else the value is a scalar, we can print it out
+                // Add this customfield's data to the substitution array (will automatically be replaced inside the ODT, eg: {cf_user} becomes 'John Doe')
+                $substitutionarray[$key] = $value; // adding this value to an odt variable (format: {cf_customfield} by default if varprefix = default 'cf_' )
+                $substitutionarray[$key.'_raw'] = $value;
+                if (isset($object->customfields->raw)) $substitutionarray[$key.'_raw'] = $object->customfields->raw->$key; // adding the raw value in the _raw variable (format: {cf_customfield_raw})
+            }
         }
     }
 
@@ -136,9 +143,15 @@ function customfields_completesubstitutionarray_lines(&$substitutionarray,$langs
         foreach ($object->customfields->lines->{$line->rowid} as $key=>$value) { // One field at a time, relative to the current line being processed
 
             if ($key == 'raw') continue; // if it's the 'raw' subarray, we skip
-            // Add this customfield's data to the substitution array (will automatically be replaced inside the ODT, eg: {cf_user} becomes 'John Doe')
-            $substitutionarray[$key] = $value; // adding this value to an odt variable (format: {cf_customfield} by default if varprefix = default 'cf_' )
-            $substitutionarray[$key.'_raw'] = $object->customfields->lines->raw->{$line->rowid}->$key; // adding the raw value in the _raw variable (format: {cf_customfield_raw})
+
+            if (!is_scalar($value)) { // If the value is not a scalar (so it cannot just be printed out because it's a complex object or array or resource), then we replace the value with an error to signal to the user that there's a problem
+                $substitutionarray[$key] = 'ErrorNotAScalar';
+                $substitutionarray[$key.'_raw'] = 'ErrorNotAScalar';
+            } else { // Else the value is a scalar, we can print it out
+                // Add this customfield's data to the substitution array (will automatically be replaced inside the ODT, eg: {cf_user} becomes 'John Doe')
+                $substitutionarray[$key] = $value; // adding this value to an odt variable (format: {cf_customfield} by default if varprefix = default 'cf_' )
+                $substitutionarray[$key.'_raw'] = $object->customfields->lines->raw->{$line->rowid}->$key; // adding the raw value in the _raw variable (format: {cf_customfield_raw})
+            }
 
         }
     }

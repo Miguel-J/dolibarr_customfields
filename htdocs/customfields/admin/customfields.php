@@ -116,6 +116,7 @@ if ($action == 'add' or $action == 'update') {
             $extra['recopy'] = false;
             $extra['recopy_field'] = '';
         }
+        if (!empty($_POST['constraint_where'])) $extra['constraint_where'] = $_POST['constraint_where']; else $extra['constraint_where'] = '';
         // Cascading field options
         if (!empty($cascade) and $cascade and (!empty($_POST['cascade_parent_field']) or !empty($cascade_custom))) { // if all necessary fields are filled, we go on
             $extra['cascade'] = true;
@@ -450,6 +451,7 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
         $field_type = GETPOST('type');
         $field_size = GETPOST('size');
         $field_constraint = GETPOST('constraint');
+        $field_constraint_where = GETPOST('constraint_where');
         $field_customtype = GETPOST('customtype');
         $checked = '';
         if (empty($_POST)) {
@@ -483,6 +485,7 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
         if (count($_POST["nulloption"]) == 1) $checked = "checked=checked"; else $checked = (strtolower($fieldobj->is_nullable) == 'yes' ? "checked=checked" : '');
         if (GETPOST('defaultvalue')) $field_defaultvalue = GETPOST('defaultvalue'); else $field_defaultvalue = $fieldobj->column_default;
         if (GETPOST('constraint')) $field_constraint = GETPOST('constraint'); else $field_constraint = $fieldobj->referenced_table_name;
+        if (GETPOST('constraint_where')) $field_constraint_where = GETPOST('constraint_where'); else $field_constraint_where = $fieldobj->extra['constraint_where'];
         if (count($_POST["requiredoption"]) == 1) $checkedr = "checked=checked"; else $checkedr = ($fieldobj->extra['required'] ? "checked=checked" : '');
         if (count($_POST["noteditableoption"]) == 1) $checkedne = "checked=checked"; else $checkedne = ($fieldobj->extra['noteditable'] ? "checked=checked" : '');
         if (count($_POST["hideoption"]) == 1) $checkedhide = "checked=checked"; else $checkedhide = ($fieldobj->extra['hide'] ? "checked=checked" : '');
@@ -527,11 +530,12 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
     $tables = $customfields->fetchAllTables();
     $tables = array_merge(array('' => $langs->trans('None')), $tables); // Adding a none choice (to avoid choosing a constraint or just to delete one)
     print $html->selectarray('constraint',$tables,$field_constraint);
+    print '<br />'.$langs->trans('Constraint').' WHERE: <input type="text" name="constraint_where" size="10" value="'.htmlentities($field_constraint_where, ENT_QUOTES).'">';
     print '</td></tr>';
 
     // Custom SQL
-    print '<tr><td class="field">'.$langs->trans("CustomSQLDefinition").' ('.$langs->trans("CustomSQLDefinitionDesc").')</td><td class="valeur"><input type="text" name="customdef" size="50" value="'.GETPOST('customdef').'"></td></tr>';
-    print '<tr><td class="field">'.$langs->trans("CustomSQL").' ('.$langs->trans("CustomSQLDesc").')</td><td class="valeur"><input type="text" name="customsql" size="50" value="'.GETPOST('customsql').'"></td></tr>';
+    print '<tr><td class="field">'.$langs->trans("CustomSQLDefinition").' ('.$langs->trans("CustomSQLDefinitionDesc").')</td><td class="valeur"><input type="text" name="customdef" size="50" value="'.htmlentities(GETPOST('customdef'), ENT_QUOTES).'"></td></tr>';
+    print '<tr><td class="field">'.$langs->trans("CustomSQL").' ('.$langs->trans("CustomSQLDesc").')</td><td class="valeur"><input type="text" name="customsql" size="50" value="'.htmlentities(GETPOST('customsql'), ENT_QUOTES).'"></td></tr>';
 
     // Recopy On Conversion
     print '<tr><td class="field">'.$langs->trans("RecopyOnConversion").'<br />'.$langs->trans("RecopyOnConversionDesc").'</td><td class="valeur">';

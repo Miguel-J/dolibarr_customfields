@@ -44,6 +44,7 @@ commandedet= Line customer orders
 commande_fournisseurdet=  Line supplier orders
 facture_fourn_det= Line supplier invoices
 user= User
+contratdet= Line contracts
 
 # Table headers
 Fieldname= Field Name

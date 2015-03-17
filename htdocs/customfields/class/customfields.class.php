@@ -53,7 +53,7 @@ if (! $res) die("Include of main fails");
 include_once(dirname(__FILE__).'/../conf/conf_customfields_func.lib.php');
 
 // Loading the translation class if it's not yet loaded (or with another name) - DO NOT EDIT!
-if (! is_object($langs))
+if (!isset($langs) or !is_object($langs))
 {
     include_once(DOL_DOCUMENT_ROOT."/core/class/translate.class.php");
     $langs=new Translate(dirname(__FILE__).'/../langs/',$conf);
@@ -257,7 +257,7 @@ class CustomFields extends compatClass4 // extends CommonObject
         $resql = $this->executeSQL($sql,__FUNCTION__.'_CustomFields',$trigger);
 
         // Filling the record object
-        if ($resql < 0) { // if there's an error
+        if (is_int($resql) and $resql < 0) { // if there's an error
             return $resql; // we return the error code
         } else { // else we fill the record
             $num = $this->db->num_rows($resql); // number of results returned (number of records)
@@ -346,7 +346,7 @@ class CustomFields extends compatClass4 // extends CommonObject
         $resql = $this->executeSQL($sql,__FUNCTION__.'_CustomFields',$trigger);
 
         // Filling the record object
-        if ($resql < 0) { // if there's no error
+        if (is_int($resql) and $resql < 0) { // if there's no error
             return $resql; // we return the error code
         } else { // else we fill the record
             $num = $this->db->num_rows($resql); // number of results returned (number of records)
@@ -554,7 +554,11 @@ class CustomFields extends compatClass4 // extends CommonObject
     */
    function getFieldSizeOrValue($column_type) {
         preg_match('/[(]([^)]+)[)]/', $column_type, $matches);
-        return $matches[1];
+        if (isset($matches[1])) {
+            return $matches[1];
+        } else {
+            return 0;
+        }
    }
 
     /*  Execute a unique SQL statement, add it to the logfile and add an event trigger (or not)
@@ -565,6 +569,8 @@ class CustomFields extends compatClass4 // extends CommonObject
      *  @return -1 if error, object of the request if OK
      */
     function executeSQL($sql, $eventname, $trigger=null) { // if $trigger is null, no trigger will be produced, else it will produce a trigger with the provided name
+        $error = 0;
+
         // Executing the SQL statement
         dol_syslog(get_class($this)."::".$eventname." sql=".$sql, LOG_DEBUG); // Adding an event to the log
         $resql=$this->db->query($sql); // Issuing the sql statement to the db
@@ -573,7 +579,7 @@ class CustomFields extends compatClass4 // extends CommonObject
 
         // Managing trigger (if there's no error)
         if (! $error) {
-            $id = $this->db->last_insert_id($this->moduletable);
+            //$id = $this->db->last_insert_id($this->moduletable);
 
             if (!empty($trigger)) {
                 global $user, $langs, $conf; // required vars for the trigger
@@ -773,7 +779,7 @@ class CustomFields extends compatClass4 // extends CommonObject
         $resql = $this->executeSQL($sql,__FUNCTION__.'_CustomFields',$trigger);
 
         // Forging the result
-        if ($resql < 0) { // if an error happened when executing the sql command, we return -1
+        if (is_int($resql) and $resql < 0) { // if an error happened when executing the sql command, we return -1
             return $resql;
         } else { // else we check the result
             if ($this->db->num_rows($resql) > 0) { // if there is a result, then we return true (the table exists)
@@ -876,7 +882,7 @@ class CustomFields extends compatClass4 // extends CommonObject
         $resql = $this->executeSQL($sql, __FUNCTION__.'_CustomFields', $trigger);
 
         // Filling the field object
-        if ($resql < 0) { // if there's no error
+        if (is_int($resql) and $resql < 0) { // if there's no error
             return $resql; // we return the error code
 
         } else { // else we fill the field
@@ -1017,7 +1023,7 @@ class CustomFields extends compatClass4 // extends CommonObject
         $resql = $this->executeSQL($sql,__FUNCTION__.'_CustomFields', $trigger);
 
         // Filling in all the fetched fields into an array of fields objects
-        if ($resql < 0) { // if there's an error in the SQL
+        if (is_int($resql) and $resql < 0) { // if there's an error in the SQL
             return $resql; // return the error code
         } else {
             $constraints = array();
@@ -1163,13 +1169,14 @@ class CustomFields extends compatClass4 // extends CommonObject
 
         // Where
         $where_sql = '';
-        if (!empty($id) or !empty($where)) {
+        if (!empty($id) or !empty($where) or !empty($field->extra['constraint_where'])) {
             $where_arr = array();
             if (!empty($id)) {
                 $id = $this->db->escape(filter_var($id, FILTER_SANITIZE_NUMBER_INT));
                 $where_arr[] = $field->referenced_column_name.'='.$id;
             }
             if (!empty($where)) $where_arr[] = $where;
+            if (!empty($field->extra['constraint_where'])) $where_arr[] = $field->extra['constraint_where'];
 
             if (count($where_arr) > 0) {
                 $where_sql = ' WHERE '.implode(' AND ', $where_arr);
@@ -1192,7 +1199,7 @@ class CustomFields extends compatClass4 // extends CommonObject
         $resql = $this->executeSQL($sql,__FUNCTION__.'_CustomFields',$trigger);
 
         // -- Filling in all the fetched fields into an array of records objects
-        if ($resql < 0) { // if there's an error in the SQL
+        if (is_int($resql) and $resql < 0) { // if there's an error in the SQL
             return $resql; // return the error code
         } else {
             $refarray = array();
@@ -1251,7 +1258,7 @@ class CustomFields extends compatClass4 // extends CommonObject
         $resql = $this->executeSQL($sql,__FUNCTION__.'_CustomFields', $trigger);
 
         // Filling in all the fetched fields into an array of fields objects
-        if ($resql < 0) { // if there's an error in the SQL
+        if (is_int($resql) and $resql < 0) { // if there's an error in the SQL
             return $resql; // return the error code
         } else {
             $tables = array();
@@ -1291,7 +1298,7 @@ class CustomFields extends compatClass4 // extends CommonObject
         $resql = $this->executeSQL($sql,__FUNCTION__.'_CustomFields', $trigger);
 
         // Filling in all the fetched fields into an array of fields objects
-        if ($resql < 0) { // if there's an error in the SQL
+        if (is_int($resql) and $resql < 0) { // if there's an error in the SQL
             $errmsg = $this->db->lasterror();
             $this->error.=($this->error?', '.$errmsg:$errmsg);
             return $resql; // return the error code
@@ -1546,6 +1553,13 @@ class CustomFields extends compatClass4 // extends CommonObject
         } else {
             $field = $fieldid;
         }
+
+        // Sanitize the inputted $extra by replacing double-quotes by single quotes (eg: to support strings with quotes in extra options)
+        // DEPRECATED: not needed! Json_encode already escapes strings for each extra parameters, and then $this->escape() will escape the json quotes so that SQL does not produce an error.
+        //foreach ($extra as $k=>$v) {
+            //$extra[$k] = str_replace('"', "'", $v);
+        //}
+        //$extra = array_map(array($this, 'escape'), $extra); // sanitize for SQL injection - doesn't work because we already escape below, thus strings aren't restituted correctly
 
         // Append new $extra options on previous options in $field->extra, by merge the two objects: the already existing extra options for this field (from the db), plus the extra options given in parameters of this function
         if (isset($field->extra) and !$replace) {

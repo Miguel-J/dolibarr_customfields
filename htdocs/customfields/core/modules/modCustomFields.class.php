@@ -304,8 +304,8 @@ class modCustomFields extends DolibarrModules
             foreach($modulesarray as $mod) { // for each module
                 if (isset($mod['tabs_admin'])) { // if the tabs parameter has been specified
                     // We then proceed onto adding a tab for this module admin interface
-                    if (isset($mod['tabs_admin']['tabname'])) $tabname = $mod['tabs_admin']['tabname']; else $tabname = 'customfields';
-                    if (isset($mod['tabs_admin']['tabtitle'])) $tabtitle = $mod['tabs_admin']['tabtitle']; else $tabtitle = 'CustomFields';
+                    if (isset($mod['tabs_admin']['tabname'])) $tabname = $mod['tabs_admin']['tabname']; else $tabname = 'customfields_'.$mod['table_element'];
+                    if (isset($mod['tabs_admin']['tabtitle'])) $tabtitle = $mod['tabs_admin']['tabtitle']; else $tabtitle = 'CustomFields '.$langs->trans($mod['table_element']);
                     array_push($this->tabs, implode(':', array($mod['tabs_admin']['objecttype'], '+'.$tabname, $tabtitle, 'customfields@customfields', '$user->admin', '/customfields/admin/customfields.php?module='.$mod['table_element'].'&tabembedded=1')));
                 }
             }

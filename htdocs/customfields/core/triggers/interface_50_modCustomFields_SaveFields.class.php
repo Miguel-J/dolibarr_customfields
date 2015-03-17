@@ -238,7 +238,7 @@ class InterfaceSaveFields
                     // Prefix with "cf_" if it's a custom field? (we just check if $dkey isn't set, in this case we try with "cf_".$dkey)
                     if (!isset($dval)) $dval = varvar($object, $customfields->varprefix.$dkey);
                     // Duplicate! $object->$key will be automatically saved by CustomFields below, as long as it's set
-                    if (!empty($dval)) $object->$key = $dval;
+                    if (isset($dval)) $object->$key = $dval;
 
                     //print('<pre>'); print("DUPFIELD:\n"); print($dkey.' => '.$key."\n"); print('New val: '.$object->$key."\n"); print_r($object); print('</pre>');
                 }

@@ -124,7 +124,7 @@ function customfields_fill_object(&$object,$fromobject = null, $outputlangs = nu
             }
 
             // Add this customfield's record's datas to the $object
-            if (!is_object($object->customfields)) $object->customfields = new stdClass();
+            if (!isset($object->customfields) or !is_object($object->customfields)) $object->customfields = new stdClass();
             if (!$linemode) {
                 // if in object mode, we simply store the datas in $object->customfields
                 if ($prefix) { // prepending the prefix whether it was specified or not
@@ -134,7 +134,7 @@ function customfields_fill_object(&$object,$fromobject = null, $outputlangs = nu
                     $object->customfields->$name = $fmvalue;
                 }
             } else {
-                if (!is_object($object->customfields->lines)) $object->customfields->lines = new stdClass();
+                if (!isset($object->customfields->lines) or !is_object($object->customfields->lines)) $object->customfields->lines = new stdClass();
                 // else we are in lines mode, we store the datas in $object->customfields->lineid (so that the customfields are easily accessible knowing just the line's id)
                 if ($prefix) { // prepending the prefix whether it was specified or not
                     if (!is_object($object->customfields->lines->$prefix->{$record->$fkname})) {
@@ -143,7 +143,7 @@ function customfields_fill_object(&$object,$fromobject = null, $outputlangs = nu
                     }
                     $object->customfields->lines->$prefix->{$record->$fkname}->$name = $fmvalue; // adding this value to a sub-property of $object to avoid any conflict (default: $object->customfields->lines->$lineid->cf_myfield)
                 } else {
-                    if (!is_object($object->customfields->lines->{$record->$fkname})) $object->customfields->lines->{$record->$fkname} = new stdClass();
+                    if (!isset($object->customfields->lines->{$record->$fkname}) or !is_object($object->customfields->lines->{$record->$fkname})) $object->customfields->lines->{$record->$fkname} = new stdClass();
                     $object->customfields->lines->{$record->$fkname}->$name = $fmvalue;
                 }
             }
@@ -155,7 +155,7 @@ function customfields_fill_object(&$object,$fromobject = null, $outputlangs = nu
             if (!empty($field->referenced_table_name) and !empty($value)) { // and only if a value was selected, else it makes little sense to fetch the remote fields (except with AJAX Cascade call where we want to fetch all referenced records, but this is managed in the ajax wrapper lib without using this facade api).
                 //$fkrecord = $customfields->fetchAny('*', $field->referenced_table_name, $field->referenced_column_name."='".$value."'"); // we fetch the record in the referenced table. Equivalent to the fetchReferencedValuesList command below using $id=$value and $allcolumns=true.
                 //$fkrecord = $customfields->fetchReferencedValuesList($field, $value, null, true); // works correctly but is not recursive. Use fetchReferencedValuesRec() for a recursive fetching.
-                $fkrecord = fetchReferencedValuesRec($customfields, $field, $value); // we fetch the record in the referenced table. This is equivalent to the fetchAny command above.
+                $fkrecord = fetchReferencedValuesRec($customfields, $field, $value, $outputlangs, $pdfformat); // we fetch the record in the referenced table. This is equivalent to the fetchAny command above.
 
                 if (!empty($fkrecord[0])) { // normally, this should never happen since a constrained customfield is always linked to a foreign record, but in case that happens, we skip to avoid errors...
                     foreach ($fkrecord[0] as $column_name => $value) { // for each foreign record, we add the value to an odt variable (format eg: base field: cf_user, constrants fields: cf_user_name, cf_user_firstname, etc..)
@@ -446,13 +446,14 @@ function customfields_clone_or_recopy($object, $fromobject, $action2 = null, $st
  *  @param $customfields Object     CustomFields class instance for the target field (necessary to know which table_element we are working one).
  *  @param $field               Object     Field object (from a call to CustomFields->fetchFieldStruct()).
  *  @param $id                   int            Rowid of the record we want to fetch (this is the rowid of the Dolibarr's module object, ie: object->rowid, NOT CustomFields record id).
+ *  @param $pdfformat      null/false/true      beautify the customfields values? (null = no beautify nor translation; false = beautify and translate; true = translation and pdf beautify with html entities encoding)
  *  @param $recursive      false/true Recursively fetch the constrained field ? (by default true, this enable Recursive Remote Fields Access).
  *  @param $blacklist         array[]     private variable, this tracks the table_element (database tables) we already visited, to avoid an infinite recursion loop.
  *  @param $level              int             private variable, to track the recursion depth level.
  *
  *  @return  null/int(-1)/array       either null if there's nothing found, either -1 if an error happened, either an associative array $fkrecord where $fkrecord[0] contains each referenced field and its value.
  */
-function fetchReferencedValuesRec($customfields, $field, $id, $recursive=true, $blacklist=null, $level=0) {
+function fetchReferencedValuesRec($customfields, $field, $id, $outputlangs=null, $pdfformat=false, $recursive=true, $blacklist=null, $level=0) {
     global $db;
 
     // Include required libs
@@ -510,6 +511,15 @@ function fetchReferencedValuesRec($customfields, $field, $id, $recursive=true, $
                         $r_value = $cf_fkrecord->{$r_field->column_name}; // value of the remote custom field. Will contain the id of a second referenced table if it's a constrained field.
                         $r_key = $customfields->varprefix.$r_field->column_name; // remote custom field key
 
+                        // Update custom field's value with beautified formatting if enabled
+                        if (!isset($pdfformat)) { // no formatting if $pdfformat == null
+                            //$fkrecord[0]->$r_key = $r_value; // value is already set at this point, so we don't have to do nothing here.
+                        } elseif ($pdfformat) { // PDF formatted and translated value (cleaned and properly formatted, eg: cf_user value = 'John Doe') of the customfield
+                            $fkrecord[0]->$r_key = $customfields_remote->printFieldPDF($r_field, $r_value, $outputlangs);
+                        } else { // if false, beautified and translated value (eg: universal date format is converted to Dolibarr locale format)
+                            $fkrecord[0]->$r_key = $customfields_remote->printField($r_field, $r_value, $outputlangs);
+                        }
+
                         // If this remote custom field is constrained (and there is a record id to point to), we recursively fetch the subreferenced fields
                         if (!empty($r_field->referenced_table_name) and !empty($r_value)) {
                             // Infinite recursion loop prevention: initialize and add current referenced table to the blacklist, to avoid infinite recursion
@@ -517,7 +527,7 @@ function fetchReferencedValuesRec($customfields, $field, $id, $recursive=true, $
                             $blacklist[] = $remote_cf_table;
 
                             // Recursively fetch the subreferenced fields
-                            $fkrecord_rec = fetchReferencedValuesRec($customfields_remote, $r_field, $r_value, $recursive, $blacklist, ++$level);
+                            $fkrecord_rec = fetchReferencedValuesRec($customfields_remote, $r_field, $r_value, $outputlangs, $pdfformat, $recursive, $blacklist, ++$level);
 
                             // If there's any subreferenced fields for this record, merge them with the list of records we will return
                             if (!empty($fkrecord_rec)) {

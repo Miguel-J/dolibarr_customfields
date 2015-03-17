@@ -3,8 +3,18 @@ CHANGELOG
 
 2015
 -------
+* add: CustomFields support for Contracts Lines.
+* add: customfields tabs in various admin modules (so that customfields can be configured directly in the context of the parent module, instead of going into the customfields admin page).
+* fix: td width and td colspan has been updated with the new values for native Dolibarr forms.
+* fix: duplication option will now duplicate empty values too.
+* fix: more resilient ODT substitution, will now just print an error when a value is not a scalar instead of failing.
+* fix: edge case fatal error on ODT/PDF document generation that happened because CustomFields tried to substitute lines as a standard field (Catchable fatal error: Object of class stdClass could not be converted to string in /htdocs/core/lib/functions.lib.php on line 3769).
+* fix: Recursive Remote Fields Access now allow to beautify values of recursively fetched custom fields (automatic call to printField() and printFieldPDF()).
+* fix: Constraint WHERE clause not reloaded on edit custom field screen when containing a string (double quotes). Also fix CustomSQLRequest and CustomSQLDefinition fields GETPOST reloading.
+* fix: various php notices.
+* add: Constraint WHERE clause in configuration menu (allows to set static conditions without using a sql view).
 * fix: CustomFields and CustomFieldsPDFTest now works again correctly without warnings when placed inside an alternative plugins folder (eg: /htdocs/custom), because DOL_DOCUMENT_ROOT_ALT was removed since Dolibarr 3.5 ( replace by dol_include_once or include dol_buildpath() ).
-* add: preliminary work for import support (it should work but some things aren't yet automated, and the whole importing process wasn't thoroughly tested).
+* add: import support (experimental feature, tested quickly and it works). Works only on Dolibarr > 3.7 (or you can backport these changes, 3 lines of code to change: https://github.com/Dolibarr/dolibarr/pull/2386/files)
 * fix: modCustomFields.class.php compatibility with PHP4 (Parse error: syntax error, unexpected '[' in /dolibarr/htdocs/customfields/core/modules/modCustomFields.class.php on line 75).
 * fix: date and datetime types custom fields will now show locale date format instead of universal one (as per the Dolibarr standard).
 * fix: regression: broken hour and minute saving in datetime type custom fields, which regression was introduced with "issue with duplicated customfields of types textarea or date on free and predefined products".

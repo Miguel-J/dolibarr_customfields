@@ -160,13 +160,13 @@ function customfields_print_creation_form($currentmodule, $object = null, $param
                 (empty($field->extra['cascade']) or empty($field->extra['cascade_parent_field']) or empty($field->extra['show_on_cascade']) or (empty($datas->{$field->extra['cascade_parent_field']}) and empty($_REQUEST[$customfields->varprefix.$field->extra['cascade_parent_field']]) ) ) ); // and also if show_on_cascade is enabled, we check if the parent's field has a value set. If that's the case, we show the field.
             $hidetr = '';
             if ( $hidecondition ) $hidetr = ' style="display: none;"';
-            print '<tr name="'.$customfields->varprefix.$field->column_name.'_tr" id="'.$customfields->varprefix.$field->column_name.'_tr"><td'.$fieldrequired.'>';
+            print '<tr name="'.$customfields->varprefix.$field->column_name.'_tr" id="'.$customfields->varprefix.$field->column_name.'_tr"><td'.$fieldrequired.' width="20%">';
             print '<span name="'.$customfields->varprefix.$field->column_name.'_label" id="'.$customfields->varprefix.$field->column_name.'_label"'.$hidetr.'>'.$customfields->findLabel($name).$fieldrecopyhelper.'</span></td>';
             //-- Output the right colspan for the table
             if(isset($parameters->colspan)) {
                 print '<td '.$parameters->colspan.'>';
             } else {
-                print '<td colspan="2">';
+                print '<td>';
             }
             //-- Recopy on conversion notice
             if ( $field->extra['recopy'] and $conversion ) print $langs->trans('RecopyCanBeEmptyHelper').'<br />';
@@ -350,7 +350,7 @@ function customfields_print_datasheet_form($currentmodule, $object, $parameters,
                     (empty($field->extra['cascade']) or empty($field->extra['cascade_parent_field']) or empty($field->extra['show_on_cascade']) or (empty($datas->{$field->extra['cascade_parent_field']}) and empty($_REQUEST[$customfields->varprefix.$field->extra['cascade_parent_field']]) ) ) ); // and also if show_on_cascade is enabled, we check if the parent's field has a value set. If that's the case, we show the field.
                 $hidetr = '';
                 if ( $hidecondition ) $hidetr = ' style="display: none;"';
-                print '<tr name="'.$customfields->varprefix.$field->column_name.'_tr" id="'.$customfields->varprefix.$field->column_name.'_tr"><td width="20%">';
+                print '<tr name="'.$customfields->varprefix.$field->column_name.'_tr" id="'.$customfields->varprefix.$field->column_name.'_tr"><td width="30%">';
                 // print the customfield's label
                 print '<span name="'.$customfields->varprefix.$field->column_name.'_label" id="'.$customfields->varprefix.$field->column_name.'_label"'.$hidetr.'>'.$customfields->findLabel($name).'</span>';
                 // print the edit button only if authorized
@@ -359,7 +359,7 @@ function customfields_print_datasheet_form($currentmodule, $object, $parameters,
                 if (isset($parameters->colspan)) { // sometimes the colspan is provided in $parameters, we use it if available
                     print '<td '.$parameters->colspan.'>';
                 } else { // if not, by default it's generally a colspan=3
-                    print '<td colspan="3">';
+                    print '<td>';
                 }
                 // print the editing form...
                 if ($action == 'editcustomfields' && strtolower(GETPOST('field')) == $name && $rightok) {
