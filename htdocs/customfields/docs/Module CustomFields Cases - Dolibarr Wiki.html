@@ -1,0 +1,1187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0060)http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr" class="client-chrome client-chrome-4 client-webkit client-win"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="verify-v1" content="HMNutRwqmhagMMJPRLLAFKlwRnifyx4SoJjYN+fyZV0=">
+		<meta name="msvalidate.01" content="97D254FD131581C03545FB5D9A228AD7">
+		
+		<meta name="generator" content="MediaWiki 1.17.0">
+<link rel="shortcut icon" href="http://wiki.dolibarr.org/skins/dolibarr/favicon.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="http://wiki.dolibarr.org/opensearch_desc.php" title="Dolibarr Wiki (en)">
+<link rel="EditURI" type="application/rsd+xml" href="http://wiki.dolibarr.org/api.php?action=rsd">
+<link rel="copyright" href="http://creativecommons.org/licenses/by-sa/4.0/">
+<link rel="alternate" type="application/atom+xml" title="Dolibarr Wiki Atom feed" href="http://wiki.dolibarr.org/index.php?title=Special:RecentChanges&feed=atom">		<title>Module CustomFields Cases - Dolibarr Wiki</title>
+		<link rel="stylesheet" href="http://wiki.dolibarr.org/load.php?debug=false&lang=en&modules=mediawiki.legacy.commonPrint%2Cshared&only=styles&skin=dolibarr&*">
+<link rel="stylesheet" href="http://wiki.dolibarr.org/skins/dolibarr/main.css?301" media="screen"><meta name="ResourceLoaderDynamicStyles" content="">		<script async="" src="http://www.google-analytics.com/analytics.js"></script><script>if ( window.mediaWiki ) {
+	mediaWiki.config.set({"wgCanonicalNamespace": "", "wgCanonicalSpecialPageName": false, "wgNamespaceNumber": 0, "wgPageName": "Module_CustomFields_Cases", "wgTitle": "Module CustomFields Cases", "wgAction": "view", "wgArticleId": 4468, "wgIsArticle": true, "wgUserName": null, "wgUserGroups": ["*"], "wgCurRevisionId": 33348, "wgCategories": ["CustomFields"], "wgBreakFrames": false, "wgRestrictionEdit": [], "wgRestrictionMove": []});
+}
+</script>		<link href="https://plus.google.com/+DolibarrOrg" rel="publisher">
+
+
+
+
+		<!-- Head Scripts -->
+<style type="text/css">/*<![CDATA[*/
+.source-php {line-height: normal;}
+.source-php li, .source-php pre {
+	line-height: normal; border: 0px none white;
+}
+/**
+ * GeSHi Dynamically Generated Stylesheet
+ * --------------------------------------
+ * Dynamically generated stylesheet for php
+ * CSS class: source-php, CSS id: 
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ * --------------------------------------
+ */
+.php.source-php .de1, .php.source-php .de2 {font: normal normal 1em/1.2em monospace; margin:0; padding:0; background:none; vertical-align:top;}
+.php.source-php  {font-family:monospace;}
+.php.source-php .imp {font-weight: bold; color: red;}
+.php.source-php li, .php.source-php .li1 {font-weight: normal; vertical-align:top;}
+.php.source-php .ln {width:1px;text-align:right;margin:0;padding:0 2px;vertical-align:top;}
+.php.source-php .li2 {font-weight: bold; vertical-align:top;}
+.php.source-php .kw1 {color: #505000;}
+.php.source-php .kw2 {color: #000000; font-weight: bold;}
+.php.source-php .kw3 {color: #505000;}
+.php.source-php .kw4 {color: #009900; font-weight: bold;}
+.php.source-php .co1 {color: #666666; font-style: italic;}
+.php.source-php .co2 {color: #666666; font-style: italic;}
+.php.source-php .co3 {color: #0000cc; font-style: italic;}
+.php.source-php .co4 {color: #009933; font-style: italic;}
+.php.source-php .coMULTI {color: #666666; font-style: italic;}
+.php.source-php .es0 {color: #000099; font-weight: bold;}
+.php.source-php .es1 {color: #000099; font-weight: bold;}
+.php.source-php .es2 {color: #660099; font-weight: bold;}
+.php.source-php .es3 {color: #660099; font-weight: bold;}
+.php.source-php .es4 {color: #006699; font-weight: bold;}
+.php.source-php .es5 {color: #006699; font-weight: bold; font-style: italic;}
+.php.source-php .es6 {color: #009933; font-weight: bold;}
+.php.source-php .es_h {color: #000099; font-weight: bold;}
+.php.source-php .br0 {color: #009900;}
+.php.source-php .sy0 {color: #339933;}
+.php.source-php .sy1 {color: #000000; font-weight: bold;}
+.php.source-php .st0 {color: #0000ff;}
+.php.source-php .st_h {color: #0000ff;}
+.php.source-php .nu0 {color: #cc66cc;}
+.php.source-php .nu8 {color: #208080;}
+.php.source-php .nu12 {color: #208080;}
+.php.source-php .nu19 {color:#800080;}
+.php.source-php .me1 {color: #004000;}
+.php.source-php .me2 {color: #004000;}
+.php.source-php .re0 {color: #000088;}
+.php.source-php .ln-xtra, .php.source-php li.ln-xtra, .php.source-php div.ln-xtra {background-color: #ffc;}
+.php.source-php span.xtra { display:block; }
+
+/*]]>*/
+</style>
+<style type="text/css">/*<![CDATA[*/
+@import "/index.php?title=MediaWiki:Geshi.css&usemsgcache=yes&action=raw&ctype=text/css&smaxage=18000";
+/*]]>*/
+</style>		<script type="text/javascript" src="./Module CustomFields Cases - Dolibarr Wiki_files/index.php"><!-- site js --></script>
+
+
+<!-- LDR Google plusone -->
+<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+
+
+<style>@-webkit-keyframes popfuldwsmaufrkxqfiqbbiicnmivkvzzmgqxfajor {50% {-webkit-transform:scale(1.2);}100% {-webkit-transform:scale(1);}}@keyframes popfuldwsmaufrkxqfiqbbiicnmivkvzzmgqxfajor {50% {-webkit-transform:scale(1.2);transform:scale(1.2);}100% {-webkit-transform:scale(1);transform:scale(1);}}#fuldwsmaufrkxqfiqbbiicnmivkvzzmgqxfajor{padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;border:solid 2px #fff !important;box-sizing:content-box !important;color:#fff !important;display:block !important;height:auto !important;margin:0 !important;opacity:0.9 !important;padding:7px 10px !important;position:fixed !important;visibility:visible !important;width:auto !important;z-index:2147483647 !important;-webkit-border-radius:5px !important;-webkit-box-shadow:0px 0px 20px #000 !important;-webkit-box-sizing:content-box !important;}.fuldwsmaufrkxqfiqbbiicnmivkvzzmgqxfajor-blocked{padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;color:#AAA !important;display:inline !important;text-decoration:line-through !important;}#fuldwsmaufrkxqfiqbbiicnmivkvzzmgqxfajor br{display:block !important;padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;}#fuldwsmaufrkxqfiqbbiicnmivkvzzmgqxfajor span{background:transparent !important;padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;}#fuldwsmaufrkxqfiqbbiicnmivkvzzmgqxfajor div{padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;border:0 !important;margin:0 !important;padding:0 !important;width:auto !important;letter-spacing:normal !important;font:13px Arial,Helvetica !important;text-align:left !important;text-shadow:none !important;text-transform:none !important;word-spacing:normal !important;}#fuldwsmaufrkxqfiqbbiicnmivkvzzmgqxfajor a{padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;font-weight:normal !important;background:none !important;text-decoration:underline !important;color:#fff !important;}a#fuldwsmaufrkxqfiqbbiicnmivkvzzmgqxfajor-gear{padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;text-decoration:none !important;position:absolute !important;display:none !important;font-size:20px !important;width:20px !important;height:20px !important;line-height:20px !important;text-align:center !important;background-color:rgba(255,255,255,.8) !important;background-image:url(chrome-extension://mlomiejdfkolichcflejclcbmpeaniij/data/images/gear.svg) !important;background-size:16px 16px !important;background-position:center center !important;background-repeat:no-repeat !important;text-decoration:none !important;}a#fuldwsmaufrkxqfiqbbiicnmivkvzzmgqxfajor-gear:hover{-webkit-animation-name:popfuldwsmaufrkxqfiqbbiicnmivkvzzmgqxfajor !important;animation-name:popfuldwsmaufrkxqfiqbbiicnmivkvzzmgqxfajor !important;-webkit-animation-duration:0.3s !important;animation-duration:0.3s !important;}#fuldwsmaufrkxqfiqbbiicnmivkvzzmgqxfajor:hover #fuldwsmaufrkxqfiqbbiicnmivkvzzmgqxfajor-gear{text-decoration:none !important;display:inline-block !important;}@media print{#fuldwsmaufrkxqfiqbbiicnmivkvzzmgqxfajor{display:none !important;}}</style></head>
+
+
+<body class="mediawiki ltr ns-0 ns-subject page-Module_CustomFields_Cases skin-dolibarr">
+
+
+<div class="htmldoc-ignore">
+<!-- LDR Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-9049390-2', 'dolibarr.org');
+  ga('require', 'displayfeatures');
+  ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+</div>
+
+
+<div id="globalWrapper">
+	<div id="column-content">
+	<div id="content">
+		<a name="top" id="top"></a>
+				<div class="htmldoc-ignore">
+				<h1 id="firstHeading" class="firstHeading">Module CustomFields Cases</h1>
+		</div>
+				<div id="bodyContent">
+						<div class="htmldoc-ignore">
+			<h3 id="siteSub">From Dolibarr Wiki</h3>
+			</div>
+						<div id="contentSub"></div>
+												<!-- start content -->
+			<div style="text-align:center; float:right; font-size:80%; background: #eef; border: 1px solid #ccf; margin-bottom: 0px; margin-left: 2px; margin-right: 2px; padding: 1px; height: 92px">
+<p><a href="http://wiki.dolibarr.org/index.php/Developer_documentation" title="Developer documentation">Return to developer<br>documentation index</a><br>
+</p>
+<a href="http://wiki.dolibarr.org/index.php/Developer_documentation" title="Developer documentation"><img alt="File Doc dev.png" src="./Module CustomFields Cases - Dolibarr Wiki_files/File_Doc_dev.png" width="48" height="48"></a></div>
+<div style="text-align: center; float:right; font-size:80%; background: #eef; border: 1px solid #ccf; margin-bottom: 0px; margin-left: 2px; margin-right: 2px; padding: 1px; height: 92px; min-width: 120px;">
+<p><a href="http://wiki.dolibarr.org/index.php/Category:List_of_Modules" title="Category:List of Modules">Return to<br>list of modules index</a><br>
+<a href="http://wiki.dolibarr.org/index.php/Category:List_of_Modules" title="Category:List of Modules"><img alt="Art.png" src="./Module CustomFields Cases - Dolibarr Wiki_files/Art.png" width="56" height="51"></a>
+</p>
+</div>
+<div>
+<table align="right" border="0" width="340px" cellpadding="2" cellspacing="0" class="dolbox">
+<tbody><tr>
+<th colspan="2" style="background-color: #e9e9ef"><b>CustomFields</b>
+</th></tr>
+<tr>
+<td valign="top" nowrap="nowrap"> Numero/ID of module </td>
+<td align="center" nowrap="nowrap"> 8500
+</td></tr>
+<tr>
+<td valign="top" nowrap="nowrap"> User doc. of module </td>
+<td align="center" nowrap="nowrap"> <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields" title="Module CustomFields">Module_CustomFields</a>
+</td></tr>
+<tr>
+<td valign="top" nowrap="nowrap"> Developer doc. of module </td>
+<td align="center" nowrap="nowrap"> <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev" title="Module CustomFields Dev">Module_CustomFields_Dev</a>
+</td></tr></tbody></table>
+</div>
+<p>This page lists a compilation of concrete, practical examples uses of <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields" title="Module CustomFields">CustomFields</a> and of its various features.
+</p><p>If you had an experience with CustomFields, you can also add here your case as an example for others to get inspired.
+</p>
+<table id="toc" class="toc"><tbody><tr><td><div id="toctitle"><h2>Contents</h2> <span class="toctoggle">[<a id="togglelink" class="internal" href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#">hide</a>]</span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#How_to_make_a_generic_PDF_template_listing_all_custom_fields"><span class="tocnumber">1</span> <span class="toctext">How to make a generic PDF template listing all custom fields</span></a></li>
+<li class="toclevel-1 tocsection-2"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Conditions_on_fields_selection"><span class="tocnumber">2</span> <span class="toctext">Conditions on fields selection</span></a>
+<ul>
+<li class="toclevel-2 tocsection-3"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Conditions_categories"><span class="tocnumber">2.1</span> <span class="toctext">Conditions categories</span></a></li>
+<li class="toclevel-2 tocsection-4"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Conditions_solutions"><span class="tocnumber">2.2</span> <span class="toctext">Conditions solutions</span></a>
+<ul>
+<li class="toclevel-3 tocsection-5"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Static_condition"><span class="tocnumber">2.2.1</span> <span class="toctext">Static condition</span></a></li>
+<li class="toclevel-3 tocsection-6"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Semi-dynamic_condition"><span class="tocnumber">2.2.2</span> <span class="toctext">Semi-dynamic condition</span></a></li>
+<li class="toclevel-3 tocsection-7"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Dynamic_condition"><span class="tocnumber">2.2.3</span> <span class="toctext">Dynamic condition</span></a></li>
+<li class="toclevel-3 tocsection-8"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Timed_condition"><span class="tocnumber">2.2.4</span> <span class="toctext">Timed condition</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-9"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Cascading"><span class="tocnumber">3</span> <span class="toctext">Cascading</span></a></li>
+<li class="toclevel-1 tocsection-10"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Overloading_functions"><span class="tocnumber">4</span> <span class="toctext">Overloading functions</span></a>
+<ul>
+<li class="toclevel-2 tocsection-11"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Dynamic_list_selection_based_on_another_one"><span class="tocnumber">4.1</span> <span class="toctext">Dynamic list selection based on another one</span></a></li>
+<li class="toclevel-2 tocsection-12"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Dynamic_discount_computation_per_products_lines_on_propales"><span class="tocnumber">4.2</span> <span class="toctext">Dynamic discount computation per products lines on propales</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-13"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Linking_Dolibarr_objects_from_two_different_modules"><span class="tocnumber">5</span> <span class="toctext">Linking Dolibarr objects from two different modules</span></a></li>
+<li class="toclevel-1 tocsection-14"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Modify_the_total_global_price_with_a_coefficient_.28without_tampering_the_discount.29"><span class="tocnumber">6</span> <span class="toctext">Modify the total global price with a coefficient (without tampering the discount)</span></a>
+<ul>
+<li class="toclevel-2 tocsection-15"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Implement_the_change_of_global_price_in_most_of_Dolibarr_.28including_remaining_debt_to_pay_and_PDF_and_ODT.29"><span class="tocnumber">6.1</span> <span class="toctext">Implement the change of global price in most of Dolibarr (including remaining debt to pay and PDF and ODT)</span></a></li>
+<li class="toclevel-2 tocsection-16"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Implementing_the_change_of_price_in_margin_module"><span class="tocnumber">6.2</span> <span class="toctext">Implementing the change of price in margin module</span></a></li>
+<li class="toclevel-2 tocsection-17"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Refresh_the_price_instantly"><span class="tocnumber">6.3</span> <span class="toctext">Refresh the price instantly</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-18"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Modify_the_total_price_PER_product.2Fservice_line_with_a_coefficient_.28without_tampering_the_discount.29"><span class="tocnumber">7</span> <span class="toctext">Modify the total price PER product/service line with a coefficient (without tampering the discount)</span></a>
+<ul>
+<li class="toclevel-2 tocsection-19"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Change_total_price_in_database"><span class="tocnumber">7.1</span> <span class="toctext">Change total price in database</span></a></li>
+<li class="toclevel-2 tocsection-20"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Change_printed_total_price_per_product_without_tampering_the_subprice_in_the_database"><span class="tocnumber">7.2</span> <span class="toctext">Change printed total price per product without tampering the subprice in the database</span></a>
+<ul>
+<li class="toclevel-3 tocsection-21"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Implementing_the_change_of_price_in_ODT_templates"><span class="tocnumber">7.2.1</span> <span class="toctext">Implementing the change of price in ODT templates</span></a></li>
+<li class="toclevel-3 tocsection-22"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Implementing_the_change_of_price_in_PDF_templates"><span class="tocnumber">7.2.2</span> <span class="toctext">Implementing the change of price in PDF templates</span></a>
+<ul>
+<li class="toclevel-4 tocsection-23"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Creating_your_own_PDF_template_by_copying_an_existing_template"><span class="tocnumber">7.2.2.1</span> <span class="toctext">Creating your own PDF template by copying an existing template</span></a></li>
+<li class="toclevel-4 tocsection-24"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Changing_the_prices_automatically_in_your_PDF"><span class="tocnumber">7.2.2.2</span> <span class="toctext">Changing the prices automatically in your PDF</span></a></li>
+</ul>
+</li>
+<li class="toclevel-3 tocsection-25"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Implementing_the_change_of_total_price_in_the_Dolibarr_interface"><span class="tocnumber">7.2.3</span> <span class="toctext">Implementing the change of total price in the Dolibarr interface</span></a></li>
+<li class="toclevel-3 tocsection-26"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Implementing_the_coefficient_column_in_the_Dolibarr_interface"><span class="tocnumber">7.2.4</span> <span class="toctext">Implementing the coefficient column in the Dolibarr interface</span></a>
+<ul>
+<li class="toclevel-4 tocsection-27"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Add_the_column_title_.22Coeff..22"><span class="tocnumber">7.2.4.1</span> <span class="toctext">Add the column title "Coeff."</span></a></li>
+<li class="toclevel-4 tocsection-28"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Add_the_generator"><span class="tocnumber">7.2.4.2</span> <span class="toctext">Add the generator</span></a></li>
+</ul>
+</li>
+<li class="toclevel-3 tocsection-29"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Implementing_the_change_of_price_in_margin_module_2"><span class="tocnumber">7.2.5</span> <span class="toctext">Implementing the change of price in margin module</span></a></li>
+<li class="toclevel-3 tocsection-30"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Implementing_the_change_of_price_in_remaining_debt_to_pay"><span class="tocnumber">7.2.6</span> <span class="toctext">Implementing the change of price in remaining debt to pay</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-31"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Custom_tax_per_product"><span class="tocnumber">8</span> <span class="toctext">Custom tax per product</span></a></li>
+</ul>
+</td></tr></tbody></table>
+<h1> <span class="mw-headline" id="How_to_make_a_generic_PDF_template_listing_all_custom_fields"> How to make a generic PDF template listing all custom fields </span></h1>
+<p>To make a generic PDF template listing all custom fields, you just need to take an existing PDF template, then you need to follow these 3 steps:
+</p><p>1/ Edit the class name (required, else it will conflict with the original template).
+</p><p>Eg: if we take the crabe template for invoices, we change:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw2">class</span> pdf_crabe <span class="kw2">extends</span> ModelePDFFactures <span class="br0">{</span>
+<span class="co1">// ... php code ...</span>
+  <span class="kw2">function</span> __constructor<span class="br0">(</span><span class="re0">$db</span><span class="br0">)</span> <span class="br0">{</span>
+<span class="co1">// ... php code ...</span>
+    <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">name</span> <span class="sy0">=</span> <span class="st0">"crabe"</span><span class="sy0">;</span></pre></div></div>
+<p>into:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw2">class</span> pdf_customfields <span class="kw2">extends</span> ModelePDFFactures <span class="br0">{</span>
+<span class="co1">// ... php code ...</span>
+  <span class="kw2">function</span> __constructor<span class="br0">(</span><span class="re0">$db</span><span class="br0">)</span> <span class="br0">{</span>
+<span class="co1">// ... php code ...</span>
+    <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">name</span> <span class="sy0">=</span> <span class="st0">"customfields"</span><span class="sy0">;</span></pre></div></div>
+<p>2/ Copy this generic function at the end of the PDF:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co4">/**
+ *   	\brief      Show the customfields in a new page
+ *   	\param      pdf     		PDF factory
+ * 		\param		object			Object invoice/propale/order/etc... (CustomFields simpler functions will automatically adapt)
+ *      \param      outputlangs		Object lang for output
+ */</span>
+<span class="kw2">function</span> _pagecustomfields<span class="br0">(</span><span class="sy0">&amp;</span><span class="re0">$pdf</span><span class="sy0">,</span><span class="re0">$object</span><span class="sy0">,</span><span class="re0">$outputlangs</span><span class="br0">)</span>
+<span class="br0">{</span>
+    <span class="kw2">global</span> <span class="re0">$conf</span><span class="sy0">;</span>
+    <span class="re0">$default_font_size</span> <span class="sy0">=</span> pdf_getPDFFontSize<span class="br0">(</span><span class="re0">$outputlangs</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// set default PDF font size</span>
+&nbsp;
+    <span class="co1">// Init and main vars</span>
+    <span class="kw1">include_once</span><span class="br0">(</span>DOL_DOCUMENT_ROOT<span class="sy0">.</span><span class="st_h">'/customfields/lib/customfields_aux.lib.php'</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Filling the $object with customfields (you can then access customfields by doing $object-&gt;customfields-&gt;cf_yourfield)</span>
+    <span class="re0">$customfields</span> <span class="sy0">=</span> customfields_fill_object<span class="br0">(</span><span class="re0">$object</span><span class="sy0">,</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$outputlangs</span><span class="sy0">,</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="kw4">true</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Setting the starting position of the text cursor</span>
+    <span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">SetXY</span><span class="br0">(</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">page_largeur</span> <span class="sy0">-</span> <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">marge_droite</span> <span class="sy0">-</span> <span class="br0">(</span><span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">GetStringWidth</span><span class="br0">(</span><span class="re0">$titre</span><span class="br0">)</span> <span class="sy0">+</span> 3<span class="br0">)</span><span class="sy0">,</span> <span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">GetY</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">+</span>4<span class="br0">)</span><span class="sy0">;</span>
+    <span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">SetY</span><span class="br0">(</span><span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">GetY</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">+</span>1<span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Printing the customfields</span>
+    <span class="kw1">foreach</span> <span class="br0">(</span><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">customfields</span> <span class="kw1">as</span> <span class="re0">$label</span><span class="sy0">=&gt;</span><span class="re0">$value</span><span class="br0">)</span> <span class="br0">{</span> <span class="co1">// $value is already formatted!</span>
+        <span class="co1">// Get translated label</span>
+        <span class="re0">$translatedlabel</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">findLabelPDF</span><span class="br0">(</span><span class="re0">$label</span><span class="sy0">,</span> <span class="re0">$outputlangs</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// translated label of the customfield (not translated by default in customfields_fill_object() because a field should always be accessible by a base name, whatever the translation is)</span>
+&nbsp;
+        <span class="co1">// PDF formatting, placement and printing</span>
+        <span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">SetFont</span><span class="br0">(</span><span class="st_h">''</span><span class="sy0">,</span><span class="st_h">'B'</span><span class="sy0">,</span> <span class="re0">$default_font_size</span><span class="br0">)</span><span class="sy0">;</span>
+        <span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">MultiCell</span><span class="br0">(</span>0<span class="sy0">,</span>3<span class="sy0">,</span> <span class="re0">$translatedlabel</span><span class="sy0">.</span><span class="st_h">' ($object-&gt;customfields-&gt;'</span><span class="sy0">.</span><span class="re0">$label</span><span class="sy0">.</span><span class="st_h">'): '</span><span class="sy0">.</span><span class="re0">$value</span><span class="sy0">,</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st_h">'L'</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// printing the customfield</span>
+        <span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">SetY</span><span class="br0">(</span><span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">GetY</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">+</span>1<span class="br0">)</span><span class="sy0">;</span> <span class="co1">// line return for the next printing</span>
+    <span class="br0">}</span>
+&nbsp;
+    <span class="kw1">return</span> <span class="nu0">1</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p>Alternative function (with a bit less functionalities, but more controllable):
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co4">/**
+ *   	\brief      Show the customfields in a new page (used to debug if CustomFields setup is correct)
+ *   	\param      pdf     		PDF factory
+ * 		\param		object			Object invoice/propal/product/whatever...
+ *      \param      outputlangs		Object lang for output
+ */</span>
+<span class="kw2">function</span> _pagecustomfields<span class="br0">(</span><span class="sy0">&amp;</span><span class="re0">$pdf</span><span class="sy0">,</span><span class="re0">$object</span><span class="sy0">,</span><span class="re0">$outputlangs</span><span class="br0">)</span>
+<span class="br0">{</span>
+    <span class="re0">$default_font_size</span> <span class="sy0">=</span> pdf_getPDFFontSize<span class="br0">(</span><span class="re0">$outputlangs</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+            <span class="kw1">if</span> <span class="br0">(</span><span class="kw3">empty</span><span class="br0">(</span><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">table_element</span><span class="br0">)</span> or <span class="kw3">empty</span><span class="br0">(</span><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">id</span><span class="br0">)</span><span class="br0">)</span> <span class="br0">{</span>
+                <span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">MultiCell</span><span class="br0">(</span><span class="nu0">0</span><span class="sy0">,</span><span class="nu0">3</span><span class="sy0">,</span> <span class="st0">"Current <span class="es1">\$</span>object is not compatible with CustomFields, could not find table_element or id."</span><span class="sy0">,</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st_h">'L'</span><span class="br0">)</span><span class="sy0">;</span>
+                <span class="kw1">return</span> <span class="nu0">1</span><span class="sy0">;</span>
+            <span class="br0">}</span>
+&nbsp;
+    <span class="co1">// Init and main vars</span>
+    <span class="kw1">include_once</span><span class="br0">(</span>DOL_DOCUMENT_ROOT<span class="sy0">.</span><span class="st_h">'/customfields/class/customfields.class.php'</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="re0">$customfields</span> <span class="sy0">=</span> <span class="kw2">new</span> CustomFields<span class="br0">(</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">db</span><span class="sy0">,</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">table_element</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+            <span class="co1">// Fetching custom fields records</span>
+            <span class="re0">$fields</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">fetch</span><span class="br0">(</span><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">id</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+            <span class="kw1">if</span> <span class="br0">(</span><span class="sy0">!</span><span class="kw3">isset</span><span class="br0">(</span><span class="re0">$fields</span><span class="br0">)</span><span class="br0">)</span> <span class="br0">{</span>
+                <span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">MultiCell</span><span class="br0">(</span><span class="nu0">0</span><span class="sy0">,</span><span class="nu0">3</span><span class="sy0">,</span> <span class="st0">"No custom field could be found for this object. Please check your configuration (did you create at least one customfield and set a value in the current datasheet?)"</span><span class="sy0">,</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st_h">'L'</span><span class="br0">)</span><span class="sy0">;</span>
+                <span class="kw1">return</span> <span class="nu0">1</span><span class="sy0">;</span>
+            <span class="br0">}</span> <span class="kw1">else</span> <span class="br0">{</span>
+                <span class="co1">// Setting the starting position of the text cursor</span>
+                <span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">SetXY</span><span class="br0">(</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">page_largeur</span> <span class="sy0">-</span> <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">marge_droite</span> <span class="sy0">-</span> <span class="br0">(</span><span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">GetStringWidth</span><span class="br0">(</span><span class="re0">$titre</span><span class="br0">)</span> <span class="sy0">+</span> 3<span class="br0">)</span><span class="sy0">,</span> <span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">GetY</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">+</span>4<span class="br0">)</span><span class="sy0">;</span>
+                <span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">SetY</span><span class="br0">(</span><span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">GetY</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">+</span>1<span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+                <span class="co1">// Printing the customfields</span>
+                <span class="kw1">foreach</span> <span class="br0">(</span><span class="re0">$fields</span> <span class="kw1">as</span> <span class="re0">$key</span><span class="sy0">=&gt;</span><span class="re0">$field</span><span class="br0">)</span> <span class="br0">{</span>
+                        <span class="re0">$translatedname</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">findLabelPDF</span><span class="br0">(</span><span class="re0">$key</span><span class="sy0">,</span> <span class="re0">$outputlangs</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// label of the customfield</span>
+                        <span class="re0">$value</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">simpleprintFieldPDF</span><span class="br0">(</span><span class="re0">$key</span><span class="sy0">,</span> <span class="re0">$field</span><span class="sy0">,</span> <span class="re0">$outputlangs</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// value (cleaned and properly formatted) of the customfield</span>
+&nbsp;
+                        <span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">SetFont</span><span class="br0">(</span><span class="st_h">''</span><span class="sy0">,</span><span class="st_h">'B'</span><span class="sy0">,</span> <span class="re0">$default_font_size</span><span class="br0">)</span><span class="sy0">;</span>
+                        <span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">MultiCell</span><span class="br0">(</span>0<span class="sy0">,</span>3<span class="sy0">,</span> <span class="re0">$translatedname</span><span class="sy0">.</span><span class="st_h">': '</span><span class="sy0">.</span><span class="re0">$value</span><span class="sy0">,</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st_h">'L'</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// printing the customfield</span>
+                        <span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">SetY</span><span class="br0">(</span><span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">GetY</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">+</span>1<span class="br0">)</span><span class="sy0">;</span> <span class="co1">// line return for the next printing</span>
+                <span class="br0">}</span>
+            <span class="br0">}</span>
+&nbsp;
+    <span class="kw1">return</span> <span class="nu0">1</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p>3/ Call the _pagecustomfields function at the right place (generally, after _pagefoot and just before $pdf-&gt;Close()):
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// Pied de page</span>
+<span class="re0">$this</span><span class="sy0">-&gt;</span>_pagefoot<span class="br0">(</span><span class="re0">$pdf</span><span class="sy0">,</span><span class="re0">$object</span><span class="sy0">,</span><span class="re0">$outputlangs</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">AliasNbPages</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// CustomFields</span>
+<span class="kw1">if</span> <span class="br0">(</span><span class="re0">$conf</span><span class="sy0">-&gt;</span><span class="me1">global</span><span class="sy0">-&gt;</span><span class="me1">MAIN_MODULE_CUSTOMFIELDS</span><span class="br0">)</span> <span class="br0">{</span> <span class="co1">// if the customfields module is activated...</span>
+        <span class="co1">// Add a page with the customfields</span>
+        <span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">AddPage</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+        <span class="re0">$this</span><span class="sy0">-&gt;</span>_pagecustomfields<span class="br0">(</span><span class="re0">$pdf</span><span class="sy0">,</span><span class="re0">$object</span><span class="sy0">,</span><span class="re0">$outputlangs</span><span class="br0">)</span><span class="sy0">;</span>
+        <span class="re0">$pagenb</span><span class="sy0">++;</span>
+<span class="br0">}</span>
+&nbsp;
+<span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">Close</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// you should first search for this, you should only find one occurrence</span></pre></div></div>
+<p>Then go to the module's admin panel (eg: invoice admin panel) and enable the template you've just created.
+</p><p>You can now use it to test if your customfields work.
+</p>
+<h1> <span class="mw-headline" id="Conditions_on_fields_selection"> Conditions on fields selection </span></h1>
+<p>Sometimes you may want to show a DropdownBox or Constraint (or another multi-choice type), but you may want to show or hide choices based on conditions (eg: only if it's a prospect, only if this zone was selected, only if this category was selected, etc..).
+</p><p>To know which is the best solution you should choose to implement your condition, you should first know in which category your condition falls in.
+</p>
+<h2> <span class="mw-headline" id="Conditions_categories"> Conditions categories </span></h2>
+<p>Conditions can be categorized into 4 types:
+</p>
+<ul><li> static condition: choices are restrained on a condition that never changes (eg: only show third-parties that are suppliers, or lowercase all data on sql insertion, or check that a field is above a certain number, etc.).
+</li><li> semi-dynamic condition: choices that are constrained on a static table but based on the value of another field/customfield. This is also commonly called "Cascaded dropdown lists" or "Dynamically linked dropdown lists".
+</li><li> dynamic: everything is dynamic: choices are based on a subfield of a field of the current module, so that there's no material table and it's impossible to create a view (because you would need to create one view per id) (eg: show only the contacts attached to the third-party being accessed)
+</li><li> timed condition: a condition that is based on time or recurrence (eg: at 5:00 AM delete old records, etc..)
+</li></ul>
+<h2> <span class="mw-headline" id="Conditions_solutions"> Conditions solutions </span></h2>
+<p>Now that you know what kind of condition you want to set, you can choose one of the following solutions depending on your preferences and knowledge.
+</p><p>In any case, you can always use the <b>CustomFields's overload functions</b> to fit your needs for nearly every type of condition.
+</p>
+<h3> <span class="mw-headline" id="Static_condition"> Static condition </span></h3>
+<ul><li> Constraint WHERE clause (when creating/editing a custom field, you can specify your own WHERE conditions).
+</li><li> View: create a view on the table based on the condition, and then create a custom field constrained on this view (which is just like any table), eg: only show third-parties that are suppliers:
+</li></ul>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1">CREATE VIEW llx_societe_supplier_view <span class="kw1">AS</span>
+SELECT <span class="sy0">*</span>
+FROM llx_societe
+WHERE fournisseur<span class="sy0">=</span><span class="nu0">1</span><span class="sy0">;</span></pre></div></div>
+<p>WARNING: foreign keys (and thus constraints) can't be used on views with MySQL, and materialized views neither exist, so you can't use this method with MySQL.
+</p>
+<ul><li> Check
+</li><li> Trigger
+</li><li> SQL Transformations
+</li><li> CustomFields's overload functions
+</li></ul>
+<h3> <span class="mw-headline" id="Semi-dynamic_condition"> Semi-dynamic condition </span></h3>
+<ul><li> CustomFields's Cascade option is ideal in most cases, and if not enough, you can use the Cascade Custom option and Overloading Functions.
+</li><li> View
+</li><li> Check
+</li><li> Trigger
+</li></ul>
+<h3> <span class="mw-headline" id="Dynamic_condition"> Dynamic condition </span></h3>
+<ul><li> CustomFields's Cascade Custom and Overload functions
+</li><li> Recursive Remote Fields Access
+</li><li> Making your own module, which calls the CustomFields class
+</li></ul>
+<h3> <span class="mw-headline" id="Timed_condition"> Timed condition </span></h3>
+<ul><li> SQL scheduled events
+</li><li> Cron job
+</li><li> CustomFields's overload functions
+</li></ul>
+<h1> <span class="mw-headline" id="Cascading"> Cascading </span></h1>
+<p>A simple example of <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields#Cascade" class="external text" target="_blank">cascading to select a location</a> can be found in the user manual.
+</p><p>But you can do a lot more with cascading if you combine it with other options, such as Duplication and Hide. Here is an example:
+</p><p>Let's say that in invoices, you want to be able to select a contact of the society selected for this invoice. Of course, you want that the list of contacts show only the contacts related to the society (ie: that you added on the Third-Party datasheet of this society).
+</p><p>To do that, you have to proceed in two steps:
+</p><p>1- Create a custom field "soccpy_nom" constrained on llx_society that will duplicate the society's id. This is necessary because other custom fields can only be cascaded using other custom fields, not any Dolibarr fields. Using duplication allows you to duplicate any Dolibarr field (and even $_GET and $_POST), so that you can use them to cascade. Copy the parameters as shown in this image:
+</p><p><a href="http://wiki.dolibarr.org/index.php/File:Cf-case-cascade-contacts1.png" class="image"><img alt="Cf-case-cascade-contacts1.png" src="./Module CustomFields Cases - Dolibarr Wiki_files/Cf-case-cascade-contacts1.png" width="1177" height="657"></a>
+</p><p>2- Create a custom field "contact_firstname_lastname" with Cascade option with parent "soccpy_nom" and constrained on the table llx_socpeople (the table of the contacts), which will show the list of contacts associated only to the selected society in soccpy_nom. Copy the parameters as shown in this image:
+</p><p><a href="http://wiki.dolibarr.org/index.php/File:Cf-case-cascade-contacts2.png" class="image"><img alt="Cf-case-cascade-contacts2.png" src="./Module CustomFields Cases - Dolibarr Wiki_files/Cf-case-cascade-contacts2.png" width="1175" height="665"></a>
+</p><p>And voila, you're done! The field soccpy_nom should be hidden so you won't see it, but you should see the field contact_firstname_lastname and you can check that only the contacts related to the society selected for the current invoice are shown.
+</p>
+<h1> <span class="mw-headline" id="Overloading_functions"> Overloading functions </span></h1>
+<p>Here are a few concrete use cases of overloading functions to achieve various goals.
+</p>
+<h2> <span class="mw-headline" id="Dynamic_list_selection_based_on_another_one"> Dynamic list selection based on another one </span></h2>
+<p>The goal is to show two custom fields on the Third-Party module: one which gives the zone (secteur) of the third-party (Isere, Alpes du sud, Haute-Savoie...) and the other which gives relative to the zone the list of all the ski resorts (station_a) inside the selected zone.
+</p><p>NOTE: this will show how to manually manage this kind of requirements using <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields#Overloading_functions:_Adding_your_own_management_code_for_custom_fields" title="Module CustomFields">overloading functions</a>, but in latest CustomFields releases, the same solution can be achieved automatically using the <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields#Cascade" title="Module CustomFields">Cascade option</a>.
+</p><p>We have one table <b>llx_k_station</b> (rowid, station (char50), secteur(char50)) which contains the following: 
+</p>
+<pre>1,les 2 alpes,isère
+2,chamrousse,isère
+3,alpe d'huez,isère
+4,vars,alpes du sud
+5,risoul,alpes du sud
+etc...
+</pre>
+<p>In CustomFields's admin panel, we create two custom fields:
+</p><p>1- secteur: returns the list of all zones - type DropdownBox: enum('- Aucun','Alpes du Sud','export','Haute-Savoie','Isère', etc...)
+</p><p>2- station_a: returns the list of all ski resorts - type constraint on <b>llx_k_station</b>
+</p><p>Here is the code to put in customfields_fields_extend.lib.php that will allow to show only the ski resorts corresponding to the selected zone:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw2">function</span> customfields_field_editview_societe_station_a <span class="br0">(</span><span class="sy0">&amp;</span><span class="re0">$currentmodule</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$object</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$parameters</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$action</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$user</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$idvar</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$rightok</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$customfields</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$field</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$name</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$value</span><span class="br0">)</span> <span class="br0">{</span>
+  <span class="kw2">global</span> <span class="re0">$db</span><span class="sy0">;</span> <span class="co1">// allow to access database functions</span>
+  <span class="re0">$sql</span><span class="sy0">=</span><span class="st0">"SELECT llx_k_station.station, llx_k_station.rowid FROM llx_societe_customfields INNER JOIN llx_k_station ON llx_societe_customfields.Secteur = llx_k_station.secteur WHERE llx_societe_customfields.fk_societe="</span><span class="sy0">.</span><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">id</span><span class="sy0">;</span>
+<span class="re0">$result</span><span class="sy0">=</span><span class="re0">$db</span><span class="sy0">-&gt;</span><span class="me1">query</span><span class="br0">(</span><span class="re0">$sql</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+  <span class="kw1">if</span> <span class="br0">(</span><span class="re0">$result</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="re0">$num</span> <span class="sy0">=</span> <span class="re0">$db</span><span class="sy0">-&gt;</span><span class="me1">num_rows</span><span class="br0">(</span><span class="re0">$result</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="re0">$i</span> <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+    <span class="re0">$myarray</span> <span class="sy0">=</span> <span class="kw3">array</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="kw1">while</span> <span class="br0">(</span><span class="re0">$i</span> <span class="sy0">&lt;</span> <span class="re0">$num</span><span class="br0">)</span>
+    <span class="br0">{</span>
+      <span class="re0">$obj</span> <span class="sy0">=</span> <span class="re0">$db</span><span class="sy0">-&gt;</span><span class="me1">fetch_object</span><span class="br0">(</span><span class="re0">$result</span><span class="br0">)</span><span class="sy0">;</span>
+      <span class="re0">$myarray</span> <span class="br0">[</span><span class="br0">]</span><span class="sy0">=</span><span class="kw3">array</span><span class="br0">(</span><span class="st_h">'id'</span><span class="sy0">=&gt;</span><span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">rowid</span><span class="sy0">,</span> <span class="st_h">'value'</span><span class="sy0">=&gt;</span><span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">station</span><span class="br0">)</span><span class="sy0">;</span>
+      <span class="re0">$i</span><span class="sy0">++;</span>
+    <span class="br0">}</span>
+    <span class="re0">$value</span> <span class="sy0">=</span> <span class="re0">$myarray</span><span class="sy0">;</span> 
+    <span class="re0">$db</span><span class="sy0">-&gt;</span><span class="me1">free</span><span class="br0">(</span><span class="re0">$result</span><span class="br0">)</span><span class="sy0">;</span>
+  <span class="br0">}</span>
+<span class="br0">}</span></pre></div></div>
+<p>Thank's to manub for giving this case.
+</p>
+<h2> <span class="mw-headline" id="Dynamic_discount_computation_per_products_lines_on_propales"> Dynamic discount computation per products lines on propales </span></h2>
+<p>The goal here is to compute the discount for a product line in propales based on a computation on three custom fields.
+</p><p>First, create three custom fields for "Line commercial proposals": vl, cpl and lc.
+</p><p>Then add the following overloading function at the end of your customfields_fields_extend.lib.php file (read the comments for more informations):
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw2">function</span> customfields_field_save_propaldet_vl <span class="br0">(</span><span class="sy0">&amp;</span><span class="re0">$currentmodule</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$object</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$action</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$user</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$customfields</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$field</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$name</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$value</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="kw2">global</span> <span class="re0">$db</span><span class="sy0">;</span> <span class="co1">// allow to access database functions</span>
+&nbsp;
+    <span class="co1">// Fetch the new posted values</span>
+    <span class="co1">// All $_POST data are generically appended into the $object properties</span>
+    <span class="re0">$vl</span> <span class="sy0">=</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="br0">{</span><span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">varprefix</span><span class="sy0">.</span><span class="st_h">'vl'</span><span class="br0">}</span><span class="sy0">;</span>
+    <span class="re0">$cpl</span> <span class="sy0">=</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="br0">{</span><span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">varprefix</span><span class="sy0">.</span><span class="st_h">'cpl'</span><span class="br0">}</span><span class="sy0">;</span>
+    <span class="re0">$lc</span> <span class="sy0">=</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="br0">{</span><span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">varprefix</span><span class="sy0">.</span><span class="st_h">'lc'</span><span class="br0">}</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Compute the discount</span>
+    <span class="re0">$remise_calculee</span> <span class="sy0">=</span> <span class="br0">(</span>100 <span class="sy0">-</span> <span class="re0">$vl</span><span class="br0">)</span> <span class="sy0">*</span> <span class="br0">(</span>100 <span class="sy0">-</span> <span class="re0">$cpl</span><span class="br0">)</span> <span class="sy0">*</span> <span class="br0">(</span>100 <span class="sy0">-</span> <span class="re0">$lc</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Clean parameters</span>
+    <span class="kw1">include_once</span> DOL_DOCUMENT_ROOT<span class="sy0">.</span><span class="st_h">'/core/lib/price.lib.php'</span><span class="sy0">;</span>
+    <span class="re0">$remise_calculee</span> <span class="sy0">=</span> price2num<span class="br0">(</span><span class="re0">$remise_calculee</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Assign the new discount into the PropalLine object</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">remise_percent</span> <span class="sy0">=</span> <span class="re0">$remise_calculee</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Update the price (it's not automatic when we edit remise_percent and update, we have to recompute manually the prices before calling $object-&gt;update())</span>
+    <span class="kw2">global</span> <span class="re0">$mysoc</span><span class="sy0">;</span>
+    <span class="re0">$localtaxes_type</span><span class="sy0">=</span>getLocalTaxesFromRate<span class="br0">(</span><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">tva_tx</span><span class="sy0">,</span>0<span class="sy0">,</span><span class="re0">$mysoc</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="re0">$tabprice</span><span class="sy0">=</span>calcul_price_total<span class="br0">(</span><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">qty</span><span class="sy0">,</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">subprice</span><span class="sy0">,</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">remise_percent</span><span class="sy0">,</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">tva_tx</span><span class="sy0">,</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">localtax1_tx</span><span class="sy0">,</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">localtax2_tx</span><span class="sy0">,</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st_h">'HT'</span><span class="sy0">,</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">info_bits</span><span class="sy0">,</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">type</span><span class="sy0">,</span> <span class="st_h">''</span><span class="sy0">,</span> <span class="re0">$localtaxes_type</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_ht</span>  <span class="sy0">=</span> <span class="re0">$tabprice</span><span class="br0">[</span>0<span class="br0">]</span><span class="sy0">;</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_tva</span> <span class="sy0">=</span> <span class="re0">$tabprice</span><span class="br0">[</span>1<span class="br0">]</span><span class="sy0">;</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_ttc</span> <span class="sy0">=</span> <span class="re0">$tabprice</span><span class="br0">[</span>2<span class="br0">]</span><span class="sy0">;</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_localtax1</span> <span class="sy0">=</span> <span class="re0">$tabprice</span><span class="br0">[</span>9<span class="br0">]</span><span class="sy0">;</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_localtax2</span> <span class="sy0">=</span> <span class="re0">$tabprice</span><span class="br0">[</span>10<span class="br0">]</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Update into database</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">update</span><span class="br0">(</span><span class="kw4">true</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// true to disable the trigger, else it will recall customfields, which will call this overloading function, etc. in an infinite loop.</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">update_total</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">//$q = "UPDATE  ".MAIN_DB_PREFIX."propaldet SET remise_percent=".$remise_calculee." WHERE  rowid=".$object-&gt;rowid;</span>
+    <span class="co1">//$db-&gt;query($q);</span>
+&nbsp;
+    <span class="co1">// Finally, cleanup POST data to avoid conflicts next time, reinserting the same discount. Else the fields will remember these values and it may mistakenly reuse the same values.</span>
+    <span class="kw3">unset</span><span class="br0">(</span><span class="re0">$_POST</span><span class="br0">[</span><span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">varprefix</span><span class="sy0">.</span><span class="st0">"vl"</span><span class="br0">]</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="kw3">unset</span><span class="br0">(</span><span class="re0">$_POST</span><span class="br0">[</span><span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">varprefix</span><span class="sy0">.</span><span class="st0">"cpl"</span><span class="br0">]</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="kw3">unset</span><span class="br0">(</span><span class="re0">$_POST</span><span class="br0">[</span><span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">varprefix</span><span class="sy0">.</span><span class="st0">"lc"</span><span class="br0">]</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<h1> <span class="mw-headline" id="Linking_Dolibarr_objects_from_two_different_modules"> Linking Dolibarr objects from two different modules </span></h1>
+<p>Dolibarr sometimes offers the possibility to link two different modules. Eg: when you convert an Intervention card into an Invoice.
+</p><p>In this case, you might want in your templates to fetch the custom fields of the linked object. Eg: you generate a PDF from the Invoice, but you want to get the custom fields from the Intervention that was converted into the Invoice.
+</p><p>The key here is to use the <b>llx_element_element</b> table or the <b>llx_element_*</b> tables (eg: llx_element_contact): this is a standard Dolibarr table that stores all links between objects of two different modules.
+</p><p>Here is the structure:
+</p>
+<pre>rowid | fk_source | sourcetype | fk_target | targettype
+-------------------------------------------------------
+1 | 2 | fichinter | 5 | facture
+</pre>
+<p>You can then use a php code like the following to populate your $object with customfields:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// Init and main vars for CustomFields</span>
+dol_include_once<span class="br0">(</span><span class="st_h">'/customfields/lib/customfields_aux.lib.php'</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Filling the $object with customfields (you can then access customfields by doing $object-&gt;customfields-&gt;cf_yourfield)</span>
+<span class="co1">// This will also create and returns us an instance of the CustomFields class, which we will use to manually query the llx_element_element table</span>
+<span class="re0">$customfields</span> <span class="sy0">=</span> customfields_fill_object<span class="br0">(</span><span class="re0">$object</span><span class="sy0">,</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$outputlangs</span><span class="sy0">,</span> <span class="st_h">'facture'</span><span class="sy0">,</span> <span class="kw4">true</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// beautified values</span>
+&nbsp;
+<span class="co1">// Querying the llx_element_element table manually to get the link between the invoice and the linked intervention card (we want the id of the intervention card)</span>
+<span class="co1">// fetchAny($columns, $table, $where='', $orderby='', $limitby='')</span>
+<span class="re0">$eltrow</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">fetchAny</span><span class="br0">(</span><span class="st_h">'*'</span><span class="sy0">,</span> MAIN_DB_PREFIX<span class="sy0">.</span><span class="st_h">'element_element'</span><span class="sy0">,</span> <span class="st_h">'targettype="'</span><span class="sy0">.</span><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">element</span><span class="sy0">.</span><span class="st_h">'" and fk_target='</span><span class="sy0">.</span><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">id</span><span class="sy0">.</span><span class="st_h">' and sourcetype="fichinter"'</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Save the intervention's id</span>
+<span class="re0">$sourceid</span> <span class="sy0">=</span> <span class="re0">$eltrow</span><span class="br0">[</span><span class="nu0">0</span><span class="br0">]</span><span class="br0">[</span><span class="st_h">'fk_source'</span><span class="br0">]</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Crafting a dummy intervention object</span>
+<span class="re0">$fromobject</span> <span class="sy0">=</span> <span class="kw2">new</span> stdClass<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// Init an empty object</span>
+<span class="re0">$fromobject</span><span class="sy0">-&gt;</span><span class="me1">id</span> <span class="sy0">=</span> <span class="re0">$sourceid</span><span class="sy0">;</span> <span class="co1">// We need the id and..</span>
+<span class="re0">$fromobject</span><span class="sy0">-&gt;</span><span class="me1">table_element</span> <span class="sy0">=</span> <span class="st_h">'fichinter'</span><span class="sy0">;</span> <span class="co1">// the table_element (name of the table)</span>
+&nbsp;
+<span class="co1">// We can then fill $object with the intervention custom fields (we store them in a sub property 'fichinter' to avoid conflicts with invoice's custom fields)</span>
+customfields_fill_object<span class="br0">(</span><span class="re0">$object</span><span class="sy0">,</span> <span class="re0">$fromobject</span><span class="sy0">,</span> <span class="re0">$outputlangs</span><span class="sy0">,</span> <span class="st_h">'fichinter'</span><span class="sy0">,</span> <span class="kw4">true</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Now you can access invoices custom fields using:</span>
+<span class="kw1">print</span><span class="br0">(</span><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">customfields</span><span class="sy0">-&gt;</span><span class="me1">facture</span><span class="sy0">-&gt;</span><span class="me1">cf_myfield</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="co1">// And access intervention custom fields with:</span>
+<span class="kw1">print</span><span class="br0">(</span><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">customfields</span><span class="sy0">-&gt;</span><span class="me1">fichinter</span><span class="sy0">-&gt;</span><span class="me1">cf_myfield</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>Thank's to netassopro for the tip.
+</p>
+<h1> <span class="mw-headline" id="Modify_the_total_global_price_with_a_coefficient_.28without_tampering_the_discount.29"> Modify the total global price with a coefficient (without tampering the discount) </span></h1>
+<p>This is more troublesome than modifying the total price per product/service line, because the total global price of an object (let's say an invoice, but this also works for any other object) is always recomputed by summing the prices and quantity of each product/service line. This means that although there's an entry "total_ttc" in the database to store the invoice's total price, this price is in fact always recomputed, it's never used as-is. Thus, it's useless to change only the database record: we need to inject some code to change how the total price is computed.
+</p><p>This could be done using an overloading function or a trigger, but unluckily, Dolibarr doesn't call a trigger nor a hook when recomputing the price. We thus need to edit core files to do what we want.
+</p><p>However, the bright side is that we can cleverly edit just two functions from one core file: update_price() and getMarginInfos() from /htdocs/core/class/commonobject.class.php , and everything should run smoothly. Beware that if you update Dolibarr, you will need to redo these two modifications in the code.
+</p><p>First, you need to create a new custom field called "global_coefficient" in Invoices (not Invoices Lines!). Then you can continue to the subchapters below.
+</p><p>Also note that this global coefficient is also compatible with per line coefficients (as described in the next chapter), thus you can use a global coefficient and per line coefficients at the same time. You can also use multiple global coefficient if you wish.
+</p><p>Another note: if you have a grid of discounts depending on quantity or price or whatever parameter, you can program a precomputation code using a Custom Ajax function (this way, your discounts will be automatically computed, but then you can still manually enter them for particular cases since the custom field is editable).
+</p>
+<h2> <span class="mw-headline" id="Implement_the_change_of_global_price_in_most_of_Dolibarr_.28including_remaining_debt_to_pay_and_PDF_and_ODT.29"> Implement the change of global price in most of Dolibarr (including remaining debt to pay and PDF and ODT) </span></h2>
+<p>The change we will implement here will reflect the new total price with the global coefficient in most of Dolibarr's code, since we will here change the main function that is usually called to update and get the total price.
+</p><p>Open /htdocs/core/class/commonobject.class.php and look for the function update_price().
+</p><p>You should see the following:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw2">function</span> update_price<span class="br0">(</span><span class="re0">$exclspec</span><span class="sy0">=</span>0<span class="sy0">,</span><span class="re0">$roundingadjust</span><span class="sy0">=</span><span class="st_h">'none'</span><span class="sy0">,</span><span class="re0">$nodatabaseupdate</span><span class="sy0">=</span>0<span class="sy0">,</span><span class="re0">$seller</span><span class="sy0">=</span><span class="st_h">''</span><span class="br0">)</span>
+<span class="br0">{</span>
+    <span class="kw2">global</span> <span class="re0">$conf</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw1">include_once</span> DOL_DOCUMENT_ROOT<span class="sy0">.</span><span class="st_h">'/core/lib/price.lib.php'</span><span class="sy0">;</span></pre></div></div>
+<p>Just below the include_once line, add the following:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// Global coefficient (CustomFields)</span>
+<span class="kw1">include_once</span> DOL_DOCUMENT_ROOT<span class="sy0">.</span><span class="st_h">'/customfields/class/customfields.class.php'</span><span class="sy0">;</span>
+<span class="kw1">include_once</span> DOL_DOCUMENT_ROOT<span class="sy0">.</span><span class="st_h">'/customfields/conf/conf_customfields_func.lib.php'</span><span class="sy0">;</span>
+<span class="re0">$customfields</span> <span class="sy0">=</span> <span class="kw2">new</span> CustomFields<span class="br0">(</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">db</span><span class="sy0">,</span> <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">table_element</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="co1">// Get object's id (either stored in property "id" or "rowid")</span>
+<span class="re0">$this_id</span> <span class="sy0">=</span> <span class="br0">(</span><span class="sy0">!</span><span class="kw3">empty</span><span class="br0">(</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">id</span><span class="br0">)</span><span class="br0">)</span>&nbsp;? <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">id</span> <span class="sy0">:</span> <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">rowid</span><span class="sy0">;</span>
+<span class="co1">// Load custom fields records</span>
+<span class="re0">$cf_parent_record</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">fetch</span><span class="br0">(</span><span class="re0">$this_id</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>This will load the global_coefficient custom field (and also any other custom field you have defined for invoices).
+</p><p>Now scroll below, and you should see this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw1">while</span> <span class="br0">(</span><span class="re0">$i</span> <span class="sy0">&lt;</span> <span class="re0">$num</span><span class="br0">)</span>
+<span class="br0">{</span>
+    <span class="re0">$obj</span> <span class="sy0">=</span> <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">db</span><span class="sy0">-&gt;</span><span class="me1">fetch_object</span><span class="br0">(</span><span class="re0">$resql</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+    <span class="sy0">...</span> <span class="br0">(</span>lots of code<span class="br0">)</span>
+&nbsp;
+    i<span class="sy0">++;</span>
+<span class="br0">}</span>
+&nbsp;
+<span class="co1">// Add revenue stamp to total</span>
+<span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">total_ttc</span>       <span class="sy0">+=</span> <span class="kw3">isset</span><span class="br0">(</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">revenuestamp</span><span class="br0">)</span>?<span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">revenuestamp</span><span class="sy0">:</span><span class="nu0">0</span><span class="sy0">;</span>
+&nbsp;
+<span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">db</span><span class="sy0">-&gt;</span><span class="me1">free</span><span class="br0">(</span><span class="re0">$resql</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>This is the end of the loop that is summing each product/service line price to compute the total price. Just after this loop, you should see this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// Now update global field total_ht, total_ttc and tva</span>
+<span class="re0">$fieldht</span><span class="sy0">=</span><span class="st_h">'total_ht'</span><span class="sy0">;</span>
+<span class="re0">$fieldtva</span><span class="sy0">=</span><span class="st_h">'tva'</span><span class="sy0">;</span>
+<span class="re0">$fieldlocaltax1</span><span class="sy0">=</span><span class="st_h">'localtax1'</span><span class="sy0">;</span>
+<span class="re0">$fieldlocaltax2</span><span class="sy0">=</span><span class="st_h">'localtax2'</span><span class="sy0">;</span>
+<span class="re0">$fieldttc</span><span class="sy0">=</span><span class="st_h">'total_ttc'</span><span class="sy0">;</span>
+<span class="co1">// Specific code for backward compatibility with old field names</span>
+<span class="kw1">if</span> <span class="br0">(</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">element</span> <span class="sy0">==</span> <span class="st_h">'facture'</span> <span class="sy0">||</span> <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">element</span> <span class="sy0">==</span> <span class="st_h">'facturerec'</span><span class="br0">)</span>             <span class="re0">$fieldht</span><span class="sy0">=</span><span class="st_h">'total'</span><span class="sy0">;</span>
+<span class="kw1">if</span> <span class="br0">(</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">element</span> <span class="sy0">==</span> <span class="st_h">'facture_fourn'</span> <span class="sy0">||</span> <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">element</span> <span class="sy0">==</span> <span class="st_h">'invoice_supplier'</span><span class="br0">)</span> <span class="re0">$fieldtva</span><span class="sy0">=</span><span class="st_h">'total_tva'</span><span class="sy0">;</span>
+<span class="kw1">if</span> <span class="br0">(</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">element</span> <span class="sy0">==</span> <span class="st_h">'propal'</span><span class="br0">)</span>                                                <span class="re0">$fieldttc</span><span class="sy0">=</span><span class="st_h">'total'</span><span class="sy0">;</span></pre></div></div>
+<p>Between those two blocks of code (so just above // Now update global field total_ht, total_ttc and tva), you can place the following:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// Global coefficient (CustomFields)</span>
+<span class="kw1">if</span> <span class="br0">(</span><span class="sy0">!</span><span class="kw3">empty</span><span class="br0">(</span><span class="re0">$cf_parent_record</span><span class="sy0">-&gt;</span><span class="me1">global_coefficient</span><span class="br0">)</span><span class="br0">)</span> <span class="br0">{</span> <span class="co1">// avoid applying the coefficient if empty (this will return a 0 price)</span>
+    <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">total_ht</span> <span class="sy0">=</span> <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">total_ht</span> <span class="sy0">*</span> <span class="re0">$cf_parent_record</span><span class="sy0">-&gt;</span><span class="me1">global_coefficient</span><span class="sy0">;</span>
+    <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">total_tva</span> <span class="sy0">=</span> <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">total_tva</span> <span class="sy0">*</span> <span class="re0">$cf_parent_record</span><span class="sy0">-&gt;</span><span class="me1">global_coefficient</span><span class="sy0">;</span>
+    <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">total_ttc</span> <span class="sy0">=</span> <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">total_ttc</span> <span class="sy0">*</span> <span class="re0">$cf_parent_record</span><span class="sy0">-&gt;</span><span class="me1">global_coefficient</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p>Done, now try to add/edit a product/service line, and the total price should be affected by the global coefficient.
+</p><p>Note that this modification <b>needs only to be done once for all modules</b>, you then just have to create a custom field named "global_coefficient" in every module you want to apply this coefficient.
+</p>
+<h2> <span class="mw-headline" id="Implementing_the_change_of_price_in_margin_module"> Implementing the change of price in margin module </span></h2>
+<p>If you enabled the margin module, you should see that the coefficient is not applied there, but it's easy to fix that.
+</p><p>Open the file /htdocs/core/class/commonobject.class.php and find the function getMarginInfos(), then inside find the following lines:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw1">foreach</span><span class="br0">(</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">lines</span> <span class="kw1">as</span> <span class="re0">$line</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="kw1">if</span> <span class="br0">(</span><span class="kw3">empty</span><span class="br0">(</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">pa_ht</span><span class="br0">)</span> <span class="sy0">&amp;&amp;</span> <span class="kw3">isset</span><span class="br0">(</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">fk_fournprice</span><span class="br0">)</span> <span class="sy0">&amp;&amp;</span> <span class="sy0">!</span><span class="re0">$force_price</span><span class="br0">)</span> <span class="br0">{</span>
+        <span class="re0">$product</span> <span class="sy0">=</span> <span class="kw2">new</span> ProductFournisseur<span class="br0">(</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">db</span><span class="br0">)</span><span class="sy0">;</span>
+        <span class="kw1">if</span> <span class="br0">(</span><span class="re0">$product</span><span class="sy0">-&gt;</span><span class="me1">fetch_product_fournisseur_price</span><span class="br0">(</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">fk_fournprice</span><span class="br0">)</span><span class="br0">)</span>
+            <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">pa_ht</span> <span class="sy0">=</span> <span class="re0">$product</span><span class="sy0">-&gt;</span><span class="me1">fourn_unitprice</span> <span class="sy0">*</span> <span class="br0">(</span>1 <span class="sy0">-</span> <span class="re0">$product</span><span class="sy0">-&gt;</span><span class="me1">fourn_remise_percent</span> <span class="sy0">/</span> 100<span class="br0">)</span><span class="sy0">;</span>
+        <span class="kw1">if</span> <span class="br0">(</span><span class="kw3">isset</span><span class="br0">(</span><span class="re0">$conf</span><span class="sy0">-&gt;</span><span class="me1">global</span><span class="sy0">-&gt;</span><span class="me1">MARGIN_TYPE</span><span class="br0">)</span> <span class="sy0">&amp;&amp;</span> <span class="re0">$conf</span><span class="sy0">-&gt;</span><span class="me1">global</span><span class="sy0">-&gt;</span><span class="me1">MARGIN_TYPE</span> <span class="sy0">==</span> <span class="st0">"2"</span> <span class="sy0">&amp;&amp;</span> <span class="re0">$product</span><span class="sy0">-&gt;</span><span class="me1">fourn_unitcharges</span> <span class="sy0">&gt;</span> 0<span class="br0">)</span>
+            <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">pa_ht</span> <span class="sy0">+=</span> <span class="re0">$product</span><span class="sy0">-&gt;</span><span class="me1">fourn_unitcharges</span><span class="sy0">;</span>
+    <span class="br0">}</span>
+    <span class="co1">// si prix d'achat non renseigné et devrait l'être, alors prix achat = prix vente</span>
+    <span class="kw1">if</span> <span class="br0">(</span><span class="br0">(</span><span class="sy0">!</span><span class="kw3">isset</span><span class="br0">(</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">pa_ht</span><span class="br0">)</span> <span class="sy0">||</span> <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">pa_ht</span> <span class="sy0">==</span> 0<span class="br0">)</span> <span class="sy0">&amp;&amp;</span> <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">subprice</span> <span class="sy0">&gt;</span> 0 <span class="sy0">&amp;&amp;</span> <span class="br0">(</span><span class="kw3">isset</span><span class="br0">(</span><span class="re0">$conf</span><span class="sy0">-&gt;</span><span class="me1">global</span><span class="sy0">-&gt;</span><span class="me1">ForceBuyingPriceIfNull</span><span class="br0">)</span> <span class="sy0">&amp;&amp;</span> <span class="re0">$conf</span><span class="sy0">-&gt;</span><span class="me1">global</span><span class="sy0">-&gt;</span><span class="me1">ForceBuyingPriceIfNull</span> <span class="sy0">==</span> 1<span class="br0">)</span><span class="br0">)</span> <span class="br0">{</span>
+        <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">pa_ht</span> <span class="sy0">=</span> <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">subprice</span> <span class="sy0">*</span> <span class="br0">(</span>1 <span class="sy0">-</span> <span class="br0">(</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">remise_percent</span> <span class="sy0">/</span> 100<span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="br0">}</span></pre></div></div>
+<p>This is where the lines are filled with margin infos. The price has just been fetched here, and we will now modify it with the coefficient before the price gets used for margin computation.
+</p><p>To optimize things up, we will load the custom fields before the loop (because they don't change between product/service lines, they are the custom fields of the parent object), and then apply the global_coefficient inside the loop.
+</p><p>Just above the code we found (just before the for loop), paste the following:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// Global coefficient (CustomFields)</span>
+dol_include_once<span class="br0">(</span><span class="st_h">'/customfields/lib/customfields_aux.lib.php'</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="co1">// Get object's id (either stored in property "id" or "rowid")</span>
+<span class="re0">$this_id</span> <span class="sy0">=</span> <span class="br0">(</span><span class="sy0">!</span><span class="kw3">empty</span><span class="br0">(</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">id</span><span class="br0">)</span><span class="br0">)</span>&nbsp;? <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">id</span> <span class="sy0">:</span> <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">rowid</span><span class="sy0">;</span>
+<span class="co1">// Load custom fields records</span>
+<span class="re0">$customfields</span> <span class="sy0">=</span> customfields_fill_object<span class="br0">(</span><span class="re0">$this</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>And now, just below the code we found, inside the loop (and just above the comment: "// calcul des marges"), paste the following:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// Global coefficient (CustomFields)</span>
+<span class="co1">// Apply the coefficient</span>
+<span class="kw1">if</span> <span class="br0">(</span><span class="sy0">!</span><span class="kw3">empty</span><span class="br0">(</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">customfields</span><span class="sy0">-&gt;</span><span class="me1">cf_global_coefficient</span><span class="br0">)</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">pa_ht</span> <span class="sy0">=</span> <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">pa_ht</span> <span class="sy0">*</span> <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">customfields</span><span class="sy0">-&gt;</span><span class="me1">cf_global_coefficient</span><span class="sy0">;</span>
+    <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">subprice</span> <span class="sy0">=</span> <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">subprice</span> <span class="sy0">*</span> <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">customfields</span><span class="sy0">-&gt;</span><span class="me1">cf_global_coefficient</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p>Note that here we cheated a bit: we do not compute the coefficient on the global total price, but rather per product/service line price. This is done on purpose, because mathematically this should produce no difference, and it also allows Dolibarr to continue peacefully with its margin calculations (else we would have to adapt all those computations, which would imply a lot more of code changes!).
+</p><p>That's all, the price should be reflected in the margin. Just refresh the page to reflect the change.
+</p><p>Note that this modification <b>needs only to be done once for all modules</b>, you then just have to create a custom field named "global_coefficient" in every module you want to apply this coefficient.
+</p>
+<h2> <span class="mw-headline" id="Refresh_the_price_instantly"> Refresh the price instantly </span></h2>
+<p>Maybe you noticed one glitch: when you modify the global_coefficient, the global total price isn't updated until you add/edit a product/service line. This is because the update_price() function is only called when we add/edit a product/service line.
+</p><p>To fix that, we need now to force the refreshing of price. To do that, we will use an "aftersave" overloading function, which will execute commands after our custom field is saved.
+</p><p>Go to the folder /htdocs/customfields/fields and rename the file customfields_fields_extend.lib.php.example into customfields_fields_extend.lib.php .
+</p><p>Now, open it in your favourite text editor, and add the following function&nbsp;:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw2">function</span> customfields_field_aftersave_facture_global_coefficient <span class="br0">(</span><span class="sy0">&amp;</span><span class="re0">$currentmodule</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$object</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$action</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$user</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$customfields</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$field</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$name</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$value</span><span class="sy0">,</span> <span class="re0">$fields</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="co1">// Force refreshing total price</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">update_price</span><span class="br0">(</span><span class="nu0">0</span><span class="sy0">,</span> <span class="st_h">'auto'</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p>That's all. Now, when you edit your global_coefficient, this will force refresh the total price.
+</p><p>However, you will still notice one last glitch: when you edit the global_coefficient, the total price isn't reflected instantly, you must refresh the webpage once to see the new price. This is because of how the datasheet and the CustomFields hook are designed: CustomFields is called only exactly where the custom fields are place, thus it is called after the total price, the margin and the remaining debt are printed. Thus, CustomFields updates the value of your custom field only after all those informations get printed, and thus it cannot modify them at this stage. That's why those information are out-of-date, and you must refresh the webpage once to get to see the latest values.
+</p><p>There is a workaround for this: refresh automatically the webpage (but delete the POST data to avoid an infinite loop). You just need to use this overloading code instead of the one above:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw2">function</span> customfields_field_aftersave_facture_global_coefficient <span class="br0">(</span><span class="sy0">&amp;</span><span class="re0">$currentmodule</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$object</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$action</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$user</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$customfields</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$field</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$name</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$value</span><span class="sy0">,</span> <span class="re0">$fields</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="co1">// Force refreshing total price</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">update_price</span><span class="br0">(</span><span class="nu0">0</span><span class="sy0">,</span> <span class="st_h">'auto'</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="co1">// Force refresh the page to update prices that were printed before the custom field aftersave was triggered (and only if not creating the object because then there's no need to refresh)</span>
+    <span class="kw1">if</span> <span class="br0">(</span><span class="re0">$action</span> <span class="sy0">!==</span> <span class="st_h">'add'</span><span class="br0">)</span> <span class="kw1">print</span><span class="br0">(</span><span class="st_h">'&lt;script type="text/javascript"&gt;window.location.href = window.location.pathname + window.location.search;&lt;/script&gt;'</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p>Another way to fix this issue would be to modify how CustomFields save the custom fields, by moving this stage at the very top. However, this would need another hook, which should be called at the very beginning of the page loading, which should be made only for this purpose (PageLoading), and should be available in all modules supported by CustomFields in order to not break anything.
+</p><p>Note that you will need to create one overloading function for each module you want to support with the global_coefficient custom field. For example, if you want to support both invoices and commercial proposals, you will need two overloading functions:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// Global coefficient for invoices (note the "facture" in the name of the function)</span>
+<span class="kw2">function</span> customfields_field_aftersave_facture_global_coefficient <span class="br0">(</span><span class="sy0">&amp;</span><span class="re0">$currentmodule</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$object</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$action</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$user</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$customfields</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$field</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$name</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$value</span><span class="sy0">,</span> <span class="re0">$fields</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="co1">// Force refreshing total price</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">update_price</span><span class="br0">(</span><span class="nu0">0</span><span class="sy0">,</span> <span class="st_h">'auto'</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="co1">// Force refresh the page to update prices that were printed before the custom field aftersave was triggered (and only if not creating the object because then there's no need to refresh)</span>
+    <span class="kw1">if</span> <span class="br0">(</span><span class="re0">$action</span> <span class="sy0">!==</span> <span class="st_h">'add'</span><span class="br0">)</span> <span class="kw1">print</span><span class="br0">(</span><span class="st_h">'&lt;script type="text/javascript"&gt;window.location.href = window.location.pathname + window.location.search;&lt;/script&gt;'</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>
+&nbsp;
+<span class="co1">// Global coefficient for commercial proposals (note the "propal" in the name of the function)</span>
+<span class="kw2">function</span> customfields_field_aftersave_propal_global_coefficient <span class="br0">(</span><span class="sy0">&amp;</span><span class="re0">$currentmodule</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$object</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$action</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$user</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$customfields</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$field</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$name</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$value</span><span class="sy0">,</span> <span class="re0">$fields</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="co1">// Force refreshing total price</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">update_price</span><span class="br0">(</span><span class="nu0">0</span><span class="sy0">,</span> <span class="st_h">'auto'</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="co1">// Force refresh the page to update prices that were printed before the custom field aftersave was triggered (and only if not creating the object because then there's no need to refresh)</span>
+    <span class="kw1">if</span> <span class="br0">(</span><span class="re0">$action</span> <span class="sy0">!==</span> <span class="st_h">'add'</span><span class="br0">)</span> <span class="kw1">print</span><span class="br0">(</span><span class="st_h">'&lt;script type="text/javascript"&gt;window.location.href = window.location.pathname + window.location.search;&lt;/script&gt;'</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<h1> <span class="mw-headline" id="Modify_the_total_price_PER_product.2Fservice_line_with_a_coefficient_.28without_tampering_the_discount.29"> Modify the total price PER product/service line with a coefficient (without tampering the discount) </span></h1>
+<p>Here we will go through the creation and management of a custom field called <b>coefficient</b> that will change the total price of each product by modifying it by the coefficient.
+</p><p>NOTE: this will not create a coefficient per product but rather per product's line. Thus if you want to create a coefficient that never change between invoices but only depending on the product and stays static, please refer to the next chapter below about creating a custom tax per product.
+</p><p>The preliminary and necessary step is to first create a custom field that will be used to modify the total price. We will create one for Client Invoice Lines.
+</p><p>Go to the CustomFields administration panel, then into the Client Invoice Lines tab, then click on the button New Field, name the field <b>coefficient</b>, and set the type to <b>Double</b>.
+</p><p>When you go to client invoices in Dolibarr, you should then see something similar to this:
+<a href="http://wiki.dolibarr.org/index.php/File:Cfe1.jpg" class="image"><img alt="Cfe1.jpg" src="./Module CustomFields Cases - Dolibarr Wiki_files/Cfe1.jpg" width="1188" height="216"></a>
+You can see that our coefficient field was successfully created.
+</p><p>Then here are two alternative ways of implementing the change of the total price of each product relativery to this coefficient.
+</p>
+<h2> <span class="mw-headline" id="Change_total_price_in_database"> Change total price in database </span></h2>
+<p>Here we will use a "save" overloading function to change the total price directly in the database, thus we won't have to modify anything else (eg: nor PDF templating nor ODT) since the total price will be already updated in the database.
+</p><p>Warning: this method will work only with CustomFields =&gt; 3.2.23 since the "save" overloading function did not work for products lines before.
+</p><p>Just add the following overloading function in your customfields_fields_extend.lib.php file:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw2">function</span> customfields_field_save_facturedet_coefficient <span class="br0">(</span><span class="sy0">&amp;</span><span class="re0">$currentmodule</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$object</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$action</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$user</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$customfields</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$field</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$name</span><span class="sy0">,</span> <span class="sy0">&amp;</span><span class="re0">$value</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="kw2">global</span> <span class="re0">$db</span><span class="sy0">;</span> <span class="co1">// allow to access database functions</span>
+&nbsp;
+    <span class="co1">// Fetch the new posted values</span>
+    <span class="co1">// All $_POST data are generically appended into the $object properties</span>
+    <span class="re0">$coefficient</span> <span class="sy0">=</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="br0">{</span><span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">varprefix</span><span class="sy0">.</span><span class="st_h">'coefficient'</span><span class="br0">}</span><span class="sy0">;</span> <span class="co1">// you could also use $coefficient = $value;</span>
+&nbsp;
+    <span class="co1">// Clean parameters</span>
+    <span class="kw1">include_once</span> DOL_DOCUMENT_ROOT<span class="sy0">.</span><span class="st_h">'/core/lib/price.lib.php'</span><span class="sy0">;</span>
+    <span class="re0">$coefficient</span> <span class="sy0">=</span> price2num<span class="br0">(</span><span class="re0">$coefficient</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Get the original subprices (it's not automatic when we edit remise_percent and update, we have to recompute manually the prices before calling $object-&gt;update())</span>
+    <span class="kw2">global</span> <span class="re0">$mysoc</span><span class="sy0">;</span>
+    <span class="re0">$localtaxes_type</span><span class="sy0">=</span>getLocalTaxesFromRate<span class="br0">(</span><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">tva_tx</span><span class="sy0">,</span>0<span class="sy0">,</span><span class="re0">$mysoc</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="re0">$tabprice</span><span class="sy0">=</span>calcul_price_total<span class="br0">(</span><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">qty</span><span class="sy0">,</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">subprice</span><span class="sy0">,</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">remise_percent</span><span class="sy0">,</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">tva_tx</span><span class="sy0">,</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">localtax1_tx</span><span class="sy0">,</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">localtax2_tx</span><span class="sy0">,</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st_h">'HT'</span><span class="sy0">,</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">info_bits</span><span class="sy0">,</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">type</span><span class="sy0">,</span> <span class="st_h">''</span><span class="sy0">,</span> <span class="re0">$localtaxes_type</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_ht</span>  <span class="sy0">=</span> <span class="re0">$tabprice</span><span class="br0">[</span>0<span class="br0">]</span><span class="sy0">;</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_tva</span> <span class="sy0">=</span> <span class="re0">$tabprice</span><span class="br0">[</span>1<span class="br0">]</span><span class="sy0">;</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_ttc</span> <span class="sy0">=</span> <span class="re0">$tabprice</span><span class="br0">[</span>2<span class="br0">]</span><span class="sy0">;</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_localtax1</span> <span class="sy0">=</span> <span class="re0">$tabprice</span><span class="br0">[</span>9<span class="br0">]</span><span class="sy0">;</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_localtax2</span> <span class="sy0">=</span> <span class="re0">$tabprice</span><span class="br0">[</span>10<span class="br0">]</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Update the subprices with the coefficient</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_ht</span> <span class="sy0">=</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_ht</span> <span class="sy0">*</span> <span class="re0">$coefficient</span><span class="sy0">;</span> <span class="co1">// compute no tax price</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_tva</span> <span class="sy0">=</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_tva</span> <span class="sy0">*</span> <span class="re0">$coefficient</span><span class="sy0">;</span> <span class="co1">// compute tax amount</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_ttc</span> <span class="sy0">=</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_ttc</span> <span class="sy0">*</span> <span class="re0">$coefficient</span><span class="sy0">;</span> <span class="co1">// compute tax included price</span>
+&nbsp;
+    <span class="co1">// Update into database</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">update</span><span class="br0">(</span><span class="st_h">''</span><span class="sy0">,</span><span class="kw4">true</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// true to disable the trigger, else it will recall customfields, which will call this overloading function, etc. in an infinite loop.</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">update_total</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Finally, cleanup POST data to avoid conflicts next time, reinserting the same discount. Else the fields will remember these values and it may mistakenly reuse the same values.</span>
+    <span class="kw3">unset</span><span class="br0">(</span><span class="re0">$_POST</span><span class="br0">[</span><span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">varprefix</span><span class="sy0">.</span><span class="st0">"coefficient"</span><span class="br0">]</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p>This should show the correct total price on the Dolibarr's interface without modifying the unit subprice (P.U. Unit):
+</p><p><a href="http://wiki.dolibarr.org/index.php/File:Cfe2.jpg" class="image"><img alt="Cfe2.jpg" src="./Module CustomFields Cases - Dolibarr Wiki_files/Cfe2.jpg" width="1188" height="216"></a>
+</p><p>You have nothing to edit in your PDF or ODT template, since the new subprice with applied coefficient will be automatically printed instead of the old one without coefficient.
+</p>
+<h2> <span class="mw-headline" id="Change_printed_total_price_per_product_without_tampering_the_subprice_in_the_database"> Change printed total price per product without tampering the subprice in the database </span></h2>
+<p>Here is a way to change the printed total price (the one shown on screen and in PDF/ODT) but without changing the total price in the database.
+</p><p>The following sub-chapters are all independent, thus you can only follow the ones that you require, eg: if you only need to change the price in your PDF documents, just create a custom field then jump to the sub-chapter to <b>Implement the change of price in PDF</b>.
+</p>
+<h3> <span class="mw-headline" id="Implementing_the_change_of_price_in_ODT_templates"> Implementing the change of price in ODT templates </span></h3>
+<p>There's no eval implementation currently inside ODT templates, but there is a kind of hook implementation, called <a href="http://wiki.dolibarr.org/index.php/Create_an_ODT_document_template#Other_personalized_tags" title="Create an ODT document template">substitution functions</a>.
+</p><p>You can either create your own module, then create your own substitution function, but for the sake of simplicity in this tutorial, we will directly use the CustomFields substitution function. However, please remember that you will have to redo your changes everytime you will update the CustomFields module, so if you don't want to do that it would be better if you create your own module and substitution function.
+</p><p>Open the file <b>htdocs/customfields/core/substitutions/functions_customfields.lib.php</b> and go to the function <b>customfields_completesubstitutionarray_lines</b>.
+</p><p>At the very end of this function, but inside the customfields check:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw1">if</span> <span class="br0">(</span><span class="re0">$conf</span><span class="sy0">-&gt;</span><span class="me1">global</span><span class="sy0">-&gt;</span><span class="me1">MAIN_MODULE_CUSTOMFIELDS</span><span class="br0">)</span> <span class="br0">{</span></pre></div></div>
+<p>But just before the ending bracket, you should add the following code:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw1">if</span> <span class="br0">(</span><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">table_element_line</span> <span class="sy0">===</span> <span class="st_h">'facturedet'</span><span class="br0">)</span> <span class="br0">{</span> <span class="co1">// First check that we are in the right module, we don't want to use coefficient for other modules if we didn't define the custom field there</span>
+    <span class="re0">$substitutionarray</span><span class="br0">[</span><span class="st_h">'line_price_full'</span><span class="br0">]</span> <span class="sy0">=</span> <span class="re0">$substitutionarray</span><span class="br0">[</span><span class="st_h">'line_price_ttc'</span><span class="br0">]</span> <span class="sy0">*</span> <span class="re0">$substitutionarray</span><span class="br0">[</span><span class="st_h">'cf_coefficient'</span><span class="br0">]</span><span class="sy0">;</span> <span class="co1">// multiply the total price with our coefficient</span>
+<span class="br0">}</span></pre></div></div>
+<p>This code will add a new tag <b>{line_price_full}</b> that you can then use inside your ODT templates.
+</p><p>Just place this tag in a table in your ODT document, between the table tags ( [!-- BEGIN row.lines --] ... [!-- END row.lines --] ), and this will print your full price.
+</p>
+<h3> <span class="mw-headline" id="Implementing_the_change_of_price_in_PDF_templates"> Implementing the change of price in PDF templates </span></h3>
+<p>First, we will create our own PDF template by copying an existing template, and then we will edit it to change the price of items.
+</p>
+<h4> <span class="mw-headline" id="Creating_your_own_PDF_template_by_copying_an_existing_template"> <b>Creating your own PDF template by copying an existing template</b> </span></h4>
+<p>Go into the following folder: <b>htdocs/core/modules/facture/doc/</b>, then copy the file <b>pdf_crabe.modules.php</b> and name the new one <b>pdf_crabecoeff.modules.php</b>.
+</p><p>Then open it in your favourite editor, and change the following lines:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw2">class</span> pdf_crabe <span class="kw2">extends</span> ModelePDFFactures <span class="co1">// change pdf_crabe into pdf_crabecoeff</span>
+<span class="br0">{</span>
+<span class="sy0">...</span>
+    <span class="kw2">function</span> __construct<span class="br0">(</span><span class="re0">$db</span><span class="br0">)</span>
+    <span class="br0">{</span>
+        <span class="sy0">...</span>
+	<span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">name</span> <span class="sy0">=</span> <span class="st0">"crabe"</span><span class="sy0">;</span> <span class="co1">// change "crabe" into "crabecoeff"</span>
+        <span class="sy0">...</span>
+    <span class="br0">}</span>
+<span class="br0">}</span></pre></div></div>
+<p>That's it, now you have your own PDF template!
+</p><p>Now you should <b>enable your PDF template</b> before doing anything else, by going into the Modules Administration panel, and into the Invoice admin page, then click on the ON button at the right of the <b>crabecoeff</b> entry to enable the template.
+</p><p>Now, let's proceed onto modifying the prices.
+</p>
+<h4> <span class="mw-headline" id="Changing_the_prices_automatically_in_your_PDF"> <b>Changing the prices automatically in your PDF</b> </span></h4>
+<p>You can now do pretty much anything you want in your PDF template, but I&nbsp;will give you a mean to automatically change the prices of every products with our coefficient, as well as the total price, without editing too much the template.
+</p><p>First, try to find the following code of line (should be inside the write_file() method):
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$pdf</span><span class="sy0">=</span>pdf_getInstance<span class="br0">(</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">format</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>Now, just copy/paste the following code <b>below</b> pdf_getInstance():
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// Init and main vars for CustomFields</span>
+dol_include_once<span class="br0">(</span><span class="st_h">'/customfields/lib/customfields_aux.lib.php'</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Filling the $object with customfields (you can then access customfields by doing $object-&gt;customfields-&gt;cf_yourfield)</span>
+<span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">customfields</span> <span class="sy0">=</span> customfields_fill_object<span class="br0">(</span><span class="re0">$object</span><span class="sy0">,</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$outputlangs</span><span class="sy0">,</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="kw4">true</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// beautified values</span>
+<span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">customfields_raw</span> <span class="sy0">=</span> customfields_fill_object<span class="br0">(</span><span class="re0">$object</span><span class="sy0">,</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$outputlangs</span><span class="sy0">,</span> <span class="st_h">'raw'</span><span class="sy0">,</span> <span class="kw4">null</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// raw values</span>
+<span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">customfields_lines</span> <span class="sy0">=</span> customfields_fill_object_lines<span class="br0">(</span><span class="re0">$object</span><span class="sy0">,</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$outputlangs</span><span class="sy0">,</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="kw4">true</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// product lines' values</span>
+&nbsp;
+<span class="co1">// Resetting every $object price because we will compute them anew</span>
+<span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_ht</span> <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+<span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_tva</span> <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+<span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_ttc</span> <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span>
+<span class="co1">// For each line of product/service, we will recompute all the prices</span>
+<span class="kw1">foreach</span><span class="br0">(</span><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">lines</span> <span class="kw1">as</span> <span class="re0">$line</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="co1">// Get the coefficient custom field's value for the current line</span>
+    <span class="re0">$coeff</span> <span class="sy0">=</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">customfields</span><span class="sy0">-&gt;</span><span class="me1">lines</span><span class="sy0">-&gt;</span><span class="br0">{</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">rowid</span><span class="br0">}</span><span class="sy0">-&gt;</span><span class="me1">cf_coefficient</span><span class="sy0">;</span>
+    <span class="co1">// Recompute the price of this product/service line</span>
+    <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">total_ht</span> <span class="sy0">=</span> <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">total_ht</span><span class="sy0">*</span><span class="re0">$coeff</span><span class="sy0">;</span> <span class="co1">// compute no tax price</span>
+    <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">total_tva</span> <span class="sy0">=</span> <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">total_tva</span><span class="sy0">*</span><span class="re0">$coeff</span><span class="sy0">;</span> <span class="co1">// compute tax amount</span>
+    <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">total_ttc</span> <span class="sy0">=</span> <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">total_ttc</span><span class="sy0">*</span><span class="re0">$coeff</span><span class="sy0">;</span> <span class="co1">// compute tax included price</span>
+    <span class="co1">// Do the sum of all new products/services prices and tva (will be incremented with every product/service line)</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_ht</span> <span class="sy0">+=</span> <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">total_ht</span><span class="sy0">;</span> <span class="co1">// global no tax price</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_tva</span> <span class="sy0">+=</span> <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">total_tva</span><span class="sy0">;</span> <span class="co1">// global vat/tax amount</span>
+    <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_ttc</span> <span class="sy0">+=</span> <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">total_ttc</span><span class="sy0">;</span> <span class="co1">// global  tax included price</span>
+<span class="br0">}</span></pre></div></div>
+<p>That's it, now you should try to generate your PDF document, and you should get something like this:
+<a href="http://wiki.dolibarr.org/index.php/File:Cfe3.jpg" class="image"><img alt="Cfe3.jpg" src="./Module CustomFields Cases - Dolibarr Wiki_files/Cfe3.jpg" width="723" height="494"></a>
+</p><p>Note: printing the coefficient as a column in your PDF document is also possible but will not be covered here because PDF templates will vary for every persons depending on your needs.
+For guidelines about how to do this, you can read the documentation on <a href="http://wiki.dolibarr.org/index.php/Create_a_PDF_document_template" title="Create a PDF document template">how to create a PDF template</a> and <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields#Implementing_in_PDF_templates" title="Module CustomFields">how to use custom fields in PDF templates</a>.
+</p><p>Hint: you should be looking inside the following conditional block, inside the write_file() method:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// Loop on each lines</span>
+<span class="kw1">for</span> <span class="br0">(</span><span class="re0">$i</span> <span class="sy0">=</span> 0 <span class="sy0">;</span> <span class="re0">$i</span> <span class="sy0">&lt;</span> <span class="re0">$nblignes</span> <span class="sy0">;</span> <span class="re0">$i</span><span class="sy0">++</span><span class="br0">)</span>
+<span class="br0">{</span></pre></div></div>
+<h3> <span class="mw-headline" id="Implementing_the_change_of_total_price_in_the_Dolibarr_interface"> Implementing the change of total price in the Dolibarr interface </span></h3>
+<p>Unluckily there is not (yet) any hooking context to modify how lines of products/services are printed, thus the only thing you can do is directly edit the <b>template file</b> and manually put inside your code to load your custom field and print it the way you want using HTML formatting, for our example:
+</p>
+<ul><li> For Dolibarr 3.3 and above, edit the file <b>htdocs/core/tpl/objectline_view.tpl.php</b>
+</li><li> For Dolibarr 3.1 and 3.2, edit the file <b>htdocs/core/tpl/freeproductline_view.tpl.php</b> AND <b>predefinedproductline_view.tpl.php</b> (apply the same changes to both files)
+</li></ul>
+<p>In the template file you opened, find the following code:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw2">&lt;?php</span> <span class="kw1">echo</span> price<span class="br0">(</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">total_ht</span><span class="br0">)</span><span class="sy0">;</span> <span class="sy1">?&gt;</span></pre></div></div>
+<p>And replace it by:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw2">&lt;?php</span>
+<span class="co1">// Include the facade API of CustomFields</span>
+dol_include_once<span class="br0">(</span><span class="st_h">'/customfields/lib/customfields_aux.lib.php'</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Filling the $object with customfields (you can then access customfields by doing $object-&gt;customfields-&gt;cf_yourfield)</span>
+<span class="re0">$linecf</span> <span class="sy0">=</span> <span class="kw2">new</span> stdClass<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="re0">$linecf</span><span class="sy0">-&gt;</span><span class="me1">id</span> <span class="sy0">=</span> <span class="br0">(</span><span class="sy0">!</span><span class="kw3">empty</span><span class="br0">(</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">id</span><span class="br0">)</span><span class="br0">)</span>?<span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">id</span><span class="sy0">:</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">rowid</span><span class="sy0">;</span>
+<span class="re0">$linecf</span><span class="sy0">-&gt;</span><span class="me1">table_element</span> <span class="sy0">=</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">table_element_line</span><span class="sy0">;</span> <span class="co1">// you can use $object-&gt;table_element_line here instead of 'facturedet' if you want this feature to work for every module supported by CustomFields</span>
+<span class="re0">$customfields</span> <span class="sy0">=</span> customfields_fill_object<span class="br0">(</span><span class="re0">$linecf</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Modifying the HT price and printing it on the Dolibarr's datasheet interface</span>
+<span class="co1">// Applying a multiplying/dividing coefficient to an HT price will give a mathematically correct TTC price since the taxes are also a multiplier</span>
+<span class="co1">// However, if you want to apply other mathematical operations (like addition or substaction), you should use the total price with $line-&gt;total_ttc</span>
+<span class="kw1">if</span> <span class="br0">(</span><span class="sy0">!</span><span class="kw3">empty</span><span class="br0">(</span><span class="re0">$linecf</span><span class="sy0">-&gt;</span><span class="me1">customfields</span><span class="sy0">-&gt;</span><span class="me1">cf_coefficient</span><span class="br0">)</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="kw1">echo</span> price<span class="br0">(</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">total_ht</span> <span class="sy0">*</span> <span class="re0">$linecf</span><span class="sy0">-&gt;</span><span class="me1">customfields</span><span class="sy0">-&gt;</span><span class="me1">cf_coefficient</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span> <span class="kw1">else</span> <span class="br0">{</span>
+    <span class="kw1">echo</span> price<span class="br0">(</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">total_ht</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>
+<span class="sy1">?&gt;</span></pre></div></div>
+<p>This should produce something like this:
+<a href="http://wiki.dolibarr.org/index.php/File:Cfe2.jpg" class="image"><img alt="Cfe2.jpg" src="./Module CustomFields Cases - Dolibarr Wiki_files/Cfe2.jpg" width="1188" height="216"></a>
+</p><p><br>
+Technical note: here we are using customfields_fill_object() instead of customfields_fill_object_lines() (the latter being specifically adapted to lines and thus should theoretically be used here) for performance reasons because the template file we are editing is called in a loop, and customfields_fill_object_lines() should be called outside a loop (because it already does the job that is done by the loop), so here we 'tricks' the customfields_fill_object() function to avoid this loop by submitting 'facturedet' as a module by itself (when in fact it's a product lines table, but it works the same way nevertheless). This is a good demonstration of the flexibility of the CustomFields functions and methods.
+</p>
+<h3> <span class="mw-headline" id="Implementing_the_coefficient_column_in_the_Dolibarr_interface"> Implementing the coefficient column in the Dolibarr interface </span></h3>
+<p>It's also possible to show the coefficient in a new column on the Dolibarr interface.
+</p><p>To do that, you need to do two things:
+</p><p>1- Add the column title "Coeff."
+</p><p>2- Add the generator that will input the coefficient value for each line.
+</p>
+<h4> <span class="mw-headline" id="Add_the_column_title_.22Coeff..22"> <b>Add the column title "Coeff."</b> </span></h4>
+<p>Open in your favourite editor the file /htdocs/core/class/commonobject.class.php and inside the function printObjectLines (note the plural s), find the following lines of code:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// Total HT</span>
+<span class="kw1">print</span> <span class="st_h">'&lt;td align="right" width="50"&gt;'</span><span class="sy0">.</span><span class="re0">$langs</span><span class="sy0">-&gt;</span><span class="me1">trans</span><span class="br0">(</span><span class="st_h">'TotalHTShort'</span><span class="br0">)</span><span class="sy0">.</span><span class="st_h">'&lt;/td&gt;'</span><span class="sy0">;</span></pre></div></div>
+<p>This is what prints the Total HT price column. We will place the Coeff column just before.
+</p><p>So, just above this code, add the following:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// Coefficient (CustomFields)</span>
+dol_include_once<span class="br0">(</span><span class="st_h">'/customfields/class/customfields.class.php'</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="re0">$customfields</span> <span class="sy0">=</span> <span class="kw2">new</span> CustomFields<span class="br0">(</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">db</span><span class="sy0">,</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">table_element_line</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="re0">$coeff_field</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">fetchFieldStruct</span><span class="br0">(</span><span class="st_h">'coefficient'</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="kw1">if</span> <span class="br0">(</span><span class="sy0">!</span><span class="kw3">empty</span><span class="br0">(</span><span class="re0">$coeff_field</span><span class="br0">)</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="kw1">print</span> <span class="st_h">'&lt;td align="right" width="50"&gt;'</span><span class="sy0">.</span><span class="re0">$langs</span><span class="sy0">-&gt;</span><span class="me1">trans</span><span class="br0">(</span><span class="st_h">'Coeff.'</span><span class="br0">)</span><span class="sy0">.</span><span class="st_h">'&lt;/td&gt;'</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p>This will take care of showing the Coeff. column, but only for modules where you created such a custom field (because the file we modified is a common object for all modules in Dolibarr, not just invoices, thus this modification will gracefully skip this custom field if it does not exists for other modules).
+</p>
+<h4> <span class="mw-headline" id="Add_the_generator"> <b>Add the generator</b> </span></h4>
+<p>Open the file /htdocs/core/tpl/objectline_view.tpl.php and try to find the following block of code:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw2">&lt;?php</span> <span class="kw1">if</span> <span class="br0">(</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">special_code</span> <span class="sy0">==</span> <span class="nu0">3</span><span class="br0">)</span>	<span class="br0">{</span> <span class="sy1">?&gt;</span>
+&lt;td align="right" class="nowrap"&gt;<span class="kw2">&lt;?php</span> <span class="re0">$coldisplay</span><span class="sy0">++;</span> <span class="sy1">?&gt;</span><span class="kw2">&lt;?php</span> <span class="kw1">echo</span> <span class="re0">$langs</span><span class="sy0">-&gt;</span><span class="me1">trans</span><span class="br0">(</span><span class="st_h">'Option'</span><span class="br0">)</span><span class="sy0">;</span> <span class="sy1">?&gt;</span>&lt;/td&gt;
+<span class="kw2">&lt;?php</span> <span class="br0">}</span> <span class="kw1">else</span> <span class="br0">{</span> <span class="sy1">?&gt;</span>
+&lt;td align="right" class="nowrap"&gt;<span class="kw2">&lt;?php</span> <span class="re0">$coldisplay</span><span class="sy0">++;</span> <span class="sy1">?&gt;</span><span class="kw2">&lt;?php</span> <span class="kw1">echo</span> price<span class="br0">(</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">total_ht</span><span class="br0">)</span><span class="sy0">;</span> <span class="sy1">?&gt;</span>&lt;/td&gt;
+<span class="kw2">&lt;?php</span> <span class="br0">}</span> <span class="sy1">?&gt;</span></pre></div></div>
+<p>This is what prints the total HT price value for each line.
+</p><p>Just above of this block of code, add the following:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw2">&lt;?php</span>
+<span class="co1">// Coefficient (CustomFields)</span>
+<span class="co1">// Include the facade API of CustomFields</span>
+dol_include_once<span class="br0">(</span><span class="st_h">'/customfields/lib/customfields_aux.lib.php'</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Filling the $object with customfields (you can then access customfields by doing $object-&gt;customfields-&gt;cf_yourfield)</span>
+<span class="re0">$linecf</span> <span class="sy0">=</span> <span class="kw2">new</span> stdClass<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="re0">$linecf</span><span class="sy0">-&gt;</span><span class="me1">id</span> <span class="sy0">=</span> <span class="br0">(</span><span class="sy0">!</span><span class="kw3">empty</span><span class="br0">(</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">id</span><span class="br0">)</span><span class="br0">)</span>?<span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">id</span><span class="sy0">:</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">rowid</span><span class="sy0">;</span>
+<span class="re0">$linecf</span><span class="sy0">-&gt;</span><span class="me1">table_element</span> <span class="sy0">=</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">table_element_line</span><span class="sy0">;</span> <span class="co1">// you can use $this-&gt;table_element_line here instead of 'facturedet' if you want this feature to work for every module supported by CustomFields</span>
+<span class="re0">$customfields</span> <span class="sy0">=</span> customfields_fill_object<span class="br0">(</span><span class="re0">$linecf</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="kw1">if</span> <span class="br0">(</span><span class="kw3">isset</span><span class="br0">(</span><span class="re0">$linecf</span><span class="sy0">-&gt;</span><span class="me1">customfields</span><span class="sy0">-&gt;</span><span class="me1">cf_coefficient</span><span class="br0">)</span><span class="br0">)</span> <span class="br0">{</span>
+<span class="sy1">?&gt;</span>
+    &lt;td align="right" class="nowrap"&gt;<span class="kw2">&lt;?php</span> <span class="re0">$coldisplay</span><span class="sy0">++;</span> <span class="sy1">?&gt;</span><span class="kw2">&lt;?php</span> <span class="kw1">echo</span> <span class="re0">$linecf</span><span class="sy0">-&gt;</span><span class="me1">customfields</span><span class="sy0">-&gt;</span><span class="me1">cf_coefficient</span><span class="sy0">;</span> <span class="sy1">?&gt;</span>&lt;/td&gt;
+<span class="kw2">&lt;?php</span> <span class="br0">}</span> <span class="sy1">?&gt;</span></pre></div></div>
+<p>Just like for the column title, this code will take care of generating the coefficient value only if the custom field is defined, because this file is also a generic template for all modules of Dolibarr.
+</p><p>At this point, everything is done, you should see the following:
+<a href="http://wiki.dolibarr.org/index.php/File:Cf_wiki_coeff_column.png" class="image"><img alt="Cf wiki coeff column.png" src="./Module CustomFields Cases - Dolibarr Wiki_files/Cf_wiki_coeff_column.png" width="694" height="189"></a>
+</p>
+<h3> <span class="mw-headline" id="Implementing_the_change_of_price_in_margin_module_2"> Implementing the change of price in margin module </span></h3>
+<p>If you enabled the margin module, you should see that the coefficient is not applied there, but it's easy to fix that.
+</p><p>Open the file /htdocs/core/class/commonobject.class.php and find the function getMarginInfos(), then inside find the following lines:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw1">foreach</span><span class="br0">(</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">lines</span> <span class="kw1">as</span> <span class="re0">$line</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="kw1">if</span> <span class="br0">(</span><span class="kw3">empty</span><span class="br0">(</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">pa_ht</span><span class="br0">)</span> <span class="sy0">&amp;&amp;</span> <span class="kw3">isset</span><span class="br0">(</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">fk_fournprice</span><span class="br0">)</span> <span class="sy0">&amp;&amp;</span> <span class="sy0">!</span><span class="re0">$force_price</span><span class="br0">)</span> <span class="br0">{</span>
+        <span class="re0">$product</span> <span class="sy0">=</span> <span class="kw2">new</span> ProductFournisseur<span class="br0">(</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">db</span><span class="br0">)</span><span class="sy0">;</span>
+        <span class="kw1">if</span> <span class="br0">(</span><span class="re0">$product</span><span class="sy0">-&gt;</span><span class="me1">fetch_product_fournisseur_price</span><span class="br0">(</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">fk_fournprice</span><span class="br0">)</span><span class="br0">)</span>
+            <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">pa_ht</span> <span class="sy0">=</span> <span class="re0">$product</span><span class="sy0">-&gt;</span><span class="me1">fourn_unitprice</span> <span class="sy0">*</span> <span class="br0">(</span>1 <span class="sy0">-</span> <span class="re0">$product</span><span class="sy0">-&gt;</span><span class="me1">fourn_remise_percent</span> <span class="sy0">/</span> 100<span class="br0">)</span><span class="sy0">;</span>
+        <span class="kw1">if</span> <span class="br0">(</span><span class="kw3">isset</span><span class="br0">(</span><span class="re0">$conf</span><span class="sy0">-&gt;</span><span class="me1">global</span><span class="sy0">-&gt;</span><span class="me1">MARGIN_TYPE</span><span class="br0">)</span> <span class="sy0">&amp;&amp;</span> <span class="re0">$conf</span><span class="sy0">-&gt;</span><span class="me1">global</span><span class="sy0">-&gt;</span><span class="me1">MARGIN_TYPE</span> <span class="sy0">==</span> <span class="st0">"2"</span> <span class="sy0">&amp;&amp;</span> <span class="re0">$product</span><span class="sy0">-&gt;</span><span class="me1">fourn_unitcharges</span> <span class="sy0">&gt;</span> 0<span class="br0">)</span>
+            <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">pa_ht</span> <span class="sy0">+=</span> <span class="re0">$product</span><span class="sy0">-&gt;</span><span class="me1">fourn_unitcharges</span><span class="sy0">;</span>
+    <span class="br0">}</span>
+    <span class="co1">// si prix d'achat non renseigné et devrait l'être, alors prix achat = prix vente</span>
+    <span class="kw1">if</span> <span class="br0">(</span><span class="br0">(</span><span class="sy0">!</span><span class="kw3">isset</span><span class="br0">(</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">pa_ht</span><span class="br0">)</span> <span class="sy0">||</span> <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">pa_ht</span> <span class="sy0">==</span> 0<span class="br0">)</span> <span class="sy0">&amp;&amp;</span> <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">subprice</span> <span class="sy0">&gt;</span> 0 <span class="sy0">&amp;&amp;</span> <span class="br0">(</span><span class="kw3">isset</span><span class="br0">(</span><span class="re0">$conf</span><span class="sy0">-&gt;</span><span class="me1">global</span><span class="sy0">-&gt;</span><span class="me1">ForceBuyingPriceIfNull</span><span class="br0">)</span> <span class="sy0">&amp;&amp;</span> <span class="re0">$conf</span><span class="sy0">-&gt;</span><span class="me1">global</span><span class="sy0">-&gt;</span><span class="me1">ForceBuyingPriceIfNull</span> <span class="sy0">==</span> 1<span class="br0">)</span><span class="br0">)</span> <span class="br0">{</span>
+        <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">pa_ht</span> <span class="sy0">=</span> <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">subprice</span> <span class="sy0">*</span> <span class="br0">(</span>1 <span class="sy0">-</span> <span class="br0">(</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">remise_percent</span> <span class="sy0">/</span> 100<span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+    <span class="br0">}</span></pre></div></div>
+<p>This is where the lines are filled with margin infos. The price has just been fetched here, and we will now modify it with the coefficient before the price gets used for margin computation.
+</p><p>Just below the code we found, paste the following:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// Coefficient (CustomFields)</span>
+<span class="co1">// Include the facade API of CustomFields</span>
+dol_include_once<span class="br0">(</span><span class="st_h">'/customfields/lib/customfields_aux.lib.php'</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="co1">// Filling the $object with customfields (you can then access customfields by doing $object-&gt;customfields-&gt;cf_yourfield)</span>
+<span class="re0">$linecf</span> <span class="sy0">=</span> <span class="kw2">new</span> stdClass<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="re0">$linecf</span><span class="sy0">-&gt;</span><span class="me1">id</span> <span class="sy0">=</span> <span class="br0">(</span><span class="sy0">!</span><span class="kw3">empty</span><span class="br0">(</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">id</span><span class="br0">)</span><span class="br0">)</span>?<span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">id</span><span class="sy0">:</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">rowid</span><span class="sy0">;</span>
+<span class="re0">$linecf</span><span class="sy0">-&gt;</span><span class="me1">table_element</span> <span class="sy0">=</span> <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">table_element</span><span class="sy0">;</span>
+<span class="re0">$customfields</span> <span class="sy0">=</span> customfields_fill_object<span class="br0">(</span><span class="re0">$linecf</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="kw1">if</span> <span class="br0">(</span><span class="sy0">!</span><span class="kw3">empty</span><span class="br0">(</span><span class="re0">$linecf</span><span class="sy0">-&gt;</span><span class="me1">customfields</span><span class="sy0">-&gt;</span><span class="me1">cf_coefficient</span><span class="br0">)</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">pa_ht</span> <span class="sy0">=</span> <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">pa_ht</span> <span class="sy0">*</span> <span class="re0">$linecf</span><span class="sy0">-&gt;</span><span class="me1">customfields</span><span class="sy0">-&gt;</span><span class="me1">cf_coefficient</span><span class="sy0">;</span>
+    <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">subprice</span> <span class="sy0">=</span> <span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">subprice</span> <span class="sy0">*</span> <span class="re0">$linecf</span><span class="sy0">-&gt;</span><span class="me1">customfields</span><span class="sy0">-&gt;</span><span class="me1">cf_coefficient</span><span class="sy0">;</span>
+<span class="br0">}</span></pre></div></div>
+<p>That's all, the price should be reflected in the margin.
+<a href="http://wiki.dolibarr.org/index.php/File:Cf_wiki_coeff_margin.png" class="image"><img alt="Cf wiki coeff margin.png" src="./Module CustomFields Cases - Dolibarr Wiki_files/Cf_wiki_coeff_margin.png" width="640" height="70"></a>
+</p>
+<h3> <span class="mw-headline" id="Implementing_the_change_of_price_in_remaining_debt_to_pay"> Implementing the change of price in remaining debt to pay </span></h3>
+<p>Open /htdocs/core/class/commonobject.class.php and look for the function update_price().
+</p><p>You should see the following:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw2">function</span> update_price<span class="br0">(</span><span class="re0">$exclspec</span><span class="sy0">=</span>0<span class="sy0">,</span><span class="re0">$roundingadjust</span><span class="sy0">=</span><span class="st_h">'none'</span><span class="sy0">,</span><span class="re0">$nodatabaseupdate</span><span class="sy0">=</span>0<span class="sy0">,</span><span class="re0">$seller</span><span class="sy0">=</span><span class="st_h">''</span><span class="br0">)</span>
+<span class="br0">{</span>
+    <span class="kw2">global</span> <span class="re0">$conf</span><span class="sy0">;</span>
+&nbsp;
+    <span class="kw1">include_once</span> DOL_DOCUMENT_ROOT<span class="sy0">.</span><span class="st_h">'/core/lib/price.lib.php'</span><span class="sy0">;</span></pre></div></div>
+<p>Just below the include_once line, add the following:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// Coefficient (CustomFields)</span>
+<span class="kw1">include_once</span> DOL_DOCUMENT_ROOT<span class="sy0">.</span><span class="st_h">'/customfields/class/customfields.class.php'</span><span class="sy0">;</span>
+<span class="kw1">include_once</span> DOL_DOCUMENT_ROOT<span class="sy0">.</span><span class="st_h">'/customfields/conf/conf_customfields_func.lib.php'</span><span class="sy0">;</span>
+<span class="re0">$customfields</span> <span class="sy0">=</span> <span class="kw2">new</span> CustomFields<span class="br0">(</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">db</span><span class="sy0">,</span> <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">table_element_line</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="co1">// Fetching line ids from parent object id</span>
+<span class="re0">$line_ids</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">fetchAny</span><span class="br0">(</span><span class="st_h">'rowid'</span><span class="sy0">,</span> MAIN_DB_PREFIX<span class="sy0">.</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">table_element_line</span><span class="sy0">,</span> <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">fk_element</span><span class="sy0">.</span><span class="st_h">' = '</span><span class="sy0">.</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">id</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="re0">$line_ids</span> <span class="sy0">=</span> array_values_recursive<span class="br0">(</span><span class="st_h">'rowid'</span><span class="sy0">,</span> <span class="re0">$line_ids</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="co1">// Load custom fields</span>
+<span class="re0">$cf_records</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">fetch</span><span class="br0">(</span><span class="re0">$line_ids</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="co1">// Reassociate the records with the line id (instead of the customfields record id)</span>
+<span class="re0">$cf_line_cfrowid_to_rowid</span> <span class="sy0">=</span> array_reassociate<span class="br0">(</span><span class="st_h">'rowid'</span><span class="sy0">,</span> <span class="st_h">'fk_'</span><span class="sy0">.</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">table_element_line</span><span class="sy0">,</span> <span class="re0">$cf_records</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="re0">$tmp</span> <span class="sy0">=</span> <span class="re0">$cf_records</span><span class="sy0">;</span>
+<span class="re0">$cf_records</span> <span class="sy0">=</span> <span class="kw3">array</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="kw1">foreach</span> <span class="br0">(</span><span class="re0">$tmp</span> <span class="kw1">as</span> <span class="re0">$k</span><span class="sy0">=&gt;</span><span class="re0">$v</span><span class="br0">)</span> <span class="br0">{</span> <span class="re0">$cf_records</span><span class="br0">[</span><span class="re0">$cf_line_cfrowid_to_rowid</span><span class="br0">[</span><span class="re0">$k</span><span class="br0">]</span><span class="br0">]</span> <span class="sy0">=</span> <span class="re0">$tmp</span><span class="br0">[</span><span class="re0">$k</span><span class="br0">]</span><span class="sy0">;</span> <span class="br0">}</span></pre></div></div>
+<p>This will load the coefficient custom field (and also any other custom field you have defined for lines).
+</p><p>Now scroll below, and you should see this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw1">while</span> <span class="br0">(</span><span class="re0">$i</span> <span class="sy0">&lt;</span> <span class="re0">$num</span><span class="br0">)</span>
+<span class="br0">{</span>
+    <span class="re0">$obj</span> <span class="sy0">=</span> <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">db</span><span class="sy0">-&gt;</span><span class="me1">fetch_object</span><span class="br0">(</span><span class="re0">$resql</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+    <span class="co1">// Note: There is no check on detail line and no check on total, if $forcedroundingmode = 'none'</span>
+&nbsp;
+    <span class="kw1">if</span> <span class="br0">(</span><span class="re0">$forcedroundingmode</span> <span class="sy0">==</span> <span class="st_h">'0'</span><span class="br0">)</span>	<span class="co1">// Check if data on line are consistent. This may solve lines that were not consistent because set with $forcedroundingmode='auto'</span>
+    <span class="br0">{</span>
+        <span class="re0">$localtax_array</span><span class="sy0">=</span><span class="kw3">array</span><span class="br0">(</span><span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">localtax1_type</span><span class="sy0">,</span><span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">localtax1_tx</span><span class="sy0">,</span><span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">localtax2_type</span><span class="sy0">,</span><span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">localtax2_tx</span><span class="br0">)</span><span class="sy0">;</span>
+        <span class="re0">$tmpcal</span><span class="sy0">=</span>calcul_price_total<span class="br0">(</span><span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">qty</span><span class="sy0">,</span> <span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">up</span><span class="sy0">,</span> <span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">remise_percent</span><span class="sy0">,</span> <span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">vatrate</span><span class="sy0">,</span> <span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">localtax1_tx</span><span class="sy0">,</span> <span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">localtax2_tx</span><span class="sy0">,</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st_h">'HT'</span><span class="sy0">,</span> <span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">info_bits</span><span class="sy0">,</span> <span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">product_type</span><span class="sy0">,</span> <span class="re0">$seller</span><span class="sy0">,</span> <span class="re0">$localtax_array</span><span class="br0">)</span><span class="sy0">;</span>
+        <span class="re0">$diff</span><span class="sy0">=</span>price2num<span class="br0">(</span><span class="re0">$tmpcal</span><span class="br0">[</span>1<span class="br0">]</span> <span class="sy0">-</span> <span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">total_tva</span><span class="sy0">,</span> <span class="st_h">'MT'</span><span class="sy0">,</span> 1<span class="br0">)</span><span class="sy0">;</span>
+        <span class="kw1">if</span> <span class="br0">(</span><span class="re0">$diff</span><span class="br0">)</span>
+        <span class="br0">{</span>
+            <span class="re0">$sqlfix</span><span class="sy0">=</span><span class="st0">"UPDATE "</span><span class="sy0">.</span>MAIN_DB_PREFIX<span class="sy0">.</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">table_element_line</span><span class="sy0">.</span><span class="st0">" SET "</span><span class="sy0">.</span><span class="re0">$fieldtva</span><span class="sy0">.</span><span class="st0">" = "</span><span class="sy0">.</span><span class="re0">$tmpcal</span><span class="br0">[</span><span class="nu0">1</span><span class="br0">]</span><span class="sy0">.</span><span class="st0">", total_ttc = "</span><span class="sy0">.</span><span class="re0">$tmpcal</span><span class="br0">[</span><span class="nu0">2</span><span class="br0">]</span><span class="sy0">.</span><span class="st0">" WHERE rowid = "</span><span class="sy0">.</span><span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">rowid</span><span class="sy0">;</span>
+            dol_syslog<span class="br0">(</span><span class="st_h">'We found unconsistent data into detailed line (difference of '</span><span class="sy0">.</span><span class="re0">$diff</span><span class="sy0">.</span><span class="st_h">') for line rowid = '</span><span class="sy0">.</span><span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">rowid</span><span class="sy0">.</span><span class="st0">" (total vat of line calculated="</span><span class="sy0">.</span><span class="re0">$tmpcal</span><span class="br0">[</span><span class="nu0">1</span><span class="br0">]</span><span class="sy0">.</span><span class="st0">", database="</span><span class="sy0">.</span><span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">total_tva</span><span class="sy0">.</span><span class="st0">"). We fix the total_vat and total_ttc of line by running sqlfix = "</span><span class="sy0">.</span><span class="re0">$sqlfix</span><span class="br0">)</span><span class="sy0">;</span>
+            <span class="re0">$resqlfix</span><span class="sy0">=</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">db</span><span class="sy0">-&gt;</span><span class="me1">query</span><span class="br0">(</span><span class="re0">$sqlfix</span><span class="br0">)</span><span class="sy0">;</span>
+            <span class="kw1">if</span> <span class="br0">(</span><span class="sy0">!</span> <span class="re0">$resqlfix</span><span class="br0">)</span> dol_print_error<span class="br0">(</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">db</span><span class="sy0">,</span><span class="st_h">'Failed to update line'</span><span class="br0">)</span><span class="sy0">;</span>
+            <span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">total_tva</span> <span class="sy0">=</span> <span class="re0">$tmpcal</span><span class="br0">[</span>1<span class="br0">]</span><span class="sy0">;</span>
+            <span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">total_ttc</span> <span class="sy0">=</span> <span class="re0">$tmpcal</span><span class="br0">[</span>2<span class="br0">]</span><span class="sy0">;</span>
+            <span class="co1">//</span>
+        <span class="br0">}</span>
+    <span class="br0">}</span></pre></div></div>
+<p>Just after, add the following:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// Coefficient (CustomFields)</span>
+<span class="re0">$cf_coeff</span> <span class="sy0">=</span> <span class="re0">$cf_records</span><span class="br0">[</span><span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">rowid</span><span class="br0">]</span><span class="sy0">-&gt;</span><span class="me1">coefficient</span><span class="sy0">;</span>
+<span class="kw1">if</span> <span class="br0">(</span><span class="kw3">empty</span><span class="br0">(</span><span class="re0">$cf_coeff</span><span class="br0">)</span> and <span class="re0">$cf_coeff</span> <span class="sy0">!==</span> 0<span class="br0">)</span> <span class="re0">$cf_coeff</span> <span class="sy0">=</span> <span class="nu0">1</span><span class="sy0">;</span> <span class="co1">// by default, an empty coefficient = 1</span>
+<span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">total_ht</span> <span class="sy0">=</span> <span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">total_ht</span> <span class="sy0">*</span> <span class="re0">$cf_coeff</span><span class="sy0">;</span>
+<span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">total_tva</span> <span class="sy0">=</span> <span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">total_tva</span> <span class="sy0">*</span> <span class="re0">$cf_coeff</span><span class="sy0">;</span>
+<span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">total_localtax1</span> <span class="sy0">=</span> <span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">total_localtax1</span> <span class="sy0">*</span> <span class="re0">$cf_coeff</span><span class="sy0">;</span>
+<span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">total_localtax2</span> <span class="sy0">=</span> <span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">total_localtax2</span> <span class="sy0">*</span> <span class="re0">$cf_coeff</span><span class="sy0">;</span>
+<span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">total_ttc</span> <span class="sy0">=</span> <span class="re0">$obj</span><span class="sy0">-&gt;</span><span class="me1">total_ttc</span> <span class="sy0">*</span> <span class="re0">$cf_coeff</span><span class="sy0">;</span></pre></div></div>
+<p>This should do the trick. Now go to one of your invoices (or whatever module you are targetting), and try to add/edit a product/service line to force refresh the total price. You should then see this:
+<a href="http://wiki.dolibarr.org/index.php/File:Cf_wiki_coeff_remaining_debt.png" class="image"><img alt="Cf wiki coeff remaining debt.png" src="./Module CustomFields Cases - Dolibarr Wiki_files/Cf_wiki_coeff_remaining_debt.png" width="697" height="525"></a>
+</p>
+<h1> <span class="mw-headline" id="Custom_tax_per_product"> Custom tax per product </span></h1>
+<p>This part will show you how to create a static custom tax per product. Static means that the tax will be stored per product, and not per product's line, thus you just have to setup the tax once per product and it will always be applied in every invoice you add this product.
+</p><p>To do that, you will need the CustomFields Pro module + ProductsEasyAccess.
+</p><p><br>
+1- Create a product's custom fields called "custom_tax". Now, using ProductsEasyAccess, you can access this field wherever you wants, either to show it on the Dolibarr's interface (see previous chapter), or in a PDF template, which we will describe below.
+</p><p><br>
+2- Modify your invoice's PDF template. You first need to load all the products' fields <i>before</i> the loop over the products' lines. To do this, search for a line like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// This should be placed above the "loop lines" below, add this:</span>
+&nbsp;
+dol_include_once<span class="br0">(</span><span class="st_h">'/productseasyaccess/lib/productseasyaccess.lib.php'</span><span class="br0">)</span><span class="sy0">;</span>
+fill_object_with_products_fields<span class="br0">(</span><span class="re0">$object</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Loop on each lines, search for this command</span>
+&nbsp;
+<span class="kw1">for</span> <span class="br0">(</span><span class="re0">$i</span> <span class="sy0">=</span> 0 <span class="sy0">;</span> <span class="re0">$i</span> <span class="sy0">&lt;</span> <span class="re0">$nblignes</span> <span class="sy0">;</span> <span class="re0">$i</span><span class="sy0">++</span><span class="br0">)</span>
+&nbsp;
+  <span class="co1">// Add this just below the for loop, this will ease your php manipulation after.</span>
+  <span class="co1">// This will allow you to more easily access the products' fields (this will store the id of each product inside $lineproductid).</span>
+  <span class="re0">$line_product_id</span> <span class="sy0">=</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">lines</span><span class="br0">[</span><span class="re0">$i</span><span class="br0">]</span><span class="sy0">-&gt;</span><span class="me1">fk_product</span><span class="sy0">;</span></pre></div></div>
+<p><br>
+4- You can now use your products' fields in your PDF. To access the custom_tax field, just use:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">productslines</span><span class="sy0">-&gt;</span><span class="re0">$line_product_id</span><span class="sy0">-&gt;</span><span class="me1">cf_custom_tax</span></pre></div></div>
+<p>And to print it in your PDF:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">MultiCell</span><span class="br0">(</span>0<span class="sy0">,</span>3<span class="sy0">,</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">productslines</span><span class="sy0">-&gt;</span><span class="re0">$line_product_id</span><span class="sy0">-&gt;</span><span class="me1">cf_custom_tax</span><span class="sy0">,</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st_h">'L'</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p><br>
+5- Then, if you want to count the custom tax total and add it to your vat total, you can create a counter inside the for loop we cited in the first step:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_custom_tax</span> <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> <span class="co1">// Initialize the custom tax total counter</span>
+&nbsp;
+<span class="co1">// Loop on each lines</span>
+&nbsp;
+<span class="kw1">for</span> <span class="br0">(</span><span class="re0">$i</span> <span class="sy0">=</span> 0 <span class="sy0">;</span> <span class="re0">$i</span> <span class="sy0">&lt;</span> <span class="re0">$nblignes</span> <span class="sy0">;</span> <span class="re0">$i</span><span class="sy0">++</span><span class="br0">)</span>
+&nbsp;
+  <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_custom_tax</span> <span class="sy0">+=</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">productslines</span><span class="sy0">-&gt;</span><span class="re0">$line_product_id</span><span class="sy0">-&gt;</span><span class="me1">cf_custom_tax</span><span class="sy0">;</span></pre></div></div>
+<p>Then find inside the function **_tableau_tot**, find the following line:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">MultiCell</span><span class="br0">(</span><span class="re0">$largcol2</span><span class="sy0">,</span> <span class="re0">$tab2_hl</span><span class="sy0">,</span> price<span class="br0">(</span><span class="re0">$sign</span> <span class="sy0">*</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_ttc</span><span class="sy0">,</span> 0<span class="sy0">,</span> <span class="re0">$outputlangs</span><span class="br0">)</span><span class="sy0">,</span> <span class="re0">$useborder</span><span class="sy0">,</span> <span class="st_h">'R'</span><span class="sy0">,</span> 1<span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>And prepend the total modification like this:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_ttc</span> <span class="sy0">=</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_ttc</span> <span class="sy0">+</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_custom_tax</span><span class="sy0">;</span> <span class="co1">// prepend this to add the custom tax to the total</span>
+<span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">MultiCell</span><span class="br0">(</span><span class="re0">$largcol2</span><span class="sy0">,</span> <span class="re0">$tab2_hl</span><span class="sy0">,</span> price<span class="br0">(</span><span class="re0">$sign</span> <span class="sy0">*</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">total_ttc</span><span class="sy0">,</span> 0<span class="sy0">,</span> <span class="re0">$outputlangs</span><span class="br0">)</span><span class="sy0">,</span> <span class="re0">$useborder</span><span class="sy0">,</span> <span class="st_h">'R'</span><span class="sy0">,</span> 1<span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p><br>
+Done. This should show your custom tax per product and your total including all custom taxes.
+</p>
+<!-- 
+NewPP limit report
+Preprocessor node count: 536/1000000
+Post-expand include size: 1155/2097152 bytes
+Template argument size: 66/2097152 bytes
+Expensive parser function count: 0/100
+-->
+
+<!-- Saved in parser cache with key dolibarrwiki:pcache:idhash:4468-0!*!0!!en!2!edit=0 and timestamp 20150401161304 -->
+<div class="printfooter">
+Retrieved from "<a href="./Module CustomFields Cases - Dolibarr Wiki_files/Module CustomFields Cases - Dolibarr Wiki.html">http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases</a>"</div>
+			<div id="catlinks" class="catlinks"><div id="mw-normal-catlinks"><a href="http://wiki.dolibarr.org/index.php/Special:Categories" title="Special:Categories">Category</a>: <span dir="ltr"><a href="http://wiki.dolibarr.org/index.php?title=Category:CustomFields&action=edit&redlink=1" class="new" title="Category:CustomFields (page does not exist)">CustomFields</a></span></div></div>			<!-- end content -->
+						<div class="visualClear"></div>
+		</div>
+	</div>
+	</div>
+
+
+		<div id="column-one" class="htmldoc-ignore">
+	<div id="p-cactions" class="portlet">
+		<h5>Views</h5>
+		<div class="pBody">
+			<ul>
+			
+				 <li id="ca-nstab-main" class="selected"><a href="./Module CustomFields Cases - Dolibarr Wiki_files/Module CustomFields Cases - Dolibarr Wiki.html" title="View the content page [alt-c]" accesskey="c">Page</a></li>
+				 <li id="ca-talk" class="new"><a href="http://wiki.dolibarr.org/index.php?title=Talk:Module_CustomFields_Cases&action=edit&redlink=1" title="Discussion about the content page [alt-t]" accesskey="t">Discussion</a></li>
+				 <li id="ca-viewsource"><a href="http://wiki.dolibarr.org/index.php?title=Module_CustomFields_Cases&action=edit" title="This page is protected.
+You can view its source [alt-e]" accesskey="e">View source</a></li>
+				 <li id="ca-history"><a href="http://wiki.dolibarr.org/index.php?title=Module_CustomFields_Cases&action=history" title="Past revisions of this page [alt-h]" accesskey="h">History</a></li>
+				 <li id="ca-language"><a href="http://wiki.dolibarr.org/index.php?title=Special:MultiLanguageManager&cible=Module_CustomFields_Cases">Language</a></li>			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-personal">
+		<h5>Personal tools</h5>
+		<div class="pBody">
+			<ul>
+							<li><img src="./Module CustomFields Cases - Dolibarr Wiki_files/pagemaster.png" height="24px"> <font color="#000000">Ask to contact@dolibarr.org to request an account to contribute to this documentation</font></li>
+							<li id="pt-login"><a href="http://wiki.dolibarr.org/index.php?title=Special:UserLogin&returnto=Module_CustomFields_Cases" title="You are encouraged to log in; however, it is not mandatory [alt-o]" accesskey="o">Log in</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-logo">
+		<a style="background-image: url(/skins/dolibarr/dolibarr_125x125.png);" href="http://wiki.dolibarr.org/index.php/Main_Page" title="Visit the main page [alt-z]" accesskey="z"></a>
+	</div>
+
+	<div class="generated-sidebar portlet" id="p-navigation">
+		<h5>Navigation</h5>
+		<div class="pBody">
+			<ul>
+				<li id="n-mainpage-description"><a href="http://wiki.dolibarr.org/index.php/Main_Page" title="Visit the main page [alt-z]" accesskey="z">Main page</a></li>
+				<li id="n-recentchanges"><a href="http://wiki.dolibarr.org/index.php/Special:RecentChanges" title="The list of recent changes in the wiki [alt-r]" accesskey="r">Recent changes</a></li>
+				<li id="n-randompage"><a href="http://wiki.dolibarr.org/index.php/Special:Random" title="Load a random page [alt-x]" accesskey="x">Random page</a></li>
+			</ul>
+		</div>
+	</div>
+<div class="generated-sidebar portlet" id="p-navigation"><h5>In other languages</h5><div class="pBody"><a class="language" href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases_FR"><img src="./Module CustomFields Cases - Dolibarr Wiki_files/fr.png" class="languageimage" alt="French"></a><!--[if lt IE 7]><span class='popup' onMouseOver="document.getElementById('language_popup').style.visibility = 'visible';"  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><span class="popup" id="popup_anchor"><img src="./Module CustomFields Cases - Dolibarr Wiki_files/es.png" class="languageimage" alt="Spanish"><!--[if lt IE 7]><span  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><div class="cadre_popup" id="language_popup">No translation in Spanish.</div><!--[if lt IE 7]></span><![endif]--></span><!--[if lt IE 7]></span><![endif]--><!--[if lt IE 7]><span class='popup' onMouseOver="document.getElementById('language_popup').style.visibility = 'visible';"  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><span class="popup" id="popup_anchor"><img src="./Module CustomFields Cases - Dolibarr Wiki_files/de.png" class="languageimage" alt="Deutsch"><!--[if lt IE 7]><span  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><div class="cadre_popup" id="language_popup">No translation in Deutsch.</div><!--[if lt IE 7]></span><![endif]--></span><!--[if lt IE 7]></span><![endif]--><!--[if lt IE 7]><span class='popup' onMouseOver="document.getElementById('language_popup').style.visibility = 'visible';"  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><span class="popup" id="popup_anchor"><img src="./Module CustomFields Cases - Dolibarr Wiki_files/it.png" class="languageimage" alt="Italian"><!--[if lt IE 7]><span  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><div class="cadre_popup" id="language_popup">No translation in Italian.</div><!--[if lt IE 7]></span><![endif]--></span><!--[if lt IE 7]></span><![endif]--><!--[if lt IE 7]><span class='popup' onMouseOver="document.getElementById('language_popup').style.visibility = 'visible';"  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><span class="popup" id="popup_anchor"><img src="./Module CustomFields Cases - Dolibarr Wiki_files/el.png" class="languageimage" alt="Greek"><!--[if lt IE 7]><span  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><div class="cadre_popup" id="language_popup">No translation in Greek.</div><!--[if lt IE 7]></span><![endif]--></span><!--[if lt IE 7]></span><![endif]-->
+</div>
+</div>
+	<div id="p-search" class="portlet">
+		<h5><label for="searchInput">Search</label></h5>
+		<div id="searchBody" class="pBody">
+			<form action="http://wiki.dolibarr.org/index.php" id="searchform">
+				<input type="hidden" name="title" value="Special:Search">
+				<input id="searchInput" title="Search Dolibarr Wiki" accesskey="f" type="search" name="search">
+				<input type="submit" name="go" class="searchButton" id="searchGoButton" value="Go" title="Go to a page with this exact name if exists">
+				<div><a href="http://wiki.dolibarr.org/index.php/Special:Search" rel="search">Advanced search</a></div>
+			</form>
+		</div>
+	</div>
+	<div class="portlet" id="p-tb">
+		<h5>Toolbox</h5>
+		<div class="pBody">
+			<ul>
+				<li id="t-whatlinkshere"><a href="http://wiki.dolibarr.org/index.php/Special:WhatLinksHere/Module_CustomFields_Cases" title="List of all wiki pages that link here [alt-j]" accesskey="j">What links here</a></li>
+				<li id="t-recentchangeslinked"><a href="http://wiki.dolibarr.org/index.php/Special:RecentChangesLinked/Module_CustomFields_Cases" title="Recent changes in pages linked from this page [alt-k]" accesskey="k">Related changes</a></li>
+<li id="t-specialpages"><a href="http://wiki.dolibarr.org/index.php/Special:SpecialPages" title="List of all special pages [alt-q]" accesskey="q">Special pages</a></li>
+				<li id="t-print"><a href="http://wiki.dolibarr.org/index.php?title=Module_CustomFields_Cases&printable=yes" title="Printable version of this page [alt-p]" accesskey="p">Printable version</a></li>				<li id="t-permalink"><a href="http://wiki.dolibarr.org/index.php?title=Module_CustomFields_Cases&oldid=33348" title="Permanent link to this revision of the page">Permanent link</a></li>			</ul>
+		</div>
+	</div>
+<br><!-- <div class='generated-sidebar portlet' id='p-navigation-donation' style='text-align: center'>
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+<input type="hidden" name="cmd" value="_s-xclick">
+<input type="hidden" name="hosted_button_id" value="8978561">
+<input type="image" src="http://wiki.dolibarr.org/upload/5/5c/Paypal.png" border="0" name="submit" alt="Help Dolibarr making a donation">
+</form>
+</div>
+ -->
+<div class="generated-sidebar portlet" id="p-navigation">
+<h5>
+Social networks
+</h5>
+<div class="pBody" align="center">
+
+<!--<div style="padding: 3px">
+<g:plus href="https://plus.google.com/+DolibarrOrg" width="100" height="131"></g:plus>
+</div>-->
+
+<div style="padding: 1px">
+<center>
+<a href="https://plus.google.com/+DolibarrOrg" target="_blank" rel="nofollow"><img src="./Module CustomFields Cases - Dolibarr Wiki_files/google.png" width="24px" height="24px" alt="Follow us on Google+"></a>
+
+<a href="http://www.facebook.com/dolibarr" target="_blank" rel="nofollow"><img src="./Module CustomFields Cases - Dolibarr Wiki_files/facebook.png" width="24px" height="24px" alt="Follow us on Facebook"></a>
+
+<a href="http://www.linkedin.com/groups?gid=2743052" target="_blank" rel="nofollow"><img src="./Module CustomFields Cases - Dolibarr Wiki_files/linkedin.png" width="24px" height="24px" alt="Follow us on LinkedIn"></a>
+
+<a href="http://twitter.com/dolibarr" target="_blank" rel="nofollow"><img src="./Module CustomFields Cases - Dolibarr Wiki_files/twitter.png" width="24px" height="24px" alt="Follow us on Twitter"></a>
+</center>
+</div>
+
+</div>
+</div>
+
+<br><br>
+
+<div class="generated-sidebar portlet" id="p-navigation-adsense" style="text-align: center">
+<div class="pBody">
+<script async="" src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- PUBSKYDOLIBARRWIKI2 -->
+<ins class="adsbygoogle" style="display:inline-block;width:160px;height:600px" data-ad-client="ca-pub-1071905880519467" data-ad-slot="7811259314"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</div>
+</div>
+
+<!-- End LDR -->
+
+
+
+	</div><!-- end of the left (by default at least) one-column -->
+	
+	<div class="visualClear"></div>
+
+		<div id="footer" class="htmldoc-ignore">
+				
+	<ul id="f-list">
+						<li id="lastmod"> This page was last modified on 1 April 2015, at 14:22.</li>
+							<li id="viewcount">This page has been accessed 8,030 times.</li>
+							<li id="copyright">Content is available under <a href="http://creativecommons.org/licenses/by-sa/4.0/" class="external ">Creative Commons Attribution-ShareAlike 4.0 International License</a>.</li>
+			
+			<!-- LDR Add author -->
+			<li><a rel="author" href="https://plus.google.com/+LaurentDestailleur?rel=author">Created or moderated by Eldy</a></li>			<!-- End Add author -->
+
+	</ul>
+		</div>	<!-- End div footer -->
+
+</div>
+
+
+
+<script src="./Module CustomFields Cases - Dolibarr Wiki_files/load.php"></script><script src="./Module CustomFields Cases - Dolibarr Wiki_files/load(1).php"></script>
+<script>if ( window.mediaWiki ) {
+	mediaWiki.config.set({"wgCanonicalNamespace": "", "wgCanonicalSpecialPageName": false, "wgNamespaceNumber": 0, "wgPageName": "Module_CustomFields_Cases", "wgTitle": "Module CustomFields Cases", "wgAction": "view", "wgArticleId": 4468, "wgIsArticle": true, "wgUserName": null, "wgUserGroups": ["*"], "wgCurRevisionId": 33348, "wgCategories": ["CustomFields"], "wgBreakFrames": false, "wgRestrictionEdit": [], "wgRestrictionMove": []});
+}
+</script>
+<script>if ( window.mediaWiki ) {
+	mediaWiki.loader.load(["mediawiki.util", "mediawiki.legacy.wikibits", "mediawiki.legacy.ajax"]);
+	mediaWiki.loader.go();
+}
+</script><script type="text/javascript" src="./Module CustomFields Cases - Dolibarr Wiki_files/load(2).php"></script>
+
+<script>if ( window.mediaWiki ) {
+	mediaWiki.user.options.set({"quickbar":0,"underline":2,"cols":80,"rows":25,"searchlimit":20,"contextlines":5,"contextchars":50,"skin":"dolibarr","math":1,"rcdays":7,"rclimit":50,"wllimit":250,"highlightbroken":1,"stubthreshold":0,"previewontop":1,"editsection":1,"editsectiononrightclick":0,"showtoc":1,"showtoolbar":1,"date":"default","imagesize":2,"thumbsize":2,"rememberpassword":0,"enotifwatchlistpages":0,"enotifusertalkpages":1,"enotifminoredits":0,"enotifrevealaddr":0,"shownumberswatching":1,"fancysig":0,"externaleditor":0,"externaldiff":0,"showjumplinks":0,"numberheadings":0,"uselivepreview":0,"watchlistdays":3,"editfont":"default","gender":"unknown","variant":"en","language":"en","searchNs0":true,"searchNs1":false,"searchNs2":false,"searchNs3":false,"searchNs4":false,"searchNs5":false,"searchNs6":false,"searchNs7":false,"searchNs8":false,"searchNs9":false,"searchNs10":false,"searchNs11":false,"searchNs12":false,"searchNs13":false,"searchNs14":false,"searchNs15":false,"searchNs100"
+	:true,"searchNs101":false,"searchNs110":false,"searchNs111":false,"searchNs120":false,"searchNs121":false});;mediaWiki.loader.state({"user.options":"ready"});
+}
+</script><!-- Served in 0.605 secs. -->
+
+</body></html>

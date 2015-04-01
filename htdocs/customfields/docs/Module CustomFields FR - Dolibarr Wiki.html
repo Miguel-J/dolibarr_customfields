@@ -1,0 +1,476 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0057)http://wiki.dolibarr.org/index.php/Module_CustomFields_FR -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr" class="client-chrome client-chrome-4 client-webkit client-win"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="verify-v1" content="HMNutRwqmhagMMJPRLLAFKlwRnifyx4SoJjYN+fyZV0=">
+		<meta name="msvalidate.01" content="97D254FD131581C03545FB5D9A228AD7">
+		
+		<meta name="generator" content="MediaWiki 1.17.0">
+<link rel="shortcut icon" href="http://wiki.dolibarr.org/skins/dolibarr/favicon.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="http://wiki.dolibarr.org/opensearch_desc.php" title="Dolibarr Wiki (fr)">
+<link rel="EditURI" type="application/rsd+xml" href="http://wiki.dolibarr.org/api.php?action=rsd">
+<link rel="copyright" href="http://creativecommons.org/licenses/by-sa/4.0/">
+<link rel="alternate" type="application/atom+xml" title="Flux Atom de Dolibarr Wiki" href="http://wiki.dolibarr.org/index.php?title=Special:RecentChanges&feed=atom">		<title>Module CustomFields FR - Dolibarr Wiki</title>
+		<link rel="stylesheet" href="http://wiki.dolibarr.org/load.php?debug=false&lang=fr&modules=mediawiki.legacy.commonPrint%2Cshared&only=styles&skin=dolibarr&*">
+<link rel="stylesheet" href="http://wiki.dolibarr.org/skins/dolibarr/main.css?301" media="screen"><meta name="ResourceLoaderDynamicStyles" content="">		<script async="" src="http://www.google-analytics.com/analytics.js"></script><script>if ( window.mediaWiki ) {
+	mediaWiki.config.set({"wgCanonicalNamespace": "", "wgCanonicalSpecialPageName": false, "wgNamespaceNumber": 0, "wgPageName": "Module_CustomFields_FR", "wgTitle": "Module CustomFields FR", "wgAction": "view", "wgArticleId": 4469, "wgIsArticle": true, "wgUserName": null, "wgUserGroups": ["*"], "wgCurRevisionId": 33004, "wgCategories": ["Modules complémentaires", "CustomFields", "Page waiting for translation"], "wgBreakFrames": false, "wgRestrictionEdit": [], "wgRestrictionMove": []});
+}
+</script>		<link href="https://plus.google.com/+DolibarrOrg" rel="publisher">
+
+
+
+
+		<!-- Head Scripts -->
+<style type="text/css">/*<![CDATA[*/
+.source-php {line-height: normal;}
+.source-php li, .source-php pre {
+	line-height: normal; border: 0px none white;
+}
+/**
+ * GeSHi Dynamically Generated Stylesheet
+ * --------------------------------------
+ * Dynamically generated stylesheet for php
+ * CSS class: source-php, CSS id: 
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ * --------------------------------------
+ */
+.php.source-php .de1, .php.source-php .de2 {font: normal normal 1em/1.2em monospace; margin:0; padding:0; background:none; vertical-align:top;}
+.php.source-php  {font-family:monospace;}
+.php.source-php .imp {font-weight: bold; color: red;}
+.php.source-php li, .php.source-php .li1 {font-weight: normal; vertical-align:top;}
+.php.source-php .ln {width:1px;text-align:right;margin:0;padding:0 2px;vertical-align:top;}
+.php.source-php .li2 {font-weight: bold; vertical-align:top;}
+.php.source-php .kw1 {color: #505000;}
+.php.source-php .kw2 {color: #000000; font-weight: bold;}
+.php.source-php .kw3 {color: #505000;}
+.php.source-php .kw4 {color: #009900; font-weight: bold;}
+.php.source-php .co1 {color: #666666; font-style: italic;}
+.php.source-php .co2 {color: #666666; font-style: italic;}
+.php.source-php .co3 {color: #0000cc; font-style: italic;}
+.php.source-php .co4 {color: #009933; font-style: italic;}
+.php.source-php .coMULTI {color: #666666; font-style: italic;}
+.php.source-php .es0 {color: #000099; font-weight: bold;}
+.php.source-php .es1 {color: #000099; font-weight: bold;}
+.php.source-php .es2 {color: #660099; font-weight: bold;}
+.php.source-php .es3 {color: #660099; font-weight: bold;}
+.php.source-php .es4 {color: #006699; font-weight: bold;}
+.php.source-php .es5 {color: #006699; font-weight: bold; font-style: italic;}
+.php.source-php .es6 {color: #009933; font-weight: bold;}
+.php.source-php .es_h {color: #000099; font-weight: bold;}
+.php.source-php .br0 {color: #009900;}
+.php.source-php .sy0 {color: #339933;}
+.php.source-php .sy1 {color: #000000; font-weight: bold;}
+.php.source-php .st0 {color: #0000ff;}
+.php.source-php .st_h {color: #0000ff;}
+.php.source-php .nu0 {color: #cc66cc;}
+.php.source-php .nu8 {color: #208080;}
+.php.source-php .nu12 {color: #208080;}
+.php.source-php .nu19 {color:#800080;}
+.php.source-php .me1 {color: #004000;}
+.php.source-php .me2 {color: #004000;}
+.php.source-php .re0 {color: #000088;}
+.php.source-php .ln-xtra, .php.source-php li.ln-xtra, .php.source-php div.ln-xtra {background-color: #ffc;}
+.php.source-php span.xtra { display:block; }
+
+/*]]>*/
+</style>
+<style type="text/css">/*<![CDATA[*/
+@import "/index.php?title=MediaWiki:Geshi.css&usemsgcache=yes&action=raw&ctype=text/css&smaxage=18000";
+/*]]>*/
+</style>		<script type="text/javascript" src="./Module CustomFields FR - Dolibarr Wiki_files/index.php"><!-- site js --></script>
+
+
+<!-- LDR Google plusone -->
+<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+
+
+<style>@-webkit-keyframes poppmbwqiruoogviutmwwapbaccevimdkji {50% {-webkit-transform:scale(1.2);}100% {-webkit-transform:scale(1);}}@keyframes poppmbwqiruoogviutmwwapbaccevimdkji {50% {-webkit-transform:scale(1.2);transform:scale(1.2);}100% {-webkit-transform:scale(1);transform:scale(1);}}#pmbwqiruoogviutmwwapbaccevimdkji{padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;border:solid 2px #fff !important;box-sizing:content-box !important;color:#fff !important;display:block !important;height:auto !important;margin:0 !important;opacity:0.9 !important;padding:7px 10px !important;position:fixed !important;visibility:visible !important;width:auto !important;z-index:2147483647 !important;-webkit-border-radius:5px !important;-webkit-box-shadow:0px 0px 20px #000 !important;-webkit-box-sizing:content-box !important;}.pmbwqiruoogviutmwwapbaccevimdkji-blocked{padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;color:#AAA !important;display:inline !important;text-decoration:line-through !important;}#pmbwqiruoogviutmwwapbaccevimdkji br{display:block !important;padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;}#pmbwqiruoogviutmwwapbaccevimdkji span{background:transparent !important;padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;}#pmbwqiruoogviutmwwapbaccevimdkji div{padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;border:0 !important;margin:0 !important;padding:0 !important;width:auto !important;letter-spacing:normal !important;font:13px Arial,Helvetica !important;text-align:left !important;text-shadow:none !important;text-transform:none !important;word-spacing:normal !important;}#pmbwqiruoogviutmwwapbaccevimdkji a{padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;font-weight:normal !important;background:none !important;text-decoration:underline !important;color:#fff !important;}a#pmbwqiruoogviutmwwapbaccevimdkji-gear{padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;text-decoration:none !important;position:absolute !important;display:none !important;font-size:20px !important;width:20px !important;height:20px !important;line-height:20px !important;text-align:center !important;background-color:rgba(255,255,255,.8) !important;background-image:url(chrome-extension://mlomiejdfkolichcflejclcbmpeaniij/data/images/gear.svg) !important;background-size:16px 16px !important;background-position:center center !important;background-repeat:no-repeat !important;text-decoration:none !important;}a#pmbwqiruoogviutmwwapbaccevimdkji-gear:hover{-webkit-animation-name:poppmbwqiruoogviutmwwapbaccevimdkji !important;animation-name:poppmbwqiruoogviutmwwapbaccevimdkji !important;-webkit-animation-duration:0.3s !important;animation-duration:0.3s !important;}#pmbwqiruoogviutmwwapbaccevimdkji:hover #pmbwqiruoogviutmwwapbaccevimdkji-gear{text-decoration:none !important;display:inline-block !important;}@media print{#pmbwqiruoogviutmwwapbaccevimdkji{display:none !important;}}</style></head>
+
+
+<body class="mediawiki ltr ns-0 ns-subject page-Module_CustomFields_FR skin-dolibarr">
+
+
+<div class="htmldoc-ignore">
+<!-- LDR Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-9049390-2', 'dolibarr.org');
+  ga('require', 'displayfeatures');
+  ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+</div>
+
+
+<div id="globalWrapper">
+	<div id="column-content">
+	<div id="content">
+		<a name="top" id="top"></a>
+				<div class="htmldoc-ignore">
+		<div id="siteNotice"><div id="localNotice"></div></div>		<h1 id="firstHeading" class="firstHeading">Module CustomFields FR</h1>
+		</div>
+				<div id="bodyContent">
+						<div class="htmldoc-ignore">
+			<h3 id="siteSub">De Dolibarr Wiki.</h3>
+			</div>
+						<div id="contentSub"></div>
+												<!-- start content -->
+			<div style="text-align: center; float:right; font-size:80%; background: #eef; border: 1px solid #ccf; margin-bottom: 0px; margin-left: 2px; margin-right: 2px; padding: 1px; height: 92px; min-width: 120px;">
+<p><a href="http://wiki.dolibarr.org/index.php/Documentation_utilisateur" title="Documentation utilisateur"> Retour index<br>Documentation Utilisateur</a><br>
+<a href="http://wiki.dolibarr.org/index.php/Documentation_utilisateur" title="Documentation utilisateur"><img alt="File Doc user.png" src="./Module CustomFields FR - Dolibarr Wiki_files/File_Doc_user.png" width="48" height="48"></a>
+</p>
+</div>
+<div style="text-align: center; float:right; font-size:80%; background: #eef; border: 1px solid #ccf; margin-bottom: 0px; margin-left: 2px; margin-right: 2px; padding: 1px; height: 92px; min-width: 120px;">
+<p><a href="http://wiki.dolibarr.org/index.php/Category:Liste_des_Modules" title="Category:Liste des Modules">Retour index<br>liste des modules</a><br>
+<a href="http://wiki.dolibarr.org/index.php/Category:Liste_des_Modules" title="Category:Liste des Modules"><img alt="Art.png" src="./Module CustomFields FR - Dolibarr Wiki_files/Art.png" width="56" height="51"></a>
+</p>
+</div>
+<p>L'article n'a pas encore été entièrement traduit en français.
+</p><p>Veuillez <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields" title="Module CustomFields">lire le wiki en anglais</a> qui est déjà complet (icône à gauche).
+</p>
+<table cellspacing="0" cellpadding="2" style="border: 1px solid #AAAAAA; background: #DCCC66;"><tbody><tr><td>
+<p><img alt="En verysmall.png" src="./Module CustomFields FR - Dolibarr Wiki_files/En_verysmall.png" width="16" height="11"> Page waiting for translation. To translate, create an account, go back and clic on "Modify".<br>
+<img alt="Fr verysmall.png" src="./Module CustomFields FR - Dolibarr Wiki_files/Fr_verysmall.png" width="16" height="11"> Page en attente de traduction. Pour traduire, créez un compte, revenez et cliquez sur "Modifier".<br>
+<img alt="Es verysmall.png" src="./Module CustomFields FR - Dolibarr Wiki_files/Es_verysmall.png" width="16" height="11"> Página a traducir. Para traducirla, cree una cuenta, vuelva a la página y haga clic en "editar"<br>
+<img alt="It verysmall.png" src="./Module CustomFields FR - Dolibarr Wiki_files/It_verysmall.png" width="16" height="11"> Pagina da tradurre. Per tradurla, crea un utente, torna indietro e clicca su "modifica"<br>
+<a href="http://wiki.dolibarr.org/index.php/File:Pt_verysmall.png" class="image"><img alt="Pt verysmall.png" src="./Module CustomFields FR - Dolibarr Wiki_files/Pt_verysmall.png" width="16" height="11"></a> Página a aguardar por tradução. Para traduzir, crie uma conta, volte atrás e clique em "Modificar"<br>
+</p>
+</td></tr></tbody></table>
+<table id="toc" class="toc"><tbody><tr><td><div id="toctitle"><h2>Contents</h2> <span class="toctoggle">[<a id="togglelink" class="internal" href="http://wiki.dolibarr.org/index.php/Module_CustomFields_FR#">masquer</a>]</span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_FR#Informations"><span class="tocnumber">1</span> <span class="toctext">Informations</span></a></li>
+<li class="toclevel-1 tocsection-2"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_FR#Utilisation"><span class="tocnumber">2</span> <span class="toctext">Utilisation</span></a>
+<ul>
+<li class="toclevel-2 tocsection-3"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_FR#Traduction_du_libell.C3.A9_d.27un_champ"><span class="tocnumber">2.1</span> <span class="toctext">Traduction du libellé d'un champ</span></a></li>
+<li class="toclevel-2 tocsection-4"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_FR#Testez_vos_champs_personnalis.C3.A9s_avec_le_module_PDFTest"><span class="tocnumber">2.2</span> <span class="toctext">Testez vos champs personnalisés avec le module PDFTest</span></a></li>
+<li class="toclevel-2 tocsection-5"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_FR#Impl.C3.A9mentation_dans_les_mod.C3.A8les_ODT"><span class="tocnumber">2.3</span> <span class="toctext">Implémentation dans les modèles ODT</span></a></li>
+<li class="toclevel-2 tocsection-6"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_FR#Impl.C3.A9mentation_dans_les_mod.C3.A8les_PDF"><span class="tocnumber">2.4</span> <span class="toctext">Implémentation dans les modèles PDF</span></a></li>
+<li class="toclevel-2 tocsection-7"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_FR#Impl.C3.A9mentation_en_code_php_.28module_core_Dolibarr_ou_pour_vos_propres_modules.29"><span class="tocnumber">2.5</span> <span class="toctext">Implémentation en code php (module core Dolibarr ou pour vos propres modules)</span></a></li>
+</ul>
+</li>
+</ul>
+</td></tr></tbody></table>
+<h1> <span class="mw-headline" id="Informations"> Informations </span></h1>
+<table border="0" width="100%" cellpadding="0" cellspacing="0" class="dolbox">
+
+<tbody><tr>
+<td valign="top" style="max-width: 200px"> Module name </td>
+<td>
+</td></tr>
+<tr>
+<td> Editor / Editeur </td>
+<td>
+</td></tr>
+<tr>
+<td> Download or buy page / Page achat ou téléchargement</td>
+<td> <a href="http://www.dolistore.com/search.php?search_query=customfield" class="external text" target="_blank">www.dolistore.com</a>
+</td></tr>
+<tr>
+<td> Status / Statut / Estado </td>
+<td>Stable
+</td></tr>
+<tr>
+<td> Prerequisites / Prérequis</td>
+<td> Dolibarr &lt;= 3.3.* Dolibarr min version 3.2.0 &nbsp;&nbsp;
+</td></tr>
+<tr>
+<td> Last update date / Date mise à jour fiche / Fecha última actualización </td>
+<td> 2014-12-22
+</td></tr>
+<tr>
+<td valign="top"> Note / Nota </td>
+<td>
+</td></tr></tbody></table>
+<h1> <span class="mw-headline" id="Utilisation"> Utilisation </span></h1>
+<h2> <span class="mw-headline" id="Traduction_du_libell.C3.A9_d.27un_champ"> Traduction du libellé d'un champ </span></h2>
+<p>Les champs peuvent être facilement renommé ou traduit dans plusieurs langues en éditant les fichiers de langues.
+</p><p>Ouvrez le fichier /customfields/langs/code_CODE/customfields-user.lang (où code_CODE est le code ISO de votre région, ex: en_US ou fr_FR) et ajoutez dedans le nom de la Variable de votre champ personnalisé (affiché dans le panneau administrateur, colonne Variable) suivi de la traduction (format: cf_monchamp= Mon Libellé).
+</p><p>Ex: disons que votre champ personnalisé est nommé "user_ref", et que le nom de Variable résultat est "cf_user_ref". Dans customfields-user.lang il vous suffit d'ajouter:
+</p>
+<pre>cf_user_ref= Le libellé que vous voulez. Vous pouvez même écrire une très très longue phrase ici.&lt;br /&gt;Et vous pouvez même insérer des retours à la ligne avec &lt;br /&gt;.
+</pre>
+<h2> <span class="mw-headline" id="Testez_vos_champs_personnalis.C3.A9s_avec_le_module_PDFTest"> Testez vos champs personnalisés avec le module PDFTest </span></h2>
+<p>Un module auxiliare appelé CustomFieldsPDFTest est fourni afin que que vous puissiez facilement et rapidement tester vos champs personnalisés dans vos documents PDF. Cela évite d'avoir à faire votre propre modèle PDF juste pour tester et risquer de faire des erreurs de code php.
+</p><p>Il suffit juste d'activer le module CustomFieldsPDFTest dans Accueil&gt;Configuration&gt;Modules et ensuite de générer un fichier PDF en utilisant n'importe quel modèle.
+</p><p>Une page sera rajouté à la fin du fichier PDF généré, contenant une liste extensive de tous les champs personnalisés disponibles ainsi que leurs valeurs, et leurs valeurs brut(=raw) (valeur raw = pas de beautification, pas d'encode html ni de traduction).
+</p><p>Vous pouvez ainsi vérifier qu'un champ personnalisé correspond bien à vos besoins et délivre toutes les informations dont vous aurez besoin dans votre futur modèle PDF.
+</p><p>Quand vous avez fini le test, désactivez simplement le module, vous ferez votre propre modèle PDF (voir ci-dessous)
+</p><p>Note: les documents PDF déjà générés ne seront pas affectés, seulement les documents générés <b>après l'activation du module PDFTest</b> se verront octroyés cette page supplémentaire de champs personnalisés, et après désactivation du module, si vous générez à nouveau le document PDF, les pages supplémentaires disparaîtrons.
+</p>
+<h2> <span class="mw-headline" id="Impl.C3.A9mentation_dans_les_mod.C3.A8les_ODT"> Implémentation dans les modèles ODT </span></h2>
+<p>Les champs personnalisés sont automatiquement chargés pour les modèles ODT sans opération supplémentaire.
+</p><p>Utilisez juste le nom de la Variable (colonne <b>Variable</b> dans le panneau admin) comme un tag, enclosé de deux accolades.
+</p><p>Ex: pour un champ personnalisé nommé user_ref, vous obtiendrez comme nom de Variable cf_user_ref. Dans votre ODT, pour obtenir la valeur de ce champ, il suffit de faire:
+</p>
+<pre>{cf_user_ref}
+</pre>
+<p>Vous pouvez également obtenir la valeur brute (sans aucun pré-traitement) en ajoutant le suffixe _raw au nom de variable:
+</p>
+<pre>{cf_user_ref_raw}
+</pre>
+<p>Il y a également un support complet des champs contraints, ce qui fait que si vous avez une contrainte sur ce champ, les valeurs liées dans la table référencée seront automatiquement récupérées et vous serez en mesure de les utiliser avec de simples tags.
+</p><p>Ex: cf_user_ref est contraint sur la table <b>llx_user</b>:
+</p>
+<pre>{cf_user_ref} = rowid
+{cf_user_ref_firstname} = firstname
+{cf_user_ref_user_mobile} = mobile phone
+etc...
+</pre>
+<p>Comme vous pouvez le voir, il suffit de rajouter le suffixe '_' et le nom de la colonne sql dont vous voulez obtenir la valeur.
+</p><p>Pour les lignes produits, cela fonctionne de la même façon, il suffit d'écrire le nom de Variable dans la table des lignes produits, entre les tags [!-- BEGIN row.lines --] et [!-- END row.lines --]
+</p><p>Note: un usage intéressant des champs personnalisés est d'utiliser un type Vrai/Faux avec une substitution conditionnelle, ex: avec un champ personnalisé cf_enablethis:
+</p>
+<pre>[!-- IF {cf_enablethis_raw} --]
+Ce texte s'affichera si cf_enablethis est Vrai
+[!-- ELSE {cf_enablethis_raw} --]
+Sinon, ce texte ci s'affichera si cf_enablethis est Faux
+[!-- ENDIF {cf_enablethis_raw} --]
+</pre>
+<p>Il est nécessaire d'utiliser la valeur brute, car il est fiable d'avoir une valeur 0/1 pour que la condition fonctionne. Sinon on peut aussi avoir vide/non-vide, ce qui fait que cette technique fonctionne aussi pour les types Text ou tout autre: si le texte est vide, vous pouvez ne rien afficher, par contre si le texte n'est pas vide vous pouvez mettre un préambule et la valeur du champ:
+</p>
+<pre>[!-- IF {cf_mytextfield_raw} --]
+Mon champ texte n'est pas vide, voici sa valeur: {cf_mytextfield}
+[!-- ENDIF {cf_mytextfield_raw} --]
+</pre>
+<h2> <span class="mw-headline" id="Impl.C3.A9mentation_dans_les_mod.C3.A8les_PDF"> Implémentation dans les modèles PDF </span></h2>
+<p>Pour utiliser vos champs personnalisés dans votre modèle PDF, vous devez tout d'abord charger les données des champs personnalisés, ensuite vous pourrez les utiliser comme bon vous semble.
+</p>
+<ul><li> Pour charger les champs personnalisés:
+</li></ul>
+<p>Placer le code suivant le plus haut possible dans votre modèle PDF:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// Init and main vars for CustomFields</span>
+dol_include_once<span class="br0">(</span><span class="st_h">'/customfields/lib/customfields_aux.lib.php'</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Filling the $object with customfields (you can then access customfields by doing $object-&gt;customfields-&gt;cf_yourfield)</span>
+<span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">customfields</span> <span class="sy0">=</span> customfields_fill_object<span class="br0">(</span><span class="re0">$object</span><span class="sy0">,</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$outputlangs</span><span class="sy0">,</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="kw4">true</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// beautified values</span>
+<span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">customfields_raw</span> <span class="sy0">=</span> customfields_fill_object<span class="br0">(</span><span class="re0">$object</span><span class="sy0">,</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$outputlangs</span><span class="sy0">,</span> <span class="st_h">'raw'</span><span class="sy0">,</span> <span class="kw4">null</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// raw values</span>
+<span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">customfields_lines</span> <span class="sy0">=</span> customfields_fill_object_lines<span class="br0">(</span><span class="re0">$object</span><span class="sy0">,</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$outputlangs</span><span class="sy0">,</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="kw4">true</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// product lines' values</span></pre></div></div>
+<p>Note: vous pouvez placer le code au-dessus juste en-dessous de cette ligne dans les modèles PDF:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$pdf</span><span class="sy0">=</span>pdf_getInstance<span class="br0">(</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">format</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<ul><li> Pour accéder à la valeur du champ personnalisé:
+</li></ul>
+<p>Formattage beautifié:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">customfields</span><span class="sy0">-&gt;</span><span class="me1">cf_myfield</span></pre></div></div>
+<p>ou pour la valeur brute:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">customfields</span><span class="sy0">-&gt;</span><span class="me1">raw</span><span class="sy0">-&gt;</span><span class="me1">cf_myfield</span></pre></div></div>
+<ul><li> Pour accéder aux champs personnalisés des lignes produits:
+</li></ul>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$lineid</span> <span class="sy0">=</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">lines</span><span class="br0">[</span><span class="re0">$i</span><span class="br0">]</span><span class="sy0">-&gt;</span><span class="me1">rowid</span><span class="sy0">;</span>
+<span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">customfields</span><span class="sy0">-&gt;</span><span class="me1">lines</span><span class="sy0">-&gt;</span><span class="re0">$lineid</span><span class="sy0">-&gt;</span><span class="me1">cf_myfield</span></pre></div></div>
+<p>Où $lineid doit être remplacé par l'id de la ligne produit que vous voulez récupérer (rowid sql des produits, donc ça ne commence pas forcément par 0 et peut être n'importe quel nombre).
+</p>
+<ul><li> Pour imprimer le champ dans votre PDF avec FPDF (librairie PDF par défaut):
+</li></ul>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$pdf</span><span class="sy0">-&gt;</span><span class="me1">MultiCell</span><span class="br0">(</span>0<span class="sy0">,</span>3<span class="sy0">,</span> <span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">customfields</span><span class="sy0">-&gt;</span><span class="me1">cf_myfield</span><span class="sy0">,</span> <span class="nu0">0</span><span class="sy0">,</span> <span class="st_h">'L'</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// printing the customfield</span></pre></div></div>
+<ul><li> Et si vous souhaitez imprimer le libellé en multilangue:
+</li></ul>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$outputlangs</span><span class="sy0">-&gt;</span><span class="me1">load</span><span class="br0">(</span><span class="st_h">'customfields-user@customfields'</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="re0">$mylabel</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">findLabel</span><span class="br0">(</span><span class="st0">"cf_myfield"</span><span class="sy0">,</span> <span class="re0">$outputlangs</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// where $outputlangs is the language the PDF should be outputted to</span></pre></div></div>
+<p>ou si vous souhaitez le faire automatiquement (utile dans une boucle):
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$outputlangs</span><span class="sy0">-&gt;</span><span class="me1">load</span><span class="br0">(</span><span class="st_h">'customfields-user@customfields'</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="re0">$keys</span><span class="sy0">=</span><span class="kw3">array_keys</span><span class="br0">(</span><span class="kw3">get_object_vars</span><span class="br0">(</span><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">customfields</span><span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="re0">$mylabel</span> <span class="sy0">=</span> <span class="re0">$outputlangs</span><span class="sy0">-&gt;</span><span class="me1">trans</span><span class="br0">(</span><span class="re0">$keys</span><span class="br0">[</span>xxx<span class="br0">]</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// where xxx is a number, you can iterate foreach($keys as $key) if you prefer</span></pre></div></div>
+<h2> <span class="mw-headline" id="Impl.C3.A9mentation_en_code_php_.28module_core_Dolibarr_ou_pour_vos_propres_modules.29"> Implémentation en code php (module core Dolibarr ou pour vos propres modules) </span></h2>
+<p>Une des fonctionnalités principales du module CustomFields est qu'il offre un moyen générique d'accéder, d'ajouter, de modifier et d'afficher des champs personnalisés depuis votre propre code. Vous pouvez facilement développer votre propre module en utilisant uniquement des champs basés sur la classe CustomFields.
+</p><p>Pour récupérer les valeurs des champs, vous pouvez utiliser la librairie simplificatrice qui facilite beaucoup l'utilisation des champs personnalisés vos codes php:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1">dol_include_once<span class="br0">(</span><span class="st_h">'/customfields/lib/customfields_aux.lib.php'</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// include the simplifier library</span>
+<span class="re0">$customfields</span> <span class="sy0">=</span> customfields_fill_object<span class="br0">(</span><span class="re0">$object</span><span class="sy0">,</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$langs</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// load the custom fields values inside $object-&gt;customfields</span></pre></div></div>
+<p>Vous pouvez alors facilement accéder aux valeurs des champs personnalisés comme ceci:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw1">print</span><span class="br0">(</span><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">customfields</span><span class="sy0">-&gt;</span><span class="me1">cf_myfield</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>Pour charger les champs personnalisés des lignes produits, vous pouvez utiliser la fonction customfields_fill_object_line():
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1">dol_include_once<span class="br0">(</span><span class="st_h">'/customfields/lib/customfields_aux.lib.php'</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// include the simplifier library</span>
+<span class="re0">$customfields</span> <span class="sy0">=</span> customfields_fill_object_lines<span class="br0">(</span><span class="re0">$object</span><span class="sy0">,</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$langs</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// load the custom fields values inside $object-&gt;customfields</span></pre></div></div>
+<p>Vous pouvez alors accéder aux champs des lignes produits comme ceci:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$object</span><span class="sy0">-&gt;</span><span class="me1">customfields</span><span class="sy0">-&gt;</span><span class="me1">lines</span><span class="sy0">-&gt;</span><span class="re0">$lineid</span><span class="sy0">-&gt;</span><span class="me1">cf_myfield</span></pre></div></div>
+<p>Vous pouvez également obtenir (et bien plus) manuellement les valeurs des champs personnalisés en utilisant la classe CustomFields:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// Init and main vars</span>
+<span class="co1">//include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php'); // OLD WAY</span>
+dol_include_once<span class="br0">(</span><span class="st_h">'/customfields/class/customfields.class.php'</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// NEW WAY since Dolibarr v3.3</span>
+<span class="re0">$customfields</span> <span class="sy0">=</span> <span class="kw2">new</span> CustomFields<span class="br0">(</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">db</span><span class="sy0">,</span> <span class="re0">$currentmodule</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// where $currentmodule is the current module, you can replace it by '' if you just want to use printing functions and fetchAny.</span>
+&nbsp;
+<span class="co1">//$records = $customfields-&gt;fetchAll(); // to fetch all records</span>
+<span class="re0">$records</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">fetch</span><span class="br0">(</span><span class="re0">$id</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// to fetch one object's records</span></pre></div></div>
+
+<!-- 
+NewPP limit report
+Preprocessor node count: 254/1000000
+Post-expand include size: 2540/2097152 bytes
+Template argument size: 232/2097152 bytes
+Expensive parser function count: 0/100
+-->
+
+<!-- Saved in parser cache with key dolibarrwiki:pcache:idhash:4469-0!*!0!!en!2!edit=0 and timestamp 20150401150038 -->
+<div class="printfooter">
+Récupérée de « <a href="./Module CustomFields FR - Dolibarr Wiki_files/Module CustomFields FR - Dolibarr Wiki.html">http://wiki.dolibarr.org/index.php/Module_CustomFields_FR</a> »</div>
+			<div id="catlinks" class="catlinks"><div id="mw-normal-catlinks"><a href="http://wiki.dolibarr.org/index.php/Special:Categories" title="Special:Categories">Catégories</a>&nbsp;: <span dir="ltr"><a href="http://wiki.dolibarr.org/index.php/Category:Modules_compl%C3%A9mentaires" title="Category:Modules complémentaires">Modules complémentaires</a></span> | <span dir="ltr"><a href="http://wiki.dolibarr.org/index.php?title=Category:CustomFields&action=edit&redlink=1" class="new" title="Category:CustomFields (page does not exist)">CustomFields</a></span> | <span dir="ltr"><a href="http://wiki.dolibarr.org/index.php/Category:Page_waiting_for_translation" title="Category:Page waiting for translation">Page waiting for translation</a></span></div></div>			<!-- end content -->
+						<div class="visualClear"></div>
+		</div>
+	</div>
+	</div>
+
+
+		<div id="column-one" class="htmldoc-ignore">
+	<div id="p-cactions" class="portlet">
+		<h5>Affichages</h5>
+		<div class="pBody">
+			<ul>
+			
+				 <li id="ca-nstab-main" class="selected"><a href="./Module CustomFields FR - Dolibarr Wiki_files/Module CustomFields FR - Dolibarr Wiki.html" title="Voir la page de contenu [alt-c]" accesskey="c">Page</a></li>
+				 <li id="ca-talk" class="new"><a href="http://wiki.dolibarr.org/index.php?title=Talk:Module_CustomFields_FR&action=edit&redlink=1" title="Discussion au sujet de cette page de contenu [alt-t]" accesskey="t">Discussion</a></li>
+				 <li id="ca-viewsource"><a href="http://wiki.dolibarr.org/index.php?title=Module_CustomFields_FR&action=edit" title="Cette page est protégée.
+Vous pouvez toutefois en visualiser la source. [alt-e]" accesskey="e">Voir le texte source</a></li>
+				 <li id="ca-history"><a href="http://wiki.dolibarr.org/index.php?title=Module_CustomFields_FR&action=history" title="Les versions passées de cette page (avec leurs contributeurs) [alt-h]" accesskey="h">Historique</a></li>
+				 <li id="ca-language"><a href="http://wiki.dolibarr.org/index.php?title=Special:MultiLanguageManager&cible=Module_CustomFields_FR">Langue</a></li>			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-personal">
+		<h5>Outils personnels</h5>
+		<div class="pBody">
+			<ul>
+							<li><img src="./Module CustomFields FR - Dolibarr Wiki_files/pagemaster.png" height="24px"> <font color="#000000">Ask to contact@dolibarr.org to request an account to contribute to this documentation</font></li>
+							<li id="pt-login"><a href="http://wiki.dolibarr.org/index.php?title=Special:UserLogin&returnto=Module_CustomFields_FR" title="Vous êtes encouragé(e) à vous identifier ; ce n’est cependant pas obligatoire. [alt-o]" accesskey="o">Connexion</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-logo">
+		<a style="background-image: url(/skins/dolibarr/dolibarr_125x125.png);" href="http://wiki.dolibarr.org/index.php/Main_Page" title="Visiter la page d’accueil du site [alt-z]" accesskey="z"></a>
+	</div>
+
+	<div class="generated-sidebar portlet" id="p-navigation">
+		<h5>Navigation</h5>
+		<div class="pBody">
+			<ul>
+				<li id="n-mainpage-description"><a href="http://wiki.dolibarr.org/index.php/Accueil" title="Aller à l’accueil [alt-z]" accesskey="z">Accueil</a></li>
+				<li id="n-recentchanges"><a href="http://wiki.dolibarr.org/index.php/Special:RecentChanges" title="Liste des modifications récentes sur le wiki [alt-r]" accesskey="r">Modifications récentes</a></li>
+				<li id="n-randompage"><a href="http://wiki.dolibarr.org/index.php/Special:Random" title="Afficher une page au hasard [alt-x]" accesskey="x">Page au hasard</a></li>
+			</ul>
+		</div>
+	</div>
+	<div id="p-search" class="portlet">
+		<h5><label for="searchInput">Rechercher</label></h5>
+		<div id="searchBody" class="pBody">
+			<form action="http://wiki.dolibarr.org/index.php" id="searchform">
+				<input type="hidden" name="title" value="Special:Search">
+				<input id="searchInput" title="Rechercher dans Dolibarr Wiki" accesskey="f" type="search" name="search">
+				<input type="submit" name="go" class="searchButton" id="searchGoButton" value="Lire" title="Aller vers une page portant exactement ce nom si elle existe.">
+				<div><a href="http://wiki.dolibarr.org/index.php/Special:Search" rel="search">Recherche avancée</a></div>
+			</form>
+		</div>
+	</div>
+	<div class="portlet" id="p-tb">
+		<h5>Boîte à outils</h5>
+		<div class="pBody">
+			<ul>
+				<li id="t-whatlinkshere"><a href="http://wiki.dolibarr.org/index.php/Special:WhatLinksHere/Module_CustomFields_FR" title="Liste des pages liées à celle-ci [alt-j]" accesskey="j">Pages liées</a></li>
+				<li id="t-recentchangeslinked"><a href="http://wiki.dolibarr.org/index.php/Special:RecentChangesLinked/Module_CustomFields_FR" title="Liste des modifications récentes des pages liées à celle-ci [alt-k]" accesskey="k">Suivi des pages liées</a></li>
+<li id="t-specialpages"><a href="http://wiki.dolibarr.org/index.php/Special:SpecialPages" title="Liste de toutes les pages spéciales [alt-q]" accesskey="q">Pages spéciales</a></li>
+				<li id="t-print"><a href="http://wiki.dolibarr.org/index.php?title=Module_CustomFields_FR&printable=yes" title="Version imprimable de cette page [alt-p]" accesskey="p">Version imprimable</a></li>				<li id="t-permalink"><a href="http://wiki.dolibarr.org/index.php?title=Module_CustomFields_FR&oldid=33004" title="Lien permanent vers cette version de la page">Adresse de cette version</a></li>			</ul>
+		</div>
+	</div>
+<div class="generated-sidebar portlet" id="p-navigation"><h5>Autres langues</h5><div class="pBody"><a class="language" href="http://wiki.dolibarr.org/index.php/Module_CustomFields"><img src="./Module CustomFields FR - Dolibarr Wiki_files/en.png" class="languageimage" alt="Anglais"></a><!--[if lt IE 7]><span class='popup' onMouseOver="document.getElementById('language_popup').style.visibility = 'visible';"  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><span class="popup" id="popup_anchor"><img src="./Module CustomFields FR - Dolibarr Wiki_files/es.png" class="languageimage" alt="Espagnol"><!--[if lt IE 7]><span  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><div class="cadre_popup" id="language_popup">Pas de traduction en Espagnol.</div><!--[if lt IE 7]></span><![endif]--></span><!--[if lt IE 7]></span><![endif]--><!--[if lt IE 7]><span class='popup' onMouseOver="document.getElementById('language_popup').style.visibility = 'visible';"  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><span class="popup" id="popup_anchor"><img src="./Module CustomFields FR - Dolibarr Wiki_files/de.png" class="languageimage" alt="Allemand"><!--[if lt IE 7]><span  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><div class="cadre_popup" id="language_popup">Pas de traduction en Allemand.</div><!--[if lt IE 7]></span><![endif]--></span><!--[if lt IE 7]></span><![endif]--><!--[if lt IE 7]><span class='popup' onMouseOver="document.getElementById('language_popup').style.visibility = 'visible';"  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><span class="popup" id="popup_anchor"><img src="./Module CustomFields FR - Dolibarr Wiki_files/it.png" class="languageimage" alt="Italien"><!--[if lt IE 7]><span  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><div class="cadre_popup" id="language_popup">Pas de traduction en Italien.</div><!--[if lt IE 7]></span><![endif]--></span><!--[if lt IE 7]></span><![endif]--><!--[if lt IE 7]><span class='popup' onMouseOver="document.getElementById('language_popup').style.visibility = 'visible';"  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><span class="popup" id="popup_anchor"><img src="./Module CustomFields FR - Dolibarr Wiki_files/el.png" class="languageimage" alt="Grèque"><!--[if lt IE 7]><span  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><div class="cadre_popup" id="language_popup">Pas de traduction en Grèque.</div><!--[if lt IE 7]></span><![endif]--></span><!--[if lt IE 7]></span><![endif]-->
+</div>
+</div>
+<br><!-- <div class='generated-sidebar portlet' id='p-navigation-donation' style='text-align: center'>
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+<input type="hidden" name="cmd" value="_s-xclick">
+<input type="hidden" name="hosted_button_id" value="8978425">
+<input type="image" src="http://wiki.dolibarr.org/upload/5/5c/Paypal.png" name="submit" alt="Aidez Dolibarr, faites un don">
+</form>
+</div>
+ -->
+<div class="generated-sidebar portlet" id="p-navigation">
+<h5>
+Social networks
+</h5>
+<div class="pBody" align="center">
+
+<!--<div style="padding: 3px">
+<g:plus href="https://plus.google.com/+DolibarrOrg" width="100" height="131"></g:plus>
+</div>-->
+
+<div style="padding: 1px">
+<center>
+<a href="https://plus.google.com/+DolibarrOrg" target="_blank" rel="nofollow"><img src="./Module CustomFields FR - Dolibarr Wiki_files/google.png" width="24px" height="24px" alt="Follow us on Google+"></a>
+
+<a href="http://www.facebook.com/dolibarr" target="_blank" rel="nofollow"><img src="./Module CustomFields FR - Dolibarr Wiki_files/facebook.png" width="24px" height="24px" alt="Follow us on Facebook"></a>
+
+<a href="http://www.linkedin.com/groups?gid=2743052" target="_blank" rel="nofollow"><img src="./Module CustomFields FR - Dolibarr Wiki_files/linkedin.png" width="24px" height="24px" alt="Follow us on LinkedIn"></a>
+
+<a href="http://twitter.com/dolibarr" target="_blank" rel="nofollow"><img src="./Module CustomFields FR - Dolibarr Wiki_files/twitter.png" width="24px" height="24px" alt="Follow us on Twitter"></a>
+</center>
+</div>
+
+</div>
+</div>
+
+<br><br>
+
+<div class="generated-sidebar portlet" id="p-navigation-adsense" style="text-align: center">
+<div class="pBody">
+<script async="" src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- PUBSKYDOLIBARRWIKI2 -->
+<ins class="adsbygoogle" style="display:inline-block;width:160px;height:600px" data-ad-client="ca-pub-1071905880519467" data-ad-slot="7811259314"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</div>
+</div>
+
+<!-- End LDR -->
+
+
+
+	</div><!-- end of the left (by default at least) one-column -->
+	
+	<div class="visualClear"></div>
+
+		<div id="footer" class="htmldoc-ignore">
+				
+	<ul id="f-list">
+						<li id="lastmod"> Dernière modification de cette page le 22 décembre 2014 à 12:46.<br></li>
+							<li id="viewcount">Cette page a été consultée 5&nbsp;797 fois.</li>
+							<li id="copyright">Content is available under <a href="http://creativecommons.org/licenses/by-sa/4.0/" class="external ">Creative Commons Attribution-ShareAlike 4.0 International License</a>.</li>
+			
+			<!-- LDR Add author -->
+			<li><a rel="author" href="https://plus.google.com/+LaurentDestailleur?rel=author">Created or moderated by Eldy</a></li>			<!-- End Add author -->
+
+	</ul>
+		</div>	<!-- End div footer -->
+
+</div>
+
+
+
+<script src="./Module CustomFields FR - Dolibarr Wiki_files/load.php"></script><script src="./Module CustomFields FR - Dolibarr Wiki_files/load(1).php"></script>
+<script>if ( window.mediaWiki ) {
+	mediaWiki.config.set({"wgCanonicalNamespace": "", "wgCanonicalSpecialPageName": false, "wgNamespaceNumber": 0, "wgPageName": "Module_CustomFields_FR", "wgTitle": "Module CustomFields FR", "wgAction": "view", "wgArticleId": 4469, "wgIsArticle": true, "wgUserName": null, "wgUserGroups": ["*"], "wgCurRevisionId": 33004, "wgCategories": ["Modules complémentaires", "CustomFields", "Page waiting for translation"], "wgBreakFrames": false, "wgRestrictionEdit": [], "wgRestrictionMove": []});
+}
+</script>
+<script>if ( window.mediaWiki ) {
+	mediaWiki.loader.load(["mediawiki.util", "mediawiki.legacy.wikibits", "mediawiki.legacy.ajax"]);
+	mediaWiki.loader.go();
+}
+</script><script type="text/javascript" src="./Module CustomFields FR - Dolibarr Wiki_files/load(2).php"></script>
+
+<script>if ( window.mediaWiki ) {
+	mediaWiki.user.options.set({"quickbar":0,"underline":2,"cols":80,"rows":25,"searchlimit":20,"contextlines":5,"contextchars":50,"skin":"dolibarr","math":1,"rcdays":7,"rclimit":50,"wllimit":250,"highlightbroken":1,"stubthreshold":0,"previewontop":1,"editsection":1,"editsectiononrightclick":0,"showtoc":1,"showtoolbar":1,"date":"default","imagesize":2,"thumbsize":2,"rememberpassword":0,"enotifwatchlistpages":0,"enotifusertalkpages":1,"enotifminoredits":0,"enotifrevealaddr":0,"shownumberswatching":1,"fancysig":0,"externaleditor":0,"externaldiff":0,"showjumplinks":0,"numberheadings":0,"uselivepreview":0,"watchlistdays":3,"editfont":"default","gender":"unknown","variant":"en","language":"en","searchNs0":true,"searchNs1":false,"searchNs2":false,"searchNs3":false,"searchNs4":false,"searchNs5":false,"searchNs6":false,"searchNs7":false,"searchNs8":false,"searchNs9":false,"searchNs10":false,"searchNs11":false,"searchNs12":false,"searchNs13":false,"searchNs14":false,"searchNs15":false,"searchNs100"
+	:true,"searchNs101":false,"searchNs110":false,"searchNs111":false,"searchNs120":false,"searchNs121":false});;mediaWiki.loader.state({"user.options":"ready"});
+}
+</script><!-- Served in 0.045 secs. -->
+
+</body></html>

@@ -1,0 +1,1276 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0058)http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr" class="client-chrome client-chrome-4 client-webkit client-win"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="verify-v1" content="HMNutRwqmhagMMJPRLLAFKlwRnifyx4SoJjYN+fyZV0=">
+		<meta name="msvalidate.01" content="97D254FD131581C03545FB5D9A228AD7">
+		
+		<meta name="generator" content="MediaWiki 1.17.0">
+<link rel="shortcut icon" href="http://wiki.dolibarr.org/skins/dolibarr/favicon.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="http://wiki.dolibarr.org/opensearch_desc.php" title="Dolibarr Wiki (en)">
+<link rel="EditURI" type="application/rsd+xml" href="http://wiki.dolibarr.org/api.php?action=rsd">
+<link rel="copyright" href="http://creativecommons.org/licenses/by-sa/4.0/">
+<link rel="alternate" type="application/atom+xml" title="Dolibarr Wiki Atom feed" href="http://wiki.dolibarr.org/index.php?title=Special:RecentChanges&feed=atom">		<title>Module CustomFields Dev - Dolibarr Wiki</title>
+		<link rel="stylesheet" href="http://wiki.dolibarr.org/load.php?debug=false&lang=en&modules=mediawiki.legacy.commonPrint%2Cshared&only=styles&skin=dolibarr&*">
+<link rel="stylesheet" href="http://wiki.dolibarr.org/skins/dolibarr/main.css?301" media="screen"><meta name="ResourceLoaderDynamicStyles" content="">		<script async="" src="http://www.google-analytics.com/analytics.js"></script><script>if ( window.mediaWiki ) {
+	mediaWiki.config.set({"wgCanonicalNamespace": "", "wgCanonicalSpecialPageName": false, "wgNamespaceNumber": 0, "wgPageName": "Module_CustomFields_Dev", "wgTitle": "Module CustomFields Dev", "wgAction": "view", "wgArticleId": 4470, "wgIsArticle": true, "wgUserName": null, "wgUserGroups": ["*"], "wgCurRevisionId": 33180, "wgCategories": ["CustomFields", "FAQ EN"], "wgBreakFrames": false, "wgRestrictionEdit": [], "wgRestrictionMove": []});
+}
+</script>		<link href="https://plus.google.com/+DolibarrOrg" rel="publisher">
+
+
+
+
+		<!-- Head Scripts -->
+<style type="text/css">/*<![CDATA[*/
+.source-php {line-height: normal;}
+.source-php li, .source-php pre {
+	line-height: normal; border: 0px none white;
+}
+/**
+ * GeSHi Dynamically Generated Stylesheet
+ * --------------------------------------
+ * Dynamically generated stylesheet for php
+ * CSS class: source-php, CSS id: 
+ * GeSHi (C) 2004 - 2007 Nigel McNie, 2007 - 2008 Benny Baumann
+ * (http://qbnz.com/highlighter/ and http://geshi.org/)
+ * --------------------------------------
+ */
+.php.source-php .de1, .php.source-php .de2 {font: normal normal 1em/1.2em monospace; margin:0; padding:0; background:none; vertical-align:top;}
+.php.source-php  {font-family:monospace;}
+.php.source-php .imp {font-weight: bold; color: red;}
+.php.source-php li, .php.source-php .li1 {font-weight: normal; vertical-align:top;}
+.php.source-php .ln {width:1px;text-align:right;margin:0;padding:0 2px;vertical-align:top;}
+.php.source-php .li2 {font-weight: bold; vertical-align:top;}
+.php.source-php .kw1 {color: #505000;}
+.php.source-php .kw2 {color: #000000; font-weight: bold;}
+.php.source-php .kw3 {color: #505000;}
+.php.source-php .kw4 {color: #009900; font-weight: bold;}
+.php.source-php .co1 {color: #666666; font-style: italic;}
+.php.source-php .co2 {color: #666666; font-style: italic;}
+.php.source-php .co3 {color: #0000cc; font-style: italic;}
+.php.source-php .co4 {color: #009933; font-style: italic;}
+.php.source-php .coMULTI {color: #666666; font-style: italic;}
+.php.source-php .es0 {color: #000099; font-weight: bold;}
+.php.source-php .es1 {color: #000099; font-weight: bold;}
+.php.source-php .es2 {color: #660099; font-weight: bold;}
+.php.source-php .es3 {color: #660099; font-weight: bold;}
+.php.source-php .es4 {color: #006699; font-weight: bold;}
+.php.source-php .es5 {color: #006699; font-weight: bold; font-style: italic;}
+.php.source-php .es6 {color: #009933; font-weight: bold;}
+.php.source-php .es_h {color: #000099; font-weight: bold;}
+.php.source-php .br0 {color: #009900;}
+.php.source-php .sy0 {color: #339933;}
+.php.source-php .sy1 {color: #000000; font-weight: bold;}
+.php.source-php .st0 {color: #0000ff;}
+.php.source-php .st_h {color: #0000ff;}
+.php.source-php .nu0 {color: #cc66cc;}
+.php.source-php .nu8 {color: #208080;}
+.php.source-php .nu12 {color: #208080;}
+.php.source-php .nu19 {color:#800080;}
+.php.source-php .me1 {color: #004000;}
+.php.source-php .me2 {color: #004000;}
+.php.source-php .re0 {color: #000088;}
+.php.source-php .ln-xtra, .php.source-php li.ln-xtra, .php.source-php div.ln-xtra {background-color: #ffc;}
+.php.source-php span.xtra { display:block; }
+
+/*]]>*/
+</style>
+<style type="text/css">/*<![CDATA[*/
+@import "/index.php?title=MediaWiki:Geshi.css&usemsgcache=yes&action=raw&ctype=text/css&smaxage=18000";
+/*]]>*/
+</style>		<script type="text/javascript" src="./Module CustomFields Dev - Dolibarr Wiki_files/index.php"><!-- site js --></script>
+
+
+<!-- LDR Google plusone -->
+<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
+
+
+<style>@-webkit-keyframes popjohvyezlqcnrmnyworiongnowsbnpnwmi {50% {-webkit-transform:scale(1.2);}100% {-webkit-transform:scale(1);}}@keyframes popjohvyezlqcnrmnyworiongnowsbnpnwmi {50% {-webkit-transform:scale(1.2);transform:scale(1.2);}100% {-webkit-transform:scale(1);transform:scale(1);}}#johvyezlqcnrmnyworiongnowsbnpnwmi{padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;border:solid 2px #fff !important;box-sizing:content-box !important;color:#fff !important;display:block !important;height:auto !important;margin:0 !important;opacity:0.9 !important;padding:7px 10px !important;position:fixed !important;visibility:visible !important;width:auto !important;z-index:2147483647 !important;-webkit-border-radius:5px !important;-webkit-box-shadow:0px 0px 20px #000 !important;-webkit-box-sizing:content-box !important;}.johvyezlqcnrmnyworiongnowsbnpnwmi-blocked{padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;color:#AAA !important;display:inline !important;text-decoration:line-through !important;}#johvyezlqcnrmnyworiongnowsbnpnwmi br{display:block !important;padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;}#johvyezlqcnrmnyworiongnowsbnpnwmi span{background:transparent !important;padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;}#johvyezlqcnrmnyworiongnowsbnpnwmi div{padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;border:0 !important;margin:0 !important;padding:0 !important;width:auto !important;letter-spacing:normal !important;font:13px Arial,Helvetica !important;text-align:left !important;text-shadow:none !important;text-transform:none !important;word-spacing:normal !important;}#johvyezlqcnrmnyworiongnowsbnpnwmi a{padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;font-weight:normal !important;background:none !important;text-decoration:underline !important;color:#fff !important;}a#johvyezlqcnrmnyworiongnowsbnpnwmi-gear{padding:0;margin:0;font:13px Arial,Helvetica;text-transform:none;font-size: 100%;vertical-align:baseline;line-height:normal;color:#fff;position:static;text-decoration:none !important;position:absolute !important;display:none !important;font-size:20px !important;width:20px !important;height:20px !important;line-height:20px !important;text-align:center !important;background-color:rgba(255,255,255,.8) !important;background-image:url(chrome-extension://mlomiejdfkolichcflejclcbmpeaniij/data/images/gear.svg) !important;background-size:16px 16px !important;background-position:center center !important;background-repeat:no-repeat !important;text-decoration:none !important;}a#johvyezlqcnrmnyworiongnowsbnpnwmi-gear:hover{-webkit-animation-name:popjohvyezlqcnrmnyworiongnowsbnpnwmi !important;animation-name:popjohvyezlqcnrmnyworiongnowsbnpnwmi !important;-webkit-animation-duration:0.3s !important;animation-duration:0.3s !important;}#johvyezlqcnrmnyworiongnowsbnpnwmi:hover #johvyezlqcnrmnyworiongnowsbnpnwmi-gear{text-decoration:none !important;display:inline-block !important;}@media print{#johvyezlqcnrmnyworiongnowsbnpnwmi{display:none !important;}}</style></head>
+
+
+<body class="mediawiki ltr ns-0 ns-subject page-Module_CustomFields_Dev skin-dolibarr">
+
+
+<div class="htmldoc-ignore">
+<!-- LDR Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-9049390-2', 'dolibarr.org');
+  ga('require', 'displayfeatures');
+  ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+</div>
+
+
+<div id="globalWrapper">
+	<div id="column-content">
+	<div id="content">
+		<a name="top" id="top"></a>
+				<div class="htmldoc-ignore">
+				<h1 id="firstHeading" class="firstHeading">Module CustomFields Dev</h1>
+		</div>
+				<div id="bodyContent">
+						<div class="htmldoc-ignore">
+			<h3 id="siteSub">From Dolibarr Wiki</h3>
+			</div>
+						<div id="contentSub"></div>
+												<!-- start content -->
+			<div style="text-align:center; float:right; font-size:80%; background: #eef; border: 1px solid #ccf; margin-bottom: 0px; margin-left: 2px; margin-right: 2px; padding: 1px; height: 92px">
+<p><a href="http://wiki.dolibarr.org/index.php/Developer_documentation" title="Developer documentation">Return to developer<br>documentation index</a><br>
+</p>
+<a href="http://wiki.dolibarr.org/index.php/Developer_documentation" title="Developer documentation"><img alt="File Doc dev.png" src="./Module CustomFields Dev - Dolibarr Wiki_files/File_Doc_dev.png" width="48" height="48"></a></div>
+<div style="text-align: center; float:right; font-size:80%; background: #eef; border: 1px solid #ccf; margin-bottom: 0px; margin-left: 2px; margin-right: 2px; padding: 1px; height: 92px; min-width: 120px;">
+<p><a href="http://wiki.dolibarr.org/index.php/Category:List_of_Modules" title="Category:List of Modules">Return to<br>list of modules index</a><br>
+<a href="http://wiki.dolibarr.org/index.php/Category:List_of_Modules" title="Category:List of Modules"><img alt="Art.png" src="./Module CustomFields Dev - Dolibarr Wiki_files/Art.png" width="56" height="51"></a>
+</p>
+</div>
+<div>
+<table align="right" border="0" width="340px" cellpadding="2" cellspacing="0" class="dolbox">
+<tbody><tr>
+<th colspan="2" style="background-color: #e9e9ef"><b>CustomFields</b>
+</th></tr>
+<tr>
+<td valign="top" nowrap="nowrap"> Numero/ID of module </td>
+<td align="center" nowrap="nowrap"> 8500
+</td></tr>
+<tr>
+<td valign="top" nowrap="nowrap"> User doc. of module </td>
+<td align="center" nowrap="nowrap"> <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields" title="Module CustomFields">Module_CustomFields</a>
+</td></tr>
+<tr>
+<td valign="top" nowrap="nowrap"> Developer doc. of module </td>
+<td align="center" nowrap="nowrap"> This page
+</td></tr></tbody></table>
+</div>
+<p>These notes are aimed to developpers who want to extend the functionnalities of the module or want to use it for extreme cases.
+This is not meant to guide implementers on how to implement and configure the module (see the related chapter for that).
+</p><p>If you are an implementer and just want to use CustomFields with its normal functions, you can read the <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields" title="Module CustomFields">user documentation of CustomFields</a>.
+</p><p>You can also jump directly to <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases" title="Module CustomFields Cases">Module_CustomFields_Cases</a> wiki page for a collection of practical examples.
+</p>
+<table id="toc" class="toc"><tbody><tr><td><div id="toctitle"><h2>Contents</h2> <span class="toctoggle">[<a id="togglelink" class="internal" href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#">hide</a>]</span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Principles"><span class="tocnumber">1</span> <span class="toctext">Principles</span></a></li>
+<li class="toclevel-1 tocsection-2"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Goals"><span class="tocnumber">2</span> <span class="toctext">Goals</span></a></li>
+<li class="toclevel-1 tocsection-3"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#SQL_structure"><span class="tocnumber">3</span> <span class="toctext">SQL structure</span></a></li>
+<li class="toclevel-1 tocsection-4"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#SQL_Indexes"><span class="tocnumber">4</span> <span class="toctext">SQL Indexes</span></a></li>
+<li class="toclevel-1 tocsection-5"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#SQL_Compatibility_mode"><span class="tocnumber">5</span> <span class="toctext">SQL Compatibility mode</span></a></li>
+<li class="toclevel-1 tocsection-6"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#JSON_extension_for_extra_options"><span class="tocnumber">6</span> <span class="toctext">JSON extension for extra options</span></a>
+<ul>
+<li class="toclevel-2 tocsection-7"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Introduction_to_JSON_in_CustomFields"><span class="tocnumber">6.1</span> <span class="toctext">Introduction to JSON in CustomFields</span></a></li>
+<li class="toclevel-2 tocsection-8"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Implementation_of_JSON"><span class="tocnumber">6.2</span> <span class="toctext">Implementation of JSON</span></a></li>
+<li class="toclevel-2 tocsection-9"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#CustomFields_JSON_API"><span class="tocnumber">6.3</span> <span class="toctext">CustomFields JSON API</span></a>
+<ul>
+<li class="toclevel-3 tocsection-10"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Storing_extra_options"><span class="tocnumber">6.3.1</span> <span class="toctext">Storing extra options</span></a></li>
+<li class="toclevel-3 tocsection-11"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Fetching_extra_options"><span class="tocnumber">6.3.2</span> <span class="toctext">Fetching extra options</span></a></li>
+<li class="toclevel-3 tocsection-12"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Modifying_extra_options"><span class="tocnumber">6.3.3</span> <span class="toctext">Modifying extra options</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-13"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#CustomFields_API"><span class="tocnumber">7</span> <span class="toctext">CustomFields API</span></a>
+<ul>
+<li class="toclevel-2 tocsection-14"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Introduction_to_CustomFields_API"><span class="tocnumber">7.1</span> <span class="toctext">Introduction to CustomFields API</span></a></li>
+<li class="toclevel-2 tocsection-15"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Prerequisite_to_use_the_CustomFields_class"><span class="tocnumber">7.2</span> <span class="toctext">Prerequisite to use the CustomFields class</span></a></li>
+<li class="toclevel-2 tocsection-16"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#General_purpose_SQL_methods"><span class="tocnumber">7.3</span> <span class="toctext">General purpose SQL methods</span></a></li>
+<li class="toclevel-2 tocsection-17"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Managing_CustomFields_structure"><span class="tocnumber">7.4</span> <span class="toctext">Managing CustomFields structure</span></a>
+<ul>
+<li class="toclevel-3 tocsection-18"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Creating_a_custom_field_definition"><span class="tocnumber">7.4.1</span> <span class="toctext">Creating a custom field definition</span></a></li>
+<li class="toclevel-3 tocsection-19"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Updating_a_custom_field_definition"><span class="tocnumber">7.4.2</span> <span class="toctext">Updating a custom field definition</span></a></li>
+<li class="toclevel-3 tocsection-20"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Delete_a_custom_field_definition"><span class="tocnumber">7.4.3</span> <span class="toctext">Delete a custom field definition</span></a></li>
+<li class="toclevel-3 tocsection-21"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Fetch_one_custom_field.27s_SQL_structure"><span class="tocnumber">7.4.4</span> <span class="toctext">Fetch one custom field's SQL structure</span></a></li>
+<li class="toclevel-3 tocsection-22"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Fetch_several_custom_fields.27_SQL_structures"><span class="tocnumber">7.4.5</span> <span class="toctext">Fetch several custom fields' SQL structures</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-23"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Managing_custom_fields_records"><span class="tocnumber">7.5</span> <span class="toctext">Managing custom fields records</span></a>
+<ul>
+<li class="toclevel-3 tocsection-24"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Creating_a_custom_field.27s_record"><span class="tocnumber">7.5.1</span> <span class="toctext">Creating a custom field's record</span></a></li>
+<li class="toclevel-3 tocsection-25"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Updating_a_custom_field.27s_record"><span class="tocnumber">7.5.2</span> <span class="toctext">Updating a custom field's record</span></a></li>
+<li class="toclevel-3 tocsection-26"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Deleting_a_custom_field.27s_record"><span class="tocnumber">7.5.3</span> <span class="toctext">Deleting a custom field's record</span></a></li>
+<li class="toclevel-3 tocsection-27"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Fetching_a_custom_field.27s_record"><span class="tocnumber">7.5.4</span> <span class="toctext">Fetching a custom field's record</span></a></li>
+<li class="toclevel-3 tocsection-28"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Fetching_all_custom_fields.27_records"><span class="tocnumber">7.5.5</span> <span class="toctext">Fetching all custom fields' records</span></a></li>
+<li class="toclevel-3 tocsection-29"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Fetching_referenced_records_of_a_constrained_field"><span class="tocnumber">7.5.6</span> <span class="toctext">Fetching referenced records of a constrained field</span></a></li>
+<li class="toclevel-3 tocsection-30"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Recursive_fetching_referenced_records_of_a_constrained_field"><span class="tocnumber">7.5.7</span> <span class="toctext">Recursive fetching referenced records of a constrained field</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-31"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Input_forms_for_custom_fields"><span class="tocnumber">7.6</span> <span class="toctext">Input forms for custom fields</span></a>
+<ul>
+<li class="toclevel-3 tocsection-32"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Printing_an_input_form_adapted_to_the_field.27s_data_type"><span class="tocnumber">7.6.1</span> <span class="toctext">Printing an input form adapted to the field's data type</span></a></li>
+<li class="toclevel-3 tocsection-33"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Printing_an_input_form_for_a_custom_field"><span class="tocnumber">7.6.2</span> <span class="toctext">Printing an input form for a custom field</span></a></li>
+<li class="toclevel-3 tocsection-34"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#AJAX-PHP_callback"><span class="tocnumber">7.6.3</span> <span class="toctext">AJAX-PHP callback</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-35"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Printing_custom_fields_in_documents"><span class="tocnumber">7.7</span> <span class="toctext">Printing custom fields in documents</span></a>
+<ul>
+<li class="toclevel-3 tocsection-36"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Printing_in_HTML"><span class="tocnumber">7.7.1</span> <span class="toctext">Printing in HTML</span></a></li>
+<li class="toclevel-3 tocsection-37"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Printing_in_documents"><span class="tocnumber">7.7.2</span> <span class="toctext">Printing in documents</span></a></li>
+<li class="toclevel-3 tocsection-38"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Simple_printing_in_documents"><span class="tocnumber">7.7.3</span> <span class="toctext">Simple printing in documents</span></a></li>
+<li class="toclevel-3 tocsection-39"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Find_the_label"><span class="tocnumber">7.7.4</span> <span class="toctext">Find the label</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-40"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Facade_API"><span class="tocnumber">8</span> <span class="toctext">Facade API</span></a>
+<ul>
+<li class="toclevel-2 tocsection-41"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#customfields_fill_object.28.29"><span class="tocnumber">8.1</span> <span class="toctext">customfields_fill_object()</span></a></li>
+<li class="toclevel-2 tocsection-42"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#customfields_fill_object_lines.28.29"><span class="tocnumber">8.2</span> <span class="toctext">customfields_fill_object_lines()</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-43"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Architecture"><span class="tocnumber">9</span> <span class="toctext">Architecture</span></a>
+<ul>
+<li class="toclevel-2 tocsection-44"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Core_files"><span class="tocnumber">9.1</span> <span class="toctext">Core files</span></a></li>
+<li class="toclevel-2 tocsection-45"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#PDFTest_module"><span class="tocnumber">9.2</span> <span class="toctext">PDFTest module</span></a></li>
+<li class="toclevel-2 tocsection-46"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Runtime_outline"><span class="tocnumber">9.3</span> <span class="toctext">Runtime outline</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-47"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#How_to_add_the_support_of_a_new_module"><span class="tocnumber">10</span> <span class="toctext">How to add the support of a new module</span></a>
+<ul>
+<li class="toclevel-2 tocsection-48"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Preliminary_test"><span class="tocnumber">10.1</span> <span class="toctext">Preliminary test</span></a></li>
+<li class="toclevel-2 tocsection-49"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Implementing_the_support_of_CustomFields_in_the_module"><span class="tocnumber">10.2</span> <span class="toctext">Implementing the support of CustomFields in the module</span></a>
+<ul>
+<li class="toclevel-3 tocsection-50"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Hooks"><span class="tocnumber">10.2.1</span> <span class="toctext">Hooks</span></a>
+<ul>
+<li class="toclevel-4 tocsection-51"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Datasheet_hook"><span class="tocnumber">10.2.1.1</span> <span class="toctext">Datasheet hook</span></a></li>
+<li class="toclevel-4 tocsection-52"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Lines_hooks"><span class="tocnumber">10.2.1.2</span> <span class="toctext">Lines hooks</span></a></li>
+</ul>
+</li>
+<li class="toclevel-3 tocsection-53"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Triggers"><span class="tocnumber">10.2.2</span> <span class="toctext">Triggers</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-54"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Configuring_CustomFields_to_support_the_module"><span class="tocnumber">10.3</span> <span class="toctext">Configuring CustomFields to support the module</span></a>
+<ul>
+<li class="toclevel-3 tocsection-55"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Preliminary_work"><span class="tocnumber">10.3.1</span> <span class="toctext">Preliminary work</span></a>
+<ul>
+<li class="toclevel-4 tocsection-56"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Getting_the_parameters_automatically"><span class="tocnumber">10.3.1.1</span> <span class="toctext">Getting the parameters automatically</span></a></li>
+<li class="toclevel-4 tocsection-57"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Getting_the_parameters_manually"><span class="tocnumber">10.3.1.2</span> <span class="toctext">Getting the parameters manually</span></a></li>
+</ul>
+</li>
+<li class="toclevel-3 tocsection-58"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Configure_hooks_and_main_parameters"><span class="tocnumber">10.3.2</span> <span class="toctext">Configure hooks and main parameters</span></a></li>
+<li class="toclevel-3 tocsection-59"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Configure_creation_triggers"><span class="tocnumber">10.3.3</span> <span class="toctext">Configure creation triggers</span></a></li>
+<li class="toclevel-3 tocsection-60"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Configuration_troubleshooting"><span class="tocnumber">10.3.4</span> <span class="toctext">Configuration troubleshooting</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-61"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Example_cases"><span class="tocnumber">11</span> <span class="toctext">Example cases</span></a></li>
+<li class="toclevel-1 tocsection-62"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#TO_DO"><span class="tocnumber">12</span> <span class="toctext">TO DO</span></a>
+<ul>
+<li class="toclevel-2 tocsection-63"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#To_Do_2"><span class="tocnumber">12.1</span> <span class="toctext">To Do</span></a></li>
+<li class="toclevel-2 tocsection-64"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#To_Document"><span class="tocnumber">12.2</span> <span class="toctext">To Document</span></a></li>
+<li class="toclevel-2 tocsection-65"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Should_do"><span class="tocnumber">12.3</span> <span class="toctext">Should do</span></a></li>
+<li class="toclevel-2 tocsection-66"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Known_bugs"><span class="tocnumber">12.4</span> <span class="toctext">Known bugs</span></a></li>
+<li class="toclevel-2 tocsection-67"><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Never.2FMaybe_one_day.C2.A0"><span class="tocnumber">12.5</span> <span class="toctext">Never/Maybe one day&nbsp;</span></a></li>
+</ul>
+</li>
+</ul>
+</td></tr></tbody></table>
+<h1> <span class="mw-headline" id="Principles"> Principles </span></h1>
+<p>CustomFields is simply a wrapper for SQL databases.
+</p><p>The module is based on SQL to manage the fields and most of the stuff. It uses and understands standard SQL.
+</p><p>The main principles of CustomFields are:
+</p>
+<ul><li> one SQL column = one Dolibarr field.
+</li><li> one SQL type = one method to show and edit the field in Dolibarr.
+</li><li> almost everything should be configurable from the configuration file, or admin interface.
+</li><li> be independent from Dolibarr's data structures.
+</li></ul>
+<p>CustomFields sits besides Dolibarr, and does not mix with it, even if in the Dolibarr's interface it looks like CustomFields is embedded inside Dolibarr, in reality, CustomFields is totally independent.
+</p>
+<h1> <span class="mw-headline" id="Goals"> Goals </span></h1>
+<p>This module was made to provide an easy way to manage custom sql fields, not only for users and implementers, but also for developpers to use in their own module:
+</p>
+<ul><li> by easily adding the support of custom fields for your own module by using this module;
+</li><li> by reusing custom fields from another module in your own module;
+</li><li> by managing sql fields in your own module by using the CustomFields class (which will take care of everything from printing, editing to PDF/ODT templating).
+</li></ul>
+<p>So this module is not only an auxiliary of other modules, but it can also be the core part of your own module by using it as your SQL query class for fields.
+</p>
+<h1> <span class="mw-headline" id="SQL_structure"> SQL structure </span></h1>
+<p>A CustomFields table needs to respect three parameters that never change:
+</p>
+<ul><li> table's name (format: llx_*dolibarrmodule*_customfields where *dolibarrmodule* = table_element in conf_customfields.lib.php)
+</li><li> first column: rowid, which is the primary key for each field
+</li><li> second column: fk_*dolibarrmodule* which is the foreign key that links every customfields record to the Dolibarr's module that is associated (invoice, order, etc...).
+</li></ul>
+<p>Apart from the table's name and the first two special columns, every other columns are just standard sql columns that you can freely create, edit or delete as you want, from the module's administration page or from a third-party SQL management tool (such as phpMyAdmin).
+</p><p>You can also create more complex sql fields: constraints, foreign keys, transformations, other sql types, etc...).
+</p><p>Then the module will try to manage the sql fields you manually created the best it can:
+</p>
+<ul><li> by printing appropriate input fields in the Dolibarr gui interface.
+</li><li> by providing the developper an easy access to these fields in php (eg: $customfields-&gt;cf_myfield or $object-&gt;customfields-&gt;cf_myfield) for any use, including PDF templates and ODT templates, or in any php script (so that you can use these fields in your own module).
+</li></ul>
+<h1> <span class="mw-headline" id="SQL_Indexes"> SQL Indexes </span></h1>
+<p>The module automatically adds an index on the primary key and foreign key (first and second columns).
+</p><p>To further optimize the performances of your database, and particularly the customfields tables, you may want to manually add indexes based on usage.
+</p><p>Also, you may add indexes on remote tables used by constrained fields, which could optimize even more the performances since constrained fields have the worst performance drawback for CustomFields.
+</p>
+<h1> <span class="mw-headline" id="SQL_Compatibility_mode"> SQL Compatibility mode </span></h1>
+<p>The module relies on referential integrity checks and foreign keys of your DBMS to keep the database clean and to provide the constrained fields feature. Referential integrity checks is part of the SQL standards and should be used whenever possible, which always was a main goal for CustomFields (to be respectful of SQL standards).
+</p><p>Unluckily, a few DBMS systems still don't support this critical functionality of the SQL standard, for example MySQL enables MyISAM engine by default, which doesn't support this feature.
+</p><p>In these cases, you can either do two things:
+</p>
+<ul><li> Switch to an engine which support referential integrity. For example with MySQL, you can enable InnoDB, which support referential integrity checks and foreign keys.
+</li><li> Use CustomFields compatibility mode (more infos below).
+</li></ul>
+<p>In the case your database does not support referential integrity checks, CustomFields will automatically switch to the SQL compatibility mode, which will allow you to use CustomFields even on databases where foreign keys are not possible.
+</p><p>In compatibility mode, you will get nearly all CustomFields advanced features such as Constrained fields, but the customfields' tables in the database won't be cleaned automatically (no delete on cascade, meaning that when you delete an object, the linked custom fields will still be kept in your database), and constrained fields won't be updated automatically on update.
+</p><p>Nevertheless, these missing cleanup functionalities won't be seen by your users because they will never be accessible: on deletion of an object, the custom fields won't ever be accessible again from Dolibarr's interface, and object's ids are never changed since Dolibarr also relies on this. Thus in compatibility mode, CustomFields will act just like normally, but your database will be a bit less clean.
+</p>
+<h1> <span class="mw-headline" id="JSON_extension_for_extra_options"> JSON extension for extra options </span></h1>
+<h2> <span class="mw-headline" id="Introduction_to_JSON_in_CustomFields"> Introduction to JSON in CustomFields </span></h2>
+<p>The relational model is very great to store and fetch data with a declarative language, and this is very powerful, but this model also imposes a few limitations, for example the relations must be well formatted and predefined.
+</p><p>That's why we finally implemented a <b>JSON extension</b> to manage <b>extra options</b> and associate them with custom fields. This allows to add many properties (or columns if you are more used to the relational model) on-the-fly without having to predefine them prior to storing and using them.
+</p><p>This allows to add an undefined number of columns/properties/extra options that will help manage special behaviours for custom fields. For example, it is currently used to allow to change the order of appearance of custom fields, and to store and manage remote table and columns datas for constrained fields on DBMS that do not support Foreign Keys checks.
+</p><p>We chose JSON over XML because the library are simpler and the data footprint smaller, and because CustomFields does not need advanced features of XML like XQuery, data typing and meta structures (at least not for now).
+</p><p>The other advantage is that php objects can directly be encoded into JSON without any preprocessing, and can then as straightly be decoded from JSON back into a php object.
+</p><p>A simple mean to encode and decode back an object into and from a storage place, as well as allow users to easily add/remove extra options were the main requirement, and JSON (+ JSON libraries for PHP) meet this criteria.
+</p><p>However, note that the extra options are now encoded as an associative array, so as to avoid any ambiguities (there's no associative array in JSON, they are converted to objects).
+</p>
+<h2> <span class="mw-headline" id="Implementation_of_JSON"> Implementation of JSON </span></h2>
+<p>The implementation is very simple: a table called <b>llx_customfields_extraoptions</b> is created when you enable the CustomFields module, and this table only contains three columns:
+</p>
+<ul><li> table_name (varchar)
+</li><li> column_name (varchar)
+</li><li> extraoptions (blob)
+</li></ul>
+<p>(table_name, column_name) both forms the primary key of the table, and links to columns (custom fields) of other customfields tables.
+extraoptions is a blob, which allows to store the data as binary (as-is) without encoding (which solves a big problem of JSON which is encoding special and foreign characters, here there is no problem at all).
+</p><p>When fetching custom fields, the module simply JOIN the extraoptions table, which adds an <b>extraoptions</b> column for each custom field in the SQL result. Then it is quite easy to just json_decode() the data returned inside the extraoptions column.
+</p><p>This methodology allows to have all the advantages of a relational database, with the flexibility of a free-schema model:
+</p>
+<ul><li> everything is stored inside the database (only one storage place)
+</li><li> fixed columns allows for relational joining and optimization
+</li><li> thus queries (fetching) are optimised
+</li><li> at the same time, the extraoptions are automatically retrieved and associated with every custom field, and whenever needed they can be used
+</li><li> and thus we also get a flexible model to <b>add extra (virtual) columns whenever needed</b> without having to alter the relational database schema
+</li></ul>
+<p>Thus no critical information is and should be stored inside the extraoptions column because they would not be query-able, only extra options that are just used to tweak the management of those fields inside the PHP application should be stored. But this is a wonderful way to add non critical informations that still allows to develop more complex features and management for special custom fields.
+</p>
+<h2> <span class="mw-headline" id="CustomFields_JSON_API"> CustomFields JSON API </span></h2>
+<h3> <span class="mw-headline" id="Storing_extra_options"> Storing extra options </span></h3>
+<p>You can use the <b>setExtra()</b> method to set extra options of a custom field.
+</p><p>Eg:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$extra</span> <span class="sy0">=</span> <span class="kw3">array</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// $extra should always be an associative array, it's no longer an object</span>
+<span class="re0">$extra</span><span class="br0">[</span><span class="st_h">'myproperty'</span><span class="br0">]</span> <span class="sy0">=</span> <span class="st_h">'Anything I want here'</span><span class="sy0">;</span> <span class="co1">// set a property/extra option like this</span>
+<span class="re0">$extra</span><span class="br0">[</span><span class="st_h">'category'</span><span class="br0">]</span><span class="br0">[</span><span class="st_h">'subcategory'</span><span class="br0">]</span><span class="br0">[</span><span class="st_h">'prop'</span><span class="br0">]</span> <span class="sy0">=</span> <span class="kw4">true</span><span class="sy0">;</span> <span class="co1">// we can set recursive properties, there's not any limit to how deep the hierarchy can be</span>
+&nbsp;
+<span class="kw1">require_once</span><span class="br0">(</span>DOL_DOCUMENT_ROOT<span class="sy0">.</span><span class="st_h">'/customfields/class/customfields.class.php'</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="re0">$customfields</span> <span class="sy0">=</span> <span class="kw2">new</span> CustomField<span class="br0">(</span><span class="re0">$db</span><span class="sy0">,</span> <span class="st_h">'currentmodule'</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="re0">$fieldid</span> <span class="sy0">=</span> <span class="st_h">'mycustomfields'</span><span class="sy0">;</span> <span class="co1">// $fieldid can either be a column_name or an ordinal_position from information_schema.columns</span>
+<span class="re0">$result</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">setExtra</span><span class="br0">(</span><span class="re0">$fieldid</span><span class="sy0">,</span> <span class="re0">$extra</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// store the extra options inside the database</span></pre></div></div>
+<p>You can also use addCustomField() or updateCustomField() with an $extra array, and these functions will also call the setExtra() method.
+</p><p><b>Note</b>: the extra options you set are <b>appended</b> to the ones already stored in the database. However, you can also overwrite previous options, just use the same name of property but with a different value (the replacement is recursive, you can do it at any level in the hierarchy).
+</p>
+<h3> <span class="mw-headline" id="Fetching_extra_options"> Fetching extra options </span></h3>
+<p>Extra options are automatically fetched along with a custom field structure, decoded, and stored inside the extra sub-property of any field object, or CustomFields object.
+</p><p>When fetched, extra options are stored as a sub-object for the current field object (which itself is stored as a subobject of the CustomFields object if caching is enabled).
+</p><p>Eg:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw1">require_once</span><span class="br0">(</span>DOL_DOCUMENT_ROOT<span class="sy0">.</span><span class="st_h">'/customfields/class/customfields.class.php'</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="re0">$customfields</span> <span class="sy0">=</span> <span class="kw2">new</span> CustomField<span class="br0">(</span><span class="re0">$db</span><span class="sy0">,</span> <span class="st_h">'currentmodule'</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="re0">$fields</span> <span class="sy0">=</span> fetchAllFieldsStruct<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// fetching fields structure will automatically fetch extra options at the same time. This works with fetchAllFieldsStruct() and fetchFieldStruct()</span>
+&nbsp;
+<span class="co1">// Now that you fetched the fields structure, you can just access the extra options sub-properties:</span>
+<span class="kw3">print_r</span><span class="br0">(</span><span class="re0">$fields</span><span class="sy0">-&gt;</span><span class="me1">mycustomfield</span><span class="sy0">-&gt;</span><span class="me1">extra</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// will print all extra options for the field mycustomfield</span>
+<span class="kw3">print_r</span><span class="br0">(</span><span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">fields</span><span class="sy0">-&gt;</span><span class="me1">mycustomfield</span><span class="sy0">-&gt;</span><span class="me1">extra</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// you can also access the same field(s) directly from the CustomFields object if caching is enabled (default behaviour)</span></pre></div></div>
+<h3> <span class="mw-headline" id="Modifying_extra_options"> Modifying extra options </span></h3>
+<p>You can just combine the two previous points to edit extra options of a custom field: just load a custom field, edit on-the-fly the extra property with PHP code, and then store it back directly into the database:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw1">require_once</span><span class="br0">(</span>DOL_DOCUMENT_ROOT<span class="sy0">.</span><span class="st_h">'/customfields/class/customfields.class.php'</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="re0">$customfields</span> <span class="sy0">=</span> <span class="kw2">new</span> CustomField<span class="br0">(</span><span class="re0">$db</span><span class="sy0">,</span> <span class="st_h">'currentmodule'</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="re0">$fields</span> <span class="sy0">=</span> fetchAllFieldsStruct<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+<span class="re0">$fields</span><span class="sy0">-&gt;</span><span class="me1">mycustomfield</span><span class="sy0">-&gt;</span><span class="me1">extra</span><span class="br0">[</span><span class="st_h">'newproperty'</span><span class="br0">]</span> <span class="sy0">=</span> <span class="st_h">'This is a new property'</span><span class="sy0">;</span> <span class="co1">// add a new property over the old extra options sub-object</span>
+<span class="re0">$fields</span><span class="sy0">-&gt;</span><span class="me1">mycustomfield</span><span class="sy0">-&gt;</span><span class="me1">extra</span><span class="br0">[</span><span class="st_h">'mycategory'</span><span class="br0">]</span> <span class="sy0">=</span> <span class="st_h">'Overwrite the old category'</span><span class="sy0">;</span> <span class="co1">// this will replace the previous value of 'mycategory' extra option</span>
+&nbsp;
+<span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">setExtra</span><span class="br0">(</span><span class="st_h">'mycustomfield'</span><span class="sy0">,</span> <span class="re0">$fields</span><span class="sy0">-&gt;</span><span class="me1">mycustomfield</span><span class="sy0">-&gt;</span><span class="me1">extra</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// store the modified extra options back into the database for future usage</span></pre></div></div>
+<h1> <span class="mw-headline" id="CustomFields_API"> CustomFields API </span></h1>
+<h2> <span class="mw-headline" id="Introduction_to_CustomFields_API"> Introduction to CustomFields API </span></h2>
+<p>This chapter will cover the basics on how to manually and concretely use the CustomFields class to create/update/fetch/manage custom fields.
+</p><p>This will give you a better understanding of how CustomFields works, as well as giving you insights on how to use it for your own applications.
+</p><p>Important note: contrary to the Facade API, the core CustomFields class use columns names without any prefix, so don't try to use the prefix, it won't work! For example: if your field is named 'mycustomfield' and prefix is 'cf_', when you use the Facade API you should use '$object-&gt;$path-&gt;cf_mycustomfield' but when you use the core CustomFields class directly, $fieldname = 'mycustomfield'.
+</p>
+<h2> <span class="mw-headline" id="Prerequisite_to_use_the_CustomFields_class"> Prerequisite to use the CustomFields class </span></h2>
+<p>Before using the CustomFields class, you first must instanciate it. This is a necessary preliminary step before using any of the methods that will be covered inside this chapter, and thus will not be repeated, only shown once here.
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// Include the CustomFields class (which contains the main API)</span>
+<span class="kw1">require_once</span><span class="br0">(</span><span class="kw3">dirname</span><span class="br0">(</span><span class="kw4">__FILE__</span><span class="br0">)</span><span class="sy0">.</span><span class="st_h">'/../class/customfields.class.php'</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Instanciate a CustomFields object</span>
+<span class="kw2">global</span> <span class="re0">$db</span><span class="sy0">;</span> <span class="co1">// the database handler created by Dolibarr</span>
+<span class="re0">$table_element</span> <span class="sy0">=</span> <span class="st_h">'currentmodule'</span><span class="sy0">;</span> <span class="co1">// where $table_element is the database's table name for the module, without the Dolibarr prefix (eg: for 'llx_facture', table_element is 'facture'). You can also find it inside the $object properties (just print_r() it).</span>
+<span class="re0">$customfields</span> <span class="sy0">=</span> <span class="kw2">new</span> CustomFields<span class="br0">(</span><span class="re0">$db</span><span class="sy0">,</span> <span class="re0">$table_element</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// instanciate the CustomFields class inside $customfields object</span></pre></div></div>
+<p>CustomFields keeps track of errors that can happen when executing methods and SQL queries inside the <b>error</b> and <b>errors</b> properties, which you can print with the printErrors() method:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// Do something with CustomFields before</span>
+&nbsp;
+<span class="kw1">if</span> <span class="br0">(</span><span class="kw3">count</span><span class="br0">(</span><span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">errors</span><span class="br0">)</span> <span class="sy0">&gt;</span> <span class="nu0">0</span><span class="br0">)</span> <span class="br0">{</span> <span class="co1">// If there is at least one error</span>
+    <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">printErrors</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// print errors</span>
+<span class="br0">}</span>
+&nbsp;
+<span class="co1">// You can also print your own error message, in two manners:</span>
+&nbsp;
+<span class="co1">// 1- submit your own message</span>
+<span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">printErrors</span><span class="br0">(</span><span class="st_h">'Your own error message here'</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// this will print ONLY your error message, using the Dolibarr's AJAX error dialog (standard way of printing errors)</span>
+&nbsp;
+<span class="co1">// 2- append your message in the customfields errors</span>
+<span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">errors</span><span class="br0">[</span><span class="br0">]</span> <span class="sy0">=</span> <span class="st_h">'Your own error message to be appended with other CustomFields messages'</span><span class="sy0">;</span>
+<span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">printErrors</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// Here your error message will be appended, thus all error messages will be printed. This allows you for example to add more intelligible informations on a specific error.</span></pre></div></div>
+<h2> <span class="mw-headline" id="General_purpose_SQL_methods"> General purpose SQL methods </span></h2>
+<p>CustomFields provide an interface to easily execute various common SQL requests, as well as your own custom SQL requests.
+</p>
+<ul><li> fetchAllTables() fetch a list of all the tables in the database
+</li><li> fetchPrimaryField($table) fetch the column_name (and only the column_name!) of the primary field of a table. You can then use fetchFieldStruct()  with the column_name to get any information you want.
+</li><li> fetchAny($columns, $table, $where=<i>, $orderby=</i>, $limitby=<i>) allows you to issue any simple SQL query command, for example fetchAny('*', 'sometable') is equivalent to SELECT * FROM sometable; (but then everything is managed automatically and result is returned to you)</i>
+</li><li> executeSQL($sql, $eventname) to execute any SQL query you want, this will return you a resource (and NOT a processed nuplet like fetchAny!). $eventname can be anything, it's just for Dolibarr logging facility.
+</li><li> executeMultiSQL($sql, $eventname) to execute multiple SQL queries
+</li><li> fetchFieldStruct($id=null, $nohide=false, $table=null, $cachepath=null) allows you to fetch the field's SQL structure of not only custom fields, but of any database's column using the $table variable. Eg: fetchFieldStruct('mycolumn', true, 'mytable');
+</li><li> probeTable($table) helps you to check if a table exists in the database
+</li><li> fetch_object($resource) will return a PHP&nbsp;object from a $resource, similarly to mysql_fetch_object() but with two advantages: it works on several DBMS (not only mysql), and it always return lowercase properties names (else depending on the configuration of the DBMS, the request can return uppercase or mixed case properties names).
+</li><li> escape() and reverse_escape() are similare to mysql_real_escape but is reversible and DBMS-independent (so you can use it with other DBMSes).
+</li></ul>
+<h2> <span class="mw-headline" id="Managing_CustomFields_structure"> Managing CustomFields structure </span></h2>
+<p>The first step into CustomFields is to create and manage the structure of a custom field.
+</p>
+<h3> <span class="mw-headline" id="Creating_a_custom_field_definition"> Creating a custom field definition </span></h3>
+<p>To create a custom field, you can use the addCustomField() method.
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$rtncode</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">addCustomField</span><span class="br0">(</span><span class="re0">$fieldname</span><span class="sy0">,</span> <span class="re0">$type</span><span class="sy0">,</span> <span class="re0">$size</span><span class="sy0">,</span> <span class="re0">$nulloption</span><span class="sy0">,</span> <span class="re0">$defaultvalue</span> <span class="sy0">=</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$constraint</span> <span class="sy0">=</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$customtype</span> <span class="sy0">=</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$customdef</span> <span class="sy0">=</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$customsql</span> <span class="sy0">=</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$fieldid</span> <span class="sy0">=</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$extra</span> <span class="sy0">=</span> <span class="kw4">null</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>This will take care of forging the (complicated) SQL query with the forgeSQLCustomField() method, and will return you an error if there was a problem.
+</p>
+<h3> <span class="mw-headline" id="Updating_a_custom_field_definition"> Updating a custom field definition </span></h3>
+<p>To update a custom field, you can use the updateCustomField() method:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$rtncode</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span>
+<span class="me1">updateCustomField</span><span class="br0">(</span><span class="re0">$fieldid</span><span class="sy0">,</span> <span class="re0">$fieldname</span><span class="sy0">,</span> <span class="re0">$type</span><span class="sy0">,</span> <span class="re0">$size</span><span class="sy0">,</span> <span class="re0">$nulloption</span><span class="sy0">,</span> <span class="re0">$defaultvalue</span><span class="sy0">,</span> <span class="re0">$constraint</span> <span class="sy0">=</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$customtype</span> <span class="sy0">=</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$customdef</span> <span class="sy0">=</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$customsql</span> <span class="sy0">=</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$extra</span> <span class="sy0">=</span> <span class="kw4">null</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>Note: the updateCustomField() and addCustomField() methods can both be used since updateCustomField() is in fact an alias for addCustomField(). CustomFields will automatically detect if a custom field already exists, and update it if that's true, or create it.
+</p><p>Note2: updating a custom field will automatically take care of the constraints and foreign keys on its own, thus you can change the foreign key, or remove it altogether if set to null.
+</p>
+<h3> <span class="mw-headline" id="Delete_a_custom_field_definition"> Delete a custom field definition </span></h3>
+<p>You can easily delete a custom field by column_name or by ordinal_position:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$rtncode</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">deleteCustomField</span><span class="br0">(</span><span class="re0">$id</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>Note: constraints and foreign keys will also be deleted automatically so you shouldn't encounter any error.
+</p>
+<h3> <span class="mw-headline" id="Fetch_one_custom_field.27s_SQL_structure"> Fetch one custom field's SQL structure </span></h3>
+<p>To get the SQL structure of a custom field, which can be quite useful to know for example its datatype or if it has a foreign key, or accepts null values, you can use the fetchFieldStruct() method:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1">fields <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">fetchFieldStruct</span><span class="br0">(</span><span class="re0">$id</span><span class="sy0">=</span><span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$nohide</span><span class="sy0">=</span><span class="kw4">false</span><span class="sy0">,</span> <span class="re0">$table</span><span class="sy0">=</span><span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$cachepath</span><span class="sy0">=</span><span class="kw4">null</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// where $id can be a column_name, an ordinal_position from information_schema.columns or null if you want to fetch all the columns at once</span></pre></div></div>
+<p>This method will either return null, either a single field object, either an array on field objects.
+</p><p>Note: this function will use caching by default to accelerate future results, but you can disable it, or even change the default cache path. For more informations please read the comments in the source code.
+</p>
+<h3> <span class="mw-headline" id="Fetch_several_custom_fields.27_SQL_structures"> Fetch several custom fields' SQL structures </span></h3>
+<p>Use the fetchAllFieldsStruct() method, which is an alias for fetchFieldStruct():
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$rtncode</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">fetchAllFieldsStruct</span><span class="br0">(</span><span class="re0">$nohide</span><span class="sy0">=</span><span class="kw4">false</span><span class="sy0">,</span> <span class="re0">$table</span><span class="sy0">=</span><span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$cachepath</span><span class="sy0">=</span><span class="kw4">null</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>Note: this method will always return an array of fields objects, even if only one is found (for more consistency), and this is the main difference with fetchFieldStruct(null).
+</p>
+<h2> <span class="mw-headline" id="Managing_custom_fields_records"> Managing custom fields records </span></h2>
+<p>Now that you know how to create and manage the structure of custom fields, we can proceed on to managing the records.
+</p>
+<h3> <span class="mw-headline" id="Creating_a_custom_field.27s_record"> Creating a custom field's record </span></h3>
+<p>Simply use the create() method:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$rtncode</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">create</span><span class="br0">(</span><span class="re0">$object</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>$object must be an object containing as its properties the customfields data.
+</p><p>For example, if you have a field named mycustomfield, your object must have $object-&gt;mycustomfields defined.
+</p><p>This method will store in the database ALL the custom fields that were created/edited and with a valid value (eg: an empty value for a field that does not accept null value is invalid) AT ONCE! So you can modify all the columns of one record at once, but not several records at once.
+</p><p>Concretely, this is very useful with Dolibarr, because modules tends to store everything inside a single object generally called $object, and CustomFields tries to hook onto $object, so that you can just pass $object as is to create() and it will save all the custom fields.
+</p><p>But you can also create an empty object with $object = new stdClass(); and then manually fill the custom fields records with whatever you want, and then call the create() method, this will work as well!
+</p><p>You can also just modify only one column of one record, by just specifying one custom field column_name in your $object. The other custom fields that are not specified won't be created/modified.
+</p>
+<h3> <span class="mw-headline" id="Updating_a_custom_field.27s_record"> Updating a custom field's record </span></h3>
+<p>Use the update() method, which is an alias for the create() method:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$rtncode</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">update</span><span class="br0">(</span><span class="re0">$object</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>As noted above, update() is an alias of the create() method, which means that CustomFields will try to detect by itself if a record needs to be updated or created.
+</p>
+<h3> <span class="mw-headline" id="Deleting_a_custom_field.27s_record"> Deleting a custom field's record </span></h3>
+<p>Use the delete() method:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$rtncode</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">delete</span><span class="br0">(</span><span class="re0">$id</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// where $id is = to fk_moduleid column, NOT rowid</span></pre></div></div>
+<h3> <span class="mw-headline" id="Fetching_a_custom_field.27s_record"> Fetching a custom field's record </span></h3>
+<p>Just use the fetch() method:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$records</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">fetch</span><span class="br0">(</span><span class="re0">$id</span><span class="sy0">=</span><span class="kw4">null</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>Where $id can either be = fk_moduleid (NOT rowid), or null to fetch all the records at once.
+</p><p>This method will either return null, a single record object, or an array of records objects.
+</p>
+<h3> <span class="mw-headline" id="Fetching_all_custom_fields.27_records"> Fetching all custom fields' records </span></h3>
+<p>Use the fetchAll() method, which is an alias for fetch():
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$records</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">fetchAll</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>Note: this method will always return an array of records object, for more consistency (and this is the main difference with fetch(null) ).
+</p>
+<h3> <span class="mw-headline" id="Fetching_referenced_records_of_a_constrained_field"> Fetching referenced records of a constrained field </span></h3>
+<p>A constrained custom field points to another database table, and a value for this constrained field is the rowid of a record in the referenced table.
+</p><p>Thus, the principal purpose of a constrained custom field is not the value of the field in itself (it's simply an integer), but rather the other fields available from the referenced table, the constrained field being in fact just a pointer.
+</p><p>To fetch the remote record from the referenced table, use the fetchReferencedValuesList() of the CustomFields class:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$fkrecord</span> <span class="sy0">=</span> fetchReferencedValuesList<span class="br0">(</span><span class="re0">$field</span><span class="sy0">,</span> <span class="re0">$id</span><span class="sy0">=</span><span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$where</span><span class="sy0">=</span><span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$allcolumns</span><span class="sy0">=</span><span class="kw4">false</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>Where:
+</p>
+<ul><li> $field is a custom field object (fetched using fetchFieldStruct() or fetchAllFieldsStruct()),
+</li><li> $id is the rowid of the record to get, just like fetch() and fetchAll(). Can be null to fetch all remote records (or to use the $where clause).
+</li><li> $where is a string without the WHERE clause (eg: "fk_facture=1") to get finer control. In this case, you can use $id or set $id=null depending on your purpose. This is mainly a private argument to allow for cascade option.
+</li><li> $allcolumns if false, it will fetch only the required columns to do the smart value substitution. If true, it will fetch all remote columns (useful for ODT substitution). If an array of strings, each string will be a column to fetch from the remote database.
+</li></ul>
+<p>Note that this function is NOT recursive (it will fetch the records from the referenced table, and that's all, it won't fetch the custom fields of the referenced table nor recursively fetch the remote constrained custom fields). To do recursive fetching, see in the Facade API.
+</p><p>Note2: this function automatically manages Smart Value Substitution depending of the $field-&gt;column_name.
+</p>
+<h3> <span class="mw-headline" id="Recursive_fetching_referenced_records_of_a_constrained_field"> Recursive fetching referenced records of a constrained field </span></h3>
+<p>If you want to recursively fetch a constrained field (eg: constrainedfield1-&gt;ref_table-&gt;constrainedfield2-&gt;ref_table2-&gt;...), you need another function called fetchReferencedValuesRec(). Technically, this function is in the Facade API (inside /customfields/lib/customfields_aux.lib.php), but it isn't meant to be used by lambda users (contrary to customfields_fill_object()), but is mainly a helper function for the rest of the facade API.
+</p><p>fetchReferencedValuesRec() works very similarly to fetchReferencedValuesList(), but it will work recursively.
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$fkrecord</span> <span class="sy0">=</span> fetchReferencedValuesRec<span class="br0">(</span><span class="re0">$customfields</span><span class="sy0">,</span> <span class="re0">$field</span><span class="sy0">,</span> <span class="re0">$id</span><span class="sy0">,</span> <span class="re0">$recursive</span><span class="sy0">=</span><span class="kw4">true</span><span class="br0">)</span></pre></div></div>
+<p>Where $customfields is the CustomFields instance for the module you are working on, $field is the constrained field you want to fetch, $id is the record's id you want to fetch, and $recursive enables or disables the recursion.
+</p><p>Note that this function automatically manages Smart Value Substitution (and also recursively).
+</p><p>Note2: This function tries to automatically avoid an infinite recursion loop by using a $blacklist: for a given constrained custom field, a table won't be visited twice. This means that for example you can do: invoice-&gt;user-&gt;socpeople-&gt;invoice, this will work and every referenced fields will be fetched, but it will automatically stop the recursion at the second invoice, because else it could continue in a loop to user, socpeople, invoice, user, socpeople, etc.
+</p><p>Note3: when adding recursively referenced fields, the key in the returned array will be prefixed by the name of the custom field that led to those remote fields. Thus, you can have something like "cf_myfield1_cf_remotefield1_cf_remotefield2" if you have a constrained field cf_myfield1-&gt;cf_remotefield1-&gt;cf_remotefield2.
+</p>
+<h2> <span class="mw-headline" id="Input_forms_for_custom_fields"> Input forms for custom fields </span></h2>
+<p>The API provides some neat ways to automatically manage the input forms for users to input new values, with the best adapted HTML form based on the custom field's data type.
+</p><p>The following methods will print input fields that are best adapted to the SQL data type of your custom fields as well as figure out the possible values and even format them (for example: a not null enum will be printed as a HTML select list without an empty option; fetch automatically remote columns for constrained fields and show them in a select).
+</p><p>So you don't have to bother how your data will be presented to the user nor how it will be processed.
+</p>
+<h3> <span class="mw-headline" id="Printing_an_input_form_adapted_to_the_field.27s_data_type"> Printing an input form adapted to the field's data type </span></h3>
+<p>showInputField() is a sort of converter customfieldstructure -&gt; HTML input field.
+</p><p>Use the <b>showInputField()</b> method to print the right input form for a custom field.
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw1">print</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">showInputField</span><span class="br0">(</span><span class="re0">$field</span><span class="sy0">,</span> <span class="re0">$currentvalue</span><span class="sy0">=</span><span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$moreparam</span><span class="sy0">=</span><span class="st_h">''</span><span class="sy0">,</span> <span class="re0">$ajax_php_callback</span><span class="sy0">=</span><span class="st_h">''</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>showInputField() takes 4 parameters:
+</p>
+<ul><li> $field is a CustomFields structure object (eg: returned by fetchFieldStruct()) and is necessary to detect the right datatype and the possible values.
+</li><li> $currentvalue is the current value if you want to preselect a value (for example if the user already defined a value, you can reload it here). This is optional, in case it is not defined, either a null/empty value will be chosen, or either the default value defined when creating the custom field.
+</li><li> $moreparam is used to add more HTML attributes, if you want for example to add some css styling or whatever you want.
+</li><li> $ajax_php_callback is optional and allows to specify the relative url to the php callback script. If specified, an AJAX script will be automatically attached to this field (see AJAX-PHP callback below).
+</li></ul>
+<p>showInputField() only prints ONE HTML input field, thus you have to enclose it/them by your own HTML form.
+</p><p>eg:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw1">print</span> <span class="st_h">'&lt;form method="get" action="?"&gt;'</span><span class="sy0">;</span>
+<span class="kw1">print</span> <span class="st_h">'&lt;input type="hidden" name="customtoken" value="ABCDEFGH" /&gt;'</span><span class="sy0">;</span> <span class="co1">// example of a custom hidden HTML input field, that can be used to pass a token for example</span>
+<span class="co1">// Loop over each custom fields (you have to load them before with $customfields-&gt;fetchAllFieldsStruct()</span>
+<span class="kw1">foreach</span> <span class="br0">(</span><span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">fields</span> <span class="kw1">as</span> <span class="re0">$field</span><span class="br0">)</span> <span class="br0">{</span>
+    <span class="kw1">print</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">showInputField</span><span class="br0">(</span><span class="re0">$field</span><span class="sy0">,</span> <span class="re0">$currentvalue</span><span class="sy0">=</span><span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$moreparam</span><span class="sy0">=</span><span class="st_h">''</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span>
+<span class="kw1">print</span> <span class="st_h">'&lt;/form&gt;'</span><span class="sy0">;</span></pre></div></div>
+<p>You can also store the resulting HTML input field and process it by a regexp for example:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$myhtmlfield</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">showInputField</span><span class="br0">(</span><span class="re0">$field</span><span class="sy0">,</span> <span class="re0">$currentvalue</span><span class="sy0">=</span><span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$moreparam</span><span class="sy0">=</span><span class="st_h">''</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="kw3">preg_replace</span><span class="br0">(</span><span class="re0">$myhtmlfield</span><span class="sy0">,</span> <span class="sy0">...,</span> <span class="sy0">...</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>Note: for constrained fields, if the name follows the convention of <b>Smart Value Substitution</b> (ie: remote columns names are included in the custom field's name), showInputField() will <b>automatically fetch the remote values, format them, and present them</b> in a HTML select.
+</p>
+<h3> <span class="mw-headline" id="Printing_an_input_form_for_a_custom_field"> Printing an input form for a custom field </span></h3>
+<p><b>showInputForm()</b> is a function used to print a single (and only one!) custom field with an adapted HTML input field, but enclosed by a HTML form. This is used for example when you want to allow to edit a single custom field but not the others.
+</p><p>showInputForm() is in fact a wrapper for showInputField(), thus it will call showInputField() and simply enclose it by a form.
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw1">print</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">showInputForm</span><span class="br0">(</span><span class="re0">$id</span><span class="sy0">,</span> <span class="re0">$field</span><span class="sy0">,</span> <span class="re0">$currentvalue</span><span class="sy0">=</span><span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$idvar</span><span class="sy0">=</span><span class="st_h">'id'</span><span class="sy0">,</span> <span class="re0">$page</span><span class="sy0">=</span><span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$moreparam</span><span class="sy0">=</span><span class="st_h">''</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<h3> <span class="mw-headline" id="AJAX-PHP_callback"> AJAX-PHP callback </span></h3>
+<p><b>showInputFieldAjax()</b> will output an AJAX script (using jQuery) to send and receive data to and from a specified php script. The AJAX script will automatically manage HTML form input's updating as long as the received data follows some convention.
+</p><p>An AJAX script can be attached to any field (including non-CustomFields) by using the method:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw1">print</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">showInputFieldAjax</span><span class="br0">(</span><span class="re0">$id</span><span class="sy0">,</span> <span class="re0">$php_callback_url</span><span class="sy0">,</span> <span class="re0">$on_func</span><span class="sy0">=</span><span class="st0">"change"</span><span class="sy0">,</span> <span class="re0">$request_type</span><span class="sy0">=</span><span class="st0">"post"</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>Where:
+</p>
+<ul><li> $id is the HTML id of the field you want to attach the AJAX to.
+</li><li> $phpcallback the relative path from Dolibarr's htdocs root folder to the php script that will receive and send back data.
+</li><li> $on_func is the Javascript or jQuery event that should trigger the AJAX script (by default on change).
+</li><li> $request_type is the HTML query type that will be used to send the data to the PHP callback (either "get" or "post").
+</li></ul>
+<p>The AJAX script will automatically manage sending/receiving of data:
+</p>
+<ul><li> automatically send all form's inputs values, as well as the current calling field's name and value. The sending happens on change by default, but another event can be set using the $on_event argument. Data will be sent using standard GET or POST.
+</li><li> Upon reception of data from the php script, the AJAX script will automatically parse the data and update the HTML fields.
+</li></ul>
+<p>The PHP callback script must send back to AJAX the data in JSON encoded format, and with with a specific format:
+</p>
+<ul><li> the data must be an associative array, where each entry's key is the name (not ID!) of an HTML field to update.
+</li><li> each entry's value is an associative array, where each sub-entry's key is the action to do. Available actions: 'options', 'value', 'html', 'alert'.
+</li><li> each sub-entry's value is the value for this action and HTML field.
+</li></ul>
+<p>Thus, this approach allows to generically support a wide range of updating actions, managed automatically.
+</p><p>You, the implementer, have just to edit the PHP callback script and return an associative array defining what action you want for each field you want to update. This is exactly what has been implemented in the Custom AJAX Functions library, which simplifies even more your job by managing automatically the step described here (generating AJAX and formatting data), so that you can focus on <b>making the data</b>.
+</p>
+<h2> <span class="mw-headline" id="Printing_custom_fields_in_documents"> Printing custom fields in documents </span></h2>
+<p>The API can also automatically manage the printing and formatting of custom fields in your ODT, PDF and HTML documents.
+</p>
+<h3> <span class="mw-headline" id="Printing_in_HTML"> Printing in HTML </span></h3>
+<p>You can either just print the value as-is, or pass them through the printField() or simpleprintField() function to format them (very useful for constrained fields) - see below.
+</p>
+<h3> <span class="mw-headline" id="Printing_in_documents"> Printing in documents </span></h3>
+<p><b>printField()</b> is used to properly print and translate a custom field's record's value. Generally, you can just print the custom field's value as-is, but in a few cases (eg for boolean types, or constrained fields), using the printField() method will more properly print the value.
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw1">print</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">printField</span><span class="br0">(</span><span class="re0">$field</span><span class="sy0">,</span> <span class="re0">$value</span><span class="sy0">,</span> <span class="re0">$outputlangs</span><span class="sy0">=</span><span class="st_h">''</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>Where:
+</p>
+<ul><li> $field is the custom field's SQL structure as an object (eg: returned by fetchFieldStruct()).
+</li><li> $value is the custom field's value for the current record (eg: $customfields-&gt;fields-&gt;myfield).
+</li><li> $outputlangs is the Translate object for the target language.
+</li></ul>
+<p>For example, with a constrained field with Smart Value Substitution, instead of printing the id like 1, it will print the full name of user like FirstName Name.
+</p><p>This method will also translate a value if a translation is found in the language files.
+</p><p>Another method <b>printFieldPDF()</b> can be used to properly print a value for a PDF (properly encoding the characters).
+</p><p>Powertip: this function can also be used to get the Smart Value Substituted value of the field (instead of printing the rowid) in the field is constrained.
+</p>
+<h3> <span class="mw-headline" id="Simple_printing_in_documents"> Simple printing in documents </span></h3>
+<p>If you don't want to have to manually fetch the structure of every custom field whose you want to print the value, you can then use a simplifier method called <b>simpleprintField()</b> which will take as input a custom field name instead of a custom field SQL structure object.
+</p><p>This method is just a simplifier (Facade) wrapper for the printField() method, and thus will have the same advantages (fetch constrained fields, values translation, etc.).
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="kw1">print</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">simpleprintField</span><span class="br0">(</span><span class="re0">$fieldname</span><span class="sy0">,</span> <span class="re0">$value</span><span class="sy0">,</span> <span class="re0">$outputlangs</span><span class="sy0">=</span><span class="st_h">''</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>Where:
+</p>
+<ul><li> $fieldname is the custom field's name (eg: "myfield").
+</li><li> $value is the custom field's value for the current record (eg: $customfields-&gt;fields-&gt;myfield).
+</li><li> $outputlangs is the Translate object for the target language.
+</li></ul>
+<p>Another method <b>simpleprintFieldPDF()</b> can be used to properly print a value for a PDF (properly encoding the characters).
+</p><p>Powertip: this function can also be used to get the Smart Value Substituted value of the field (instead of printing the rowid) in the field is constrained.
+</p>
+<h3> <span class="mw-headline" id="Find_the_label"> Find the label </span></h3>
+<p>Finding the label of a custom field might not be as simple as it seems. First, values of properties objects may be easily used, but their name (key) is a worst job. Secondly, custom fields' labels can be translated, and the following functions are expressly made for that purpose. Thirdly, for PDF and some other documents you have to encode the characters if you want them to properly be drawn.
+</p><p>So if you want to print a custom field's label with translation (multilingual) support, just use the <b>findLabel()</b> method:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$translatedfieldname</span> <span class="sy0">=</span> <span class="re0">$customfields</span><span class="sy0">-&gt;</span><span class="me1">findLabel</span><span class="br0">(</span><span class="re0">$fieldname</span><span class="sy0">,</span> <span class="re0">$outputlangs</span> <span class="sy0">=</span> <span class="st_h">''</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// where $fieldname is just a custom field label (eg: cf_mycustomfield or mycustomfield, both will work) and $outputlangs is the target language object (see the Translate class native of Dolibarr)</span></pre></div></div>
+<p>As for the other printing methods, you also have the <b>findLabelPDF()</b> wrapper method to easily print labels that with characters encoded for PDF.
+</p>
+<h1> <span class="mw-headline" id="Facade_API"> Facade API </span></h1>
+<p>The Facade API was made to ease the usage of the CustomFields class with the Dolibarr system. It provides a neat way to do many operations with single commands, and will automatically manage the loading of the CustomFields class, and its usage with many optimizations.
+</p>
+<h2> <span class="mw-headline" id="customfields_fill_object.28.29"> customfields_fill_object() </span></h2>
+<p>You can load the Facade API and then use the <b>customfields_fill_object()</b> to automatically fetch the fields structures and the records, and also automatically link to remote fields when a constrained field is found. This is an all-in-one solution to easily fetch CustomFields datas, and is also optimized to fully use caching and other special properties of the CustomFields class.
+</p><p>Concretely, you just have to include the Facade API, then pass the customfields_fill_object() with a Dolibarr $object, and the Facade API will return a CustomFields object with appended the custom fields records and also the custom fields' SQL structures.
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// Init and main vars for CustomFields</span>
+dol_include_once<span class="br0">(</span><span class="st_h">'/customfields/lib/customfields_aux.lib.php'</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Filling the $object with customfields (you can then access customfields by doing $object-&gt;customfields-&gt;cf_yourfield)</span>
+<span class="re0">$customfields</span> <span class="sy0">=</span> customfields_fill_object<span class="br0">(</span><span class="re0">$object</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<ul><li> $object will then include the custom fields records associated with this object (eg: $object-&gt;customfields-&gt;cf_yourfield).
+</li><li> $customfields will be a CustomFields object containing the fields structures (eg: $customfields-&gt;fields-&gt;yourfield).
+</li></ul>
+<p>You can also call any CustomFields function if you need to using the $customfields object, eg: $customfields-&gt;simpleprintField($object-&gt;customfields-&gt;cf_yourfield);
+</p><p>Note: $object can also be a dummy object containing only two properties that are required: $object-&gt;id and $object-&gt;table_element.
+</p><p><br>
+We will now describe the full specification of this function:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$customfields</span> <span class="sy0">=</span> customfields_fill_object<span class="br0">(</span><span class="sy0">&amp;</span><span class="re0">$object</span><span class="sy0">,</span><span class="re0">$fromobject</span> <span class="sy0">=</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$outputlangs</span> <span class="sy0">=</span> <span class="kw4">null</span><span class="sy0">,</span> <span class="re0">$prefix</span> <span class="sy0">=</span> <span class="kw4">null</span><span class="sy0">,</span><span class="re0">$pdfformat</span> <span class="sy0">=</span> <span class="kw4">false</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<ul><li> $object is the object where the customfields will be saved
+</li><li> $fromobject is the object from where the customfields will be fetched (this can be a different module than $object, or can be null to be the same as $object)
+</li><li> $outputlangs is the target language for translation of fields value (if empty, the default current global translation object will be used)
+</li><li> $prefix allows you to save the custom fields in a sub-object. By default, when $prefix=null, custom fields are saved in the path $object-&gt;customfields, but when you specify a prefix, custom fields will be saved inside $object-&gt;customfields-&gt;$prefix. This may be useful if you want to store multiple object's custom fields or records in the same $object.
+</li><li> $pdfformat defines if you want a special formatting for the values: if null, there's no formatting, if false, there is a simple formatting (eg: translation of fields' values), if true then the formatting will be adapted for PDF templating.
+</li></ul>
+<p>For more informations on pratical usages of this function, please <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields#Implementing_in_php_code_.28dolibarr_core_modules_or_your_own_module.29" title="Module CustomFields">read the user documentation on how to implement CustomFields in php code</a> or <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases#Linking_Dolibarr_objects_from_two_different_modules" title="Module CustomFields Cases">read an example case of linking two objects of different modules together</a>.
+</p>
+<h2> <span class="mw-headline" id="customfields_fill_object_lines.28.29"> customfields_fill_object_lines() </span></h2>
+<p>Similar to customfields_fill_object() for normal custom fields, there is also a <b>customfields_fill_object_lines()</b> to fetch custom fields associated with lines of products/services. This function is also optimized and it is strongly advised to use it and to not try to fetch manually this kind of custom fields (ie: associated with lines of products/services rather than objects), because there are a lot of optimizations going on behind the scene and that are very hard to do manually.
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// Init and main vars for CustomFields</span>
+dol_include_once<span class="br0">(</span><span class="st_h">'/customfields/lib/customfields_aux.lib.php'</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Filling the $object with customfields for lines of products/services (you can then access them by doing $object-&gt;customfields-&gt;lines-&gt;$lineid-&gt;cf_yourfield)</span>
+<span class="re0">$customfields</span> <span class="sy0">=</span> customfields_fill_object_lines<span class="br0">(</span><span class="re0">$object</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>Requirements: $object can be a dummy object but must contain at least 2 properties: $object-&gt;id and $object-&gt;table_element_line.
+</p><p>For more informations on pratical usages of this function, please <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields#Implementing_in_php_code_.28dolibarr_core_modules_or_your_own_module.29" title="Module CustomFields">read the user documentation on how to implement CustomFields in php code</a>.
+</p>
+<h1> <span class="mw-headline" id="Architecture"> Architecture </span></h1>
+<p>Here is a full list of the CustomFields packaged files with a short description (for a more in-depth view just crawl the source files, they are full of comments):
+</p>
+<h2> <span class="mw-headline" id="Core_files"> Core files </span></h2>
+<p>files that are necessary for the CustomFields to work, they contains the core functions
+</p>
+<ul><li> /customfields/admin/customfields.php --- Administrator's configuration panel&nbsp;: this is where you create and manage the custom fields definitions
+</li><li> /customfields/class/actions_customfields.class.php --- Hooks class&nbsp;: used to hook into Dolibarr core modules without altering any core file (can be used to hook into your own modules too). Also used to preprocess the parameters before calling the printforms library.
+</li><li> /customfields/class/customfields.class.php --- Core class&nbsp;: every database action is made here in this class. You can find some printing functions because they are very generic.
+</li><li> /customfields/conf/conf_customfields.lib.php --- Configuration file&nbsp;:&nbsp;contains the main configurable variables to adapt CustomFields to your needs or to expand its support to other modules and more native sql types.
+</li><li> /customfields/conf/conf_customfields_func.lib.php --- Auxiliary functions library to read and manage config variables
+</li><li> /customfields/core/modules/modCustomFields.class.php --- Dolibarr's module definition file&nbsp;: this is a core file necessary for Dolibarr to recognize the module and to declare the hooks to Dolibarr (but it does not store anything else than meta-informations).
+</li><li> /customfields/core/substitutions/functions_customfields.lib.php --- CustomFields substitution class for ODT generation&nbsp;: necessary to support customfields tags in ODT files
+</li><li> /customfields/core/triggers/interface_50_modCustomFields_SaveFields.class.php --- Core triggers file&nbsp;: this is where the actions on records are managed. This is an interface between other modules and CustomFields management. You should not modify this file but you should add your triggers in $triggersarray inside conf_customfields.lib.php, but if you really have a special need and know what you do, you can edit this file to directly add your own triggers. Also, if CustomFields are shown in the forms but cannot be modified nor saved, then probably this trigger file is not detected by Dolibarr (maybe you can try to lower the number 50 to raise the priority?).
+</li><li> /customfields/fields/customfields_fields_extend.lib.php.example --- Overloading functions library with users functions: this is where implementers can use their own php code to manage the custom fields they want (one function per action and per field).
+</li><li> /customfields/fields/customfields_fields_ajax_custom.lib.php.example --- Custom AJAX functions library with users functions: this is where implementers can use their own php code to manage the custom fields cascading and AJAX calls, similarly to the Overloading functions library (one function per action and per field).
+</li><li> /customfields/langs/code_CODE/customfields.lang --- Core language file&nbsp;: this is where you can translate the admin config panel (data types names, labels, descriptions, etc.)
+</li><li> /customfields/langs/code_CODE/customfields-user.lang --- User defined language file&nbsp;: this is where you can store the labels and values of your custom fields (see the related chapter)
+</li><li> /customfields/lib/customfields_aux.lib.php --- Simplifier library to easily use CustomFields class to populate an $object with custom fields datas (Facade design pattern). This is what you should use for most of your needs.
+</li><li> /customfields/lib/customfields_printforms.lib.php --- Core printing library for records&nbsp;: contains only printing functions, there's not really any core functions inside but it allows to manage the printing of the custom fields records and their editing.
+</li><li> /customfields/lib/customfields_ajax_wrapper.lib.php --- AJAX wrapper library to automatically manage cascading at objects creation. This isn't really necessary for CustomFields to function, this is more an addition to allow dynamical AJAX updating, but CustomFields core functionalities can work without this library.
+</li><li> /customfields/sql/*.sql --- Unused (the tables are created directly via a function in the customfields.class.php) - but the sql files are still valid, they were used as squeletton in the first designs.
+</li></ul>
+<h2> <span class="mw-headline" id="PDFTest_module"> PDFTest module </span></h2>
+<p>optional module to append a page listing all custom fields values on newly generated PDF documents. To be used to test if custom fields are working correctly before making one's own template.
+</p>
+<ul><li> /customfieldspdftest/class/actions_customfieldspdftest.class.php --- Main functions library and hooks class, to hook onto pdf generation. Contains the PDFTest functions.
+</li><li> /customfieldspdftest/core/modules/modCustomFieldsPDFTest.class.php --- Module descriptor for Dolibarr
+</li></ul>
+<h2> <span class="mw-headline" id="Runtime_outline"> Runtime outline </span></h2>
+<p>Here is an outline of how CustomFields works: what functions will be called and why:
+</p><p><br>
+<b>- At admin page:</b>
+</p>
+<ul><li> No external function call (apart for some icons or needed admin functions like for tabs), everything that is done are sql queries via CustomFields class (to fetch and modify the sql columns in the customfields tables).
+</li></ul>
+<p><br>
+<b>- At printing:</b>
+</p>
+<ul><li> Module's hook formObjectOptions calls Dolibarr's hookmanager
+</li><li> Hookmanager calls CustomFields /class/actions_customfields.class.php, function formObjectOptions() of CustomFields
+</li><li> Preprocess a few parameters (mainly the $action) and calls customfields_print_forms()
+</li><li> customfields_print_forms() preprocess all the hook's parameters and assimilate them with the CustomFields's configuration parameters (there's no connection to the database at this stage, only parameters preprocessing), then calls /lib/customfields_printforms.lib.php, functions customfields_print_creation_form() or customfields_print_datasheet_form
+</li><li> both customfields_print_creation_form() lookup the database using CustomFields class and prints empty custom fields; customfields_print_datasheet_form() lookup the database using CustomFields class, fetch the values of the custom fields and prints them;
+</li></ul>
+<p><br>
+<b>- At edition:</b>
+</p>
+<ul><li> Same steps as <b>At printing</b>
+</li><li> then customfields_print_datasheet_form() process the custom field being edited differently than the others: if editing, it prints the html input field (to enter a new value), or if saving it just saves the data into the database by calling the CUSTOMFIELDS_MODIFY trigger and then continue to print the other fields normally.
+</li><li> CUSTOMFIELDS_MODIFY trigger calls $customfields-&gt;update($newrecord);
+</li></ul>
+<p><br>
+<b>- At creation (saving):</b>
+</p>
+<ul><li> Module's creation trigger MYMODULE_CREATE calls Dolibarr's run_trigger()
+</li><li> Dolibarr run_trigger() calls CustomFields trigger file /core/trigger/interface_50_modCustomFields_SaveFields.class.php, function run_trigger()
+</li><li> CustomFields's run_trigger() assimilate the given parameters with the CustomFields's config parameters, and if the trigger is found in $triggersarray, then the appropriate action is taken (by default: _CREATE or another standard action if recognized), if not in $triggersarray, the function will still try to automatically detect the appropriate action by detecting MYMODULE_ALISTOFACTIONS with a regular expression.
+</li><li> The appropriate action is then done (creation in this case) by calling $customfields-&gt;create($record).
+</li></ul>
+<p><br>
+<b>- At edition or creation of product lines:</b>
+</p>
+<ul><li> Similar to <b>At edition</b> but with hooks: formCreateProductOptions and formEditProductOptions.
+</li></ul>
+<p><br>
+<b>- At ODT document generation and substitution:</b>
+</p>
+<ul><li> Module's ODT generator calls for Dolibarr's function complete_substitution_array(), which then calls for CustomFields substitution file /core/substitution/functions_customfields.lib.php, function customfields_completesubstitutionarray()
+</li><li> CustomFields's function customfields_completesubstitutionarray() calls the simplifier library customfields_aux.lib.php, function customfields_fill_object() and make the substitution inside the $substitutionarray.
+</li></ul>
+<p><br>
+<b>- At ODT document generation and substitution for product lines:</b>
+</p>
+<ul><li> Same as the previous point but this function is called for every product lines, and thus the data is cached. Also the simplifier function is here called customfields_fill_object_lines(), and the CustomFields's substitution function called customfields_completesubstitutionarray_lines().
+</li></ul>
+<h1> <span class="mw-headline" id="How_to_add_the_support_of_a_new_module"> How to add the support of a new module </span></h1>
+<p>There are two cases: either the module already implements hooks, and you just have to configure CustomFields to support it, or either the module does not implements hooks nor triggers.
+</p><p>This chapter will guide you through the steps to make any module supported by CustomFields (be it a Dolibarr core module or your own module).
+</p>
+<h2> <span class="mw-headline" id="Preliminary_test"> Preliminary test </span></h2>
+<p>This preliminary test will allow you to know at a glance how much work needs to be done in order to make your module supported by CustomFields, and it will also give you all the config parameters if they are available.
+</p><p>Important note: this test will only give data about hooks, which is the main part to make CustomFields work for your module. But for triggers, there is no way to test, so you will have to check the triggers manually (either by testing if the custom fields are saved at creation page, or by looking at the source code of the objects classes).
+</p><p>Edit the php script of the module (check the URL when you access the module's datasheet or creation page - attention both are two different pages, so you have to do this twice), then put this at the very <b>end</b> of the php script:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// CustomFields debuglines to show config parameters for current module</span>
+<span class="kw1">print</span><span class="br0">(</span><span class="st0">"&lt;pre&gt;"</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// html nice output</span>
+<span class="kw1">print</span><span class="br0">(</span><span class="st0">"table_element: <span class="es4">{$object-&gt;table_element}</span> - table_element_line: <span class="es4">{$object-&gt;table_element_line}</span> - contexts: "</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="kw3">print_r</span><span class="br0">(</span><span class="re0">$hookmanager</span><span class="sy0">-&gt;</span><span class="me1">contextarray</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="kw1">print</span><span class="br0">(</span><span class="st0">" - conf hooks_modules: "</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="kw3">print_r</span><span class="br0">(</span><span class="re0">$conf</span><span class="sy0">-&gt;</span><span class="me1">hooks_modules</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="kw1">print</span><span class="br0">(</span><span class="st0">" - hooks attached: "</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="kw3">print_r</span><span class="br0">(</span><span class="re0">$hookmanager</span><span class="sy0">-&gt;</span><span class="me1">hooks</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="kw1">print</span><span class="br0">(</span><span class="st0">" - user rights: "</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="kw3">print_r</span><span class="br0">(</span><span class="re0">$user</span><span class="sy0">-&gt;</span><span class="me1">rights</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="kw1">print</span><span class="br0">(</span><span class="st0">"&lt;/pre&gt;"</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>Now reload the page, and scroll at the very bottom. You should see some informations about the module.
+</p><p>Depending on the data available, you will know what you have to do:
+</p>
+<ul><li> If all the datas is available, then it's ok, jump to <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Configuring_CustomFields_to_support_the_module" title="Module CustomFields Dev">Module_CustomFields_Dev#Configuring_CustomFields_to_support_the_module</a> and copy these datas to the parameters of conf_customfields.lib.php
+</li></ul>
+<ul><li> If there's no <b>table_element</b>: $object is not defined, try to find how is called the main object variable and replace $object by this variable in the debug code given above (eg: in Agenda, the object variable is called $agenda and $agendacomm).
+</li></ul>
+<ul><li> If there's no <b>table_element_line</b>: either there's no products lines for this module, either the main object variable is not called $object (see the previous point). One last case is that the object is not standard and does not store table_element_line (the name of the table that stores its products lines), in which case you have to manually add it in the class (eg: $this-&gt;table_element_line = 'something').
+</li></ul>
+<ul><li> If there's no <b>contexts</b>: the hookmanager is not defined, and probably there's no hook at all in this module, so you'll have to implement them by yourself. Jump to <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Hooks" title="Module CustomFields Dev">Module_CustomFields_Dev#Hooks</a>.
+</li></ul>
+<ul><li> If there is a list of <b>contexts</b> but the module cannot be found in the list: the hookmanager is defined but the module has not defined a context, you still have to implement the hooks. Jump to <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Hooks" title="Module CustomFields Dev">Module_CustomFields_Dev#Hooks</a>.
+</li></ul>
+<ul><li> If there's no <b>conf hooks_modules</b>: this variable is not necessary, empty or not it doesn't matter. But if you see customfields and/or customfieldspdftest inside the list, it is a confirmation that CustomFields indeed is hooking the module correctly.
+</li></ul>
+<ul><li> If there's no <b>hooks attached</b>, or CustomFields cannot be found in the list: CustomFields has not been properly configured to hook to this module, or you forgot to disable then re enable CustomFields in order to update the CustomFields's hooks. Jump to <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Configuring_CustomFields_to_support_the_module" title="Module CustomFields Dev">Module_CustomFields_Dev#Configuring_CustomFields_to_support_the_module</a>.
+</li></ul>
+<ul><li> If there is no <b>$user-&gt;rights</b>: there is either no standard security implemented in this module, or either the variable is called with another name. If there is no security, you don't need to configure it in CustomFields, but if there is a security, you need to find how the variable is called (like $object can get another name sometimes).
+</li></ul>
+<ul><li> If there is <b>$user-&gt;rights</b> but the module can't be found in the list: either the name for the rights is different (this often happens, the rights array is not yet standardized), or either the rights are hardcoded into the module's code (rights should be announced to the $user-&gt;rights array, but sometimes it happens that the dev forgot to do so, and thus the right is entirely hardcoded and you can't find it in the dynamic rights array). In any of these two cases, you will have to manually read the module's code to find the right. Also, maybe there is no security implemented, but since $user-&gt;rights is declared this is less probable.
+</li></ul>
+<p>Here is an example of output on a correctly hooked module (invoice):
+</p>
+<pre>table_element: facture - table_element_line: facturedet - contexts: Array
+(
+    [0] =&gt; searchform
+    [1] =&gt; leftblock
+    [2] =&gt; toprightmenu
+    [3] =&gt; invoicecard
+)
+ - conf hooks_modules: Array
+(
+    [customfields] =&gt; invoicecard:propalcard:productcard:ordercard:thirdpartycard:contactcard:ordersuppliercard:invoicesuppliercard:membercard:actioncard:projectcard:projecttaskcard:contractcard:interventioncard:doncard:tripsandexpensescard:taxvatcard:expeditioncard:invoicecard:propalcard:ordercard:ordersuppliercard:invoicesuppliercard
+    [customfieldspdftest] =&gt; Array
+        (
+            [0] =&gt; pdfgeneration
+            [1] =&gt; ordersuppliercard
+        )
+
+)
+ - hooks attached: Array
+(
+    [invoicecard] =&gt; Array
+        (
+            [customfields] =&gt; ActionsCustomFields Object
+                (
+                )
+
+        )
+
+)
+ - user rights: stdClass Object
+(
+    [user] =&gt; stdClass Object
+        (
+            [user] =&gt; stdClass Object
+                (
+                    [lire] =&gt; 1
+                    [creer] =&gt; 1
+                    [password] =&gt; 1
+                    [supprimer] =&gt; 1
+                    [export] =&gt; 1
+                )
+
+            [self] =&gt; stdClass Object
+                (
+                    [creer] =&gt; 1
+                    [password] =&gt; 1
+                )
+
+            [user_advance] =&gt; stdClass Object
+                (
+                    [readperms] =&gt; 1
+                    [write] =&gt; 1
+                )
+
+            [self_advance] =&gt; stdClass Object
+                (
+                    [readperms] =&gt; 1
+                    [writeperms] =&gt; 1
+                )
+
+            [group_advance] =&gt; stdClass Object
+                (
+                    [read] =&gt; 1
+                    [readperms] =&gt; 1
+                    [write] =&gt; 1
+                    [delete] =&gt; 1
+                )
+
+        )
+
+    [facture] =&gt; stdClass Object
+        (
+            [lire] =&gt; 1
+            [creer] =&gt; 1
+            [invoice_advance] =&gt; stdClass Object
+                (
+                    [unvalidate] =&gt; 1
+                    [send] =&gt; 1
+                )
+
+            [valider] =&gt; 1
+            [paiement] =&gt; 1
+            [supprimer] =&gt; 1
+            [facture] =&gt; stdClass Object
+                (
+                    [export] =&gt; 1
+                )
+
+        )
+
+    [propale] =&gt; stdClass Object
+        (
+            [lire] =&gt; 1
+            [creer] =&gt; 1
+            [valider] =&gt; 1
+            [propal_advance] =&gt; stdClass Object
+                (
+                    [send] =&gt; 1
+                )
+
+            [cloturer] =&gt; 1
+            [supprimer] =&gt; 1
+            [export] =&gt; 1
+        )
+
+    [produit] =&gt; stdClass Object
+        (
+            [lire] =&gt; 1
+            [creer] =&gt; 1
+            [supprimer] =&gt; 1
+            [export] =&gt; 1
+        )
+
+    etc... a lot of other rights...
+
+)
+</pre>
+<p>When you are finished with implementing the support of CustomFields in the module, you should delete these debug lines.
+</p>
+<h2> <span class="mw-headline" id="Implementing_the_support_of_CustomFields_in_the_module"> Implementing the support of CustomFields in the module </span></h2>
+<p>If there is a module you want to implement the support of CustomFields, but does not yet has the required components, here is a guide on how to implement these components.
+</p>
+<h3> <span class="mw-headline" id="Hooks"> Hooks </span></h3>
+<p>Implementing hooks will allow custom fields to appear on your module's page. They will also be editable and they will save the data. For creation, you need to use a trigger (see the subchapter below).
+</p><p>First you should be familiar with the way that hooks are implemented in modules. If you don't, please first <a href="http://wiki.dolibarr.org/index.php/Hooks_system#Implementation" title="Hooks system">read the hooks documentation</a>.
+</p><p>An example case of implementation of hooks into a Dolibarr core file can be found in the <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases" title="Module CustomFields Cases">CustomFields Example Cases wiki page</a>.
+</p>
+<h4> <span class="mw-headline" id="Datasheet_hook"> <b>Datasheet hook</b> </span></h4>
+<p>To implement CustomFields in your module, you must initialize the hook manager, then use the following hook context:
+</p>
+<ul><li> formObjectOptions
+</li></ul>
+<p>This hook must be placed everywhere in your code where you want custom fields to appear (eg: on the creation page and datasheet view page).
+</p><p>Note: Generally, you will have to place the hook just before the end of a table tag (<b>&lt;/table&gt;</b>), so if you don't know where to place it (eg: if you're implementing CustomFields on a Dolibarr core module), just search for this tag in the page shown in the url (eg: /htdocs/commande/fiche.php).
+</p><p>Eg: First load the hookmanager at the beginning of your php script:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// Initialize technical object to manage hooks of thirdparties. Note that conf-&gt;hooks_modules contains array array</span>
+<span class="kw1">include_once</span><span class="br0">(</span>DOL_DOCUMENT_ROOT<span class="sy0">.</span><span class="st_h">'/core/class/hookmanager.class.php'</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="re0">$hookmanager</span><span class="sy0">=</span><span class="kw2">new</span> HookManager<span class="br0">(</span><span class="re0">$db</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="re0">$hookmanager</span><span class="sy0">-&gt;</span><span class="me1">initHooks</span><span class="br0">(</span><span class="kw3">array</span><span class="br0">(</span><span class="st_h">'yourmodule'</span><span class="br0">)</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>Then place the hook as many times as required:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="co1">// ... a lot of php code ...</span>
+&nbsp;
+<span class="kw1">print</span> <span class="st_h">'&lt;/td&gt;&lt;/tr&gt;'</span><span class="sy0">;</span> <span class="co1">// end of the last row of a table</span>
+&nbsp;
+<span class="co1">// Other attributes</span>
+<span class="re0">$parameters</span><span class="sy0">=</span><span class="kw3">array</span><span class="br0">(</span><span class="st_h">'colspan'</span> <span class="sy0">=&gt;</span> <span class="st_h">' colspan="3"'</span><span class="br0">)</span><span class="sy0">;</span> <span class="co1">// specifying the colspan is optional but will help CustomFields know how to correctly print the table</span>
+<span class="re0">$reshook</span><span class="sy0">=</span><span class="re0">$hookmanager</span><span class="sy0">-&gt;</span><span class="me1">executeHooks</span><span class="br0">(</span><span class="st_h">'formObjectOptions'</span><span class="sy0">,</span><span class="re0">$parameters</span><span class="sy0">,</span><span class="re0">$object</span><span class="sy0">,</span><span class="re0">$action</span><span class="br0">)</span><span class="sy0">;</span>    <span class="co1">// Note that $action and $object may have been modified by hook</span>
+&nbsp;
+<span class="kw1">print</span> <span class="st_h">'&lt;/table&gt;'</span><span class="sy0">;</span> <span class="co1">// end of the table, this is what you're looking for, place the hook just above</span>
+&nbsp;
+<span class="co1">// ... a lot of php code ... redo the same if you find another &lt;/table&gt; and there's a page where there's no custom fields but you want to place custom fields on there</span></pre></div></div>
+<p>Note2: If after implementing the hook you receive an error or custom fields don't appear, you may have to change $object to another variable, depending on what is called the main object (eg: in Agenda it's called $action and $actioncomm).
+</p>
+<h4> <span class="mw-headline" id="Lines_hooks"> <b>Lines hooks</b> </span></h4>
+<p>For product lines, you should anyway use the product lines template files: htdocs/core/tpl/freeproductline_edit.tpl.php
+</p><p>If you don't, you can still manually implement the required hooks, what is required is that you supply $line (which is the current line object being processed) in the $parameters array:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$parameters</span><span class="sy0">=</span><span class="kw3">array</span><span class="br0">(</span><span class="st_h">'line'</span><span class="sy0">=&gt;</span><span class="re0">$line</span><span class="sy0">,</span><span class="st_h">'fk_parent_line'</span><span class="sy0">=&gt;</span><span class="re0">$line</span><span class="sy0">-&gt;</span><span class="me1">fk_parent_line</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+<span class="kw1">echo</span> <span class="re0">$hookmanager</span><span class="sy0">-&gt;</span><span class="me1">executeHooks</span><span class="br0">(</span><span class="st_h">'formEditProductOptions'</span><span class="sy0">,</span><span class="re0">$parameters</span><span class="sy0">,</span><span class="re0">$this</span><span class="sy0">,</span><span class="re0">$action</span><span class="br0">)</span><span class="sy0">;</span></pre></div></div>
+<p>Hooks names:
+</p>
+<ul><li> formEditProductOptions
+</li><li> formCreateProductOptions ($line is not required here, because we create a new product line! you can leave $parameters=array(); empty).
+</li></ul>
+<p>Note: there's no hook for viewing, because showing the customfields will clutter the visual field, but if you really want you can also do it by adding a formViewProductOptions hook.
+</p>
+<h3> <span class="mw-headline" id="Triggers"> Triggers </span></h3>
+<p>First you need to know how to implement triggers in Dolibarr. For more informations about how to implement triggers in your module, please read the <a href="http://wiki.dolibarr.org/index.php/Triggers#Manage_and_create_a_new_trigger.27s_action" title="Triggers">triggers wiki page</a>.
+</p><p>An example case of implementation of hooks into a Dolibarr core file can be found in the <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases" title="Module CustomFields Cases">CustomFields Example Cases wiki page</a>.
+</p><p>Implementing triggers on your module will allow CustomFields to save the fields at creation (datasheet edition is already managed by hooks).
+</p><p>You need to implement 3 triggers:
+- on creation of object - eg: YOURMODULE_CREATE
+- on creation of lines - eg: YOURMODULELINE_INSERT (optional, only if your module has product lines)
+- on update of lines - eg: YOURMODULELINE_UPDATE (optional, only if your module has product lines)
+</p><p>Note: you need to supply the sql id of the newly created object before calling the trigger.
+</p><p>Eg:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">id</span> <span class="sy0">=</span> <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">db</span><span class="sy0">-&gt;</span><span class="me1">last_insert_id</span><span class="br0">(</span>MAIN_DB_PREFIX<span class="sy0">.</span><span class="st0">"yourmodule_table_element"</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+<span class="co1">// Appel des triggers</span>
+<span class="kw1">include_once</span><span class="br0">(</span>DOL_DOCUMENT_ROOT <span class="sy0">.</span> <span class="st0">"/core/class/interfaces.class.php"</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="re0">$interface</span><span class="sy0">=</span><span class="kw2">new</span> Interfaces<span class="br0">(</span><span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">db</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="re0">$result</span><span class="sy0">=</span><span class="re0">$interface</span><span class="sy0">-&gt;</span><span class="me1">run_triggers</span><span class="br0">(</span><span class="st_h">'YOURMODULE_CREATE'</span><span class="sy0">,</span><span class="re0">$this</span><span class="sy0">,</span><span class="re0">$user</span><span class="sy0">,</span><span class="re0">$langs</span><span class="sy0">,</span><span class="re0">$conf</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="kw1">if</span> <span class="br0">(</span><span class="re0">$result</span> <span class="sy0">&lt;</span> 0<span class="br0">)</span> <span class="br0">{</span>
+    <span class="re0">$error</span><span class="sy0">++;</span> <span class="re0">$this</span><span class="sy0">-&gt;</span><span class="me1">errors</span><span class="sy0">=</span><span class="re0">$interface</span><span class="sy0">-&gt;</span><span class="me1">errors</span><span class="sy0">;</span>
+<span class="br0">}</span>
+<span class="co1">// Fin appel triggers</span></pre></div></div>
+<p>Note2: if it's a Dolibarr core module, you can easily find the right place to put the trigger by searching for 'create sql' in the class subfolder (eg: URL is /htdocs/commande/fiche.php, the class is in /htdocs/commande/class/commande.class.php).
+</p><p>Note3: CustomFields also supports a few other triggers like _CLONE, _UPDATE, _MODIFY, but they are not required and may not work depending on how your module works to manage these actions.
+</p>
+<h2> <span class="mw-headline" id="Configuring_CustomFields_to_support_the_module"> Configuring CustomFields to support the module </span></h2>
+<h3> <span class="mw-headline" id="Preliminary_work"> Preliminary work </span></h3>
+<p>You need to get the parameters of this module, and you will then put them in the CustomFields configuration file (conf_customfields.lib.php).
+</p>
+<h4> <span class="mw-headline" id="Getting_the_parameters_automatically"> <b>Getting the parameters automatically</b> </span></h4>
+<p>You can use the <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Preliminary_test" title="Module CustomFields Dev">preliminary test</a> to easily get all those parameters.
+</p>
+<h4> <span class="mw-headline" id="Getting_the_parameters_manually"> <b>Getting the parameters manually</b> </span></h4>
+<p>To configure CustomFields to support a module, you need at least 5 parameters:
+</p>
+<ul><li> the module's table_name (name of the sql table where the module stores its datas)
+</li><li> the module's context (name given by the module to the hookmanager)
+</li><li> the module's idvar (name of the variable that holds the sql row id of the record)
+</li><li> the module's trigger action(s) (triggers on creation and update, see the related chapter above)
+</li><li> the module's rights (for security purposes)
+</li></ul>
+<p>To get these parameters manually, you can take a look inside the code of the module's files you want to implement:
+</p>
+<ul><li> module's table name: either find it by yourself in the database (looks like llx_themodulename) or by printing it in actions_customfields.class.php by adding <b>print_r($parameters)</b> and search for $parameters-&gt;table_element
+</li><li> module's context: search for "callHooks(" without the quotes or take a look at the wiki: <a href="http://wiki.dolibarr.org/index.php/Hooks_system" class="external free" target="_blank">http://wiki.dolibarr.org/index.php/Hooks_system</a>
+</li></ul>
+<p>or you can get it by printing it in the /htdocs/customfields/class/actions_customfields.class.php by adding print_r($parameters) and search for $parameters-&gt;context
+</p>
+<ul><li> module's trigger actions: search for "run_triggers(" or take a look at the wiki: <a href="http://wiki.dolibarr.org/index.php/Triggers#List_of_known_triggers_actions" class="external free" target="_blank">http://wiki.dolibarr.org/index.php/Triggers#List_of_known_triggers_actions</a>
+</li><li> module's idvar: look at the url when you access one of the module's record, and you should see something like fiche.php?xxxid=12 - you need the xxxid (eg: socid, facid, etc.).
+</li><li> module's security: in the page shown in URL when accessing the module's datasheet, edit this file and add <b>print($user-&gt;rights)</b>, then in the list try to find the correct right (generally something like $user-&gt;modulename-&gt;creer). You can also try to search for $user-&gt;rights in the sourcecode of this module.
+</li></ul>
+<p>With these values, edit the config file (/htdocs/customfields/conf/conf_customfields.lib.php), particularly the $modulesarray and $triggersarray variables:
+</p>
+<h3> <span class="mw-headline" id="Configure_hooks_and_main_parameters"> Configure hooks and main parameters </span></h3>
+<p>Add every parameters except triggers in the $modulesarray:
+</p>
+<div dir="ltr" class="mw-geshi" style="text-align: left;"><div class="php source-php" style="font-family:monospace;"><pre class="de1"><span class="re0">$modulesarray</span> <span class="sy0">=</span> <span class="kw3">array</span><span class="br0">(</span>
+                      <span class="kw3">array</span><span class="br0">(</span><span class="st_h">'context'</span><span class="sy0">=&gt;</span><span class="st_h">'invoicecard'</span><span class="sy0">,</span> <span class="st_h">'table_element'</span><span class="sy0">=&gt;</span><span class="st_h">'facture'</span><span class="sy0">,</span> <span class="st_h">'idvar'</span><span class="sy0">=&gt;</span><span class="st_h">'facid'</span><span class="sy0">,</span> <span class="st_h">'rights'</span><span class="sy0">=&gt;</span>array<span class="br0">(</span><span class="st_h">'$user-&gt;rights-&gt;facture-&gt;creer'</span><span class="br0">)</span><span class="br0">)</span><span class="sy0">,</span> <span class="co1">// Client Invoice</span>
+                      <span class="kw3">array</span><span class="br0">(</span><span class="st_h">'context'</span><span class="sy0">=&gt;</span><span class="st_h">'membercard'</span><span class="sy0">,</span> <span class="st_h">'table_element'</span><span class="sy0">=&gt;</span><span class="st_h">'adherent'</span><span class="sy0">,</span> <span class="st_h">'idvar'</span><span class="sy0">=&gt;</span><span class="st_h">'rowid'</span><span class="sy0">,</span> <span class="st_h">'rights'</span><span class="sy0">=&gt;</span>array<span class="br0">(</span><span class="st_h">'$user-&gt;rights-&gt;adherent-&gt;creer'</span><span class="br0">)</span><span class="sy0">,</span> <span class="st_h">'tabs'</span><span class="sy0">=&gt;</span>array<span class="br0">(</span><span class="st_h">'objecttype'</span><span class="sy0">=&gt;</span><span class="st_h">'member_admin'</span><span class="sy0">,</span> <span class="st_h">'function'</span><span class="sy0">=&gt;</span><span class="st_h">'member_admin_prepare_head'</span><span class="sy0">,</span> <span class="st_h">'lib'</span><span class="sy0">=&gt;</span>DOL_DOCUMENT_ROOT<span class="sy0">.</span><span class="st_h">'/core/lib/member.lib.php'</span><span class="br0">)</span><span class="br0">)</span><span class="sy0">,</span> <span class="co1">// Members / Adherents</span>
+                     <span class="br0">)</span><span class="sy0">;</span> <span class="co1">// Edit me to add the support of another module - NOTE: Lowercase only!</span></pre></div></div>
+<p>There are also a lot of others parameters you can give to CustomFields so that the module gets better managed or to add a few other functionnalities, here is a non-exhaustive list:
+</p>
+<ul><li> context: name of the module's context.
+</li><li> table_element: name of the sql table that holds the object's datas.
+</li><li> idvar: name of the variable that holds the id of the object in the sql database (by default 'id' or 'rowid').
+</li><li> rights: prevent the custom fields to be editable unless all the rights set here are enabled (preventing custom fields to be viewed is useless because they won't show anyway if the page can't be loaded due to insufficient rights, so this is directly handled by the module).
+</li><li> tabs=&gt;array(objecttype, function, lib, tabname, tabtitle): used to embed CustomFields's admin panel into another module's admin page.
+</li></ul>
+<h3> <span class="mw-headline" id="Configure_creation_triggers"> Configure creation triggers </span></h3>
+<p>Add the triggers in $triggersarray:
+$triggersarray = array("order_create"=&gt;"commande",
+</p>
+<pre>                      "yourmodule_triggeraction1"=&gt;"yourmodule_tablename",
+                      "yourmodule_triggeraction2"=&gt;"yourmodule_tablename");
+</pre>
+<p>Note: generally you will be looking to implement the _CREATE.
+</p><p>Note2: if a triggeraction is not recognized by CustomFields (eg: mymodule_addpayment) then by default CustomFields will assimilate it to a _create action (it will create and save the values for the custom fields, just for a module's creation page).
+</p><p>Note3: CustomFields also supports a few other triggers like _CLONE, _UPDATE, _MODIFY, but they are not required and may not work depending on how your module works to manage these actions.
+</p>
+<h3> <span class="mw-headline" id="Configuration_troubleshooting"> Configuration troubleshooting </span></h3>
+<ul><li> If you cannot see the custom fields appear on your module's page, this means the hooks are not implemented or configured in CustomFields, please read the related chapters.
+</li></ul>
+<ul><li> If the custom fields appear on the datasheet but there's no edit button icon: the module implements security but you did not configure it properly in CustomFields, please find the right security in $user-&gt;rights and set it in conf_customfields.lib.php.
+</li></ul>
+<ul><li> If the custom fields appear on the creation page but are not saved: you forgot to set the trigger in $triggersarray, or the creation trigger does not exist for this module and you have to implement it. Jump to <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Triggers" title="Module CustomFields Dev">Module_CustomFields_Dev#Triggers</a>.
+</li></ul>
+<ul><li> If the custom fields appear on the datasheet but not on the creation page (or vice versa): A hook is missing on the page where the custom fields do not appear. Jump to <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev#Hooks" title="Module CustomFields Dev">Module_CustomFields_Dev#Hooks</a>.
+</li></ul>
+<ul><li> If the custom fields appear on the datasheet with the edit button, but when the edit button is clicked, everything disappear: either the $idvar is not properly set (look at the URL to know if you need to set idvar), or the hook is not properly made ($object is not defined and it's called by another name, but the hook use $object instead of the correct variable).
+</li></ul>
+<ul><li> If the custom fields appear on the datasheet with the edit button, can be edited but cannot be saved (the data is not saved): same as the previous point: either $idvar or $object bug.
+</li></ul>
+<p>Also you might find useful to <b><a href="http://wiki.dolibarr.org/index.php/Module_CustomFields#General_advices_for_troubleshooting" title="Module CustomFields">enable php errors</a></b> to better track errors if that's not already done.
+</p>
+<h1> <span class="mw-headline" id="Example_cases"> Example cases </span></h1>
+<p>You can find a compilation of concrete, practical examples on the <a href="http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases" title="Module CustomFields Cases">Module_CustomFields_Cases</a> wiki page.
+</p>
+<h1> <span class="mw-headline" id="TO_DO"> TO DO </span></h1>
+<p>You will find below the public list of features that should be implemented in the future.
+</p><p>If you have an idea about a new feature that isn't listed below, feel free to add it to the list!
+</p>
+<h2> <span class="mw-headline" id="To_Do_2"> To Do </span></h2>
+<ul><li> Better management of hidden fields with custom cascading (eg: works great on creation form, but on edit form and creation form with edit action, if the parents already have a value, the hidden fields will stay hidden! This is because of the AJAX is not called, and this is normal). -&gt; Propose a better custom cascade function storing the hidden field's state inside extraoptions?
+</li></ul>
+<h2> <span class="mw-headline" id="To_Document"> To Document </span></h2>
+<ul><li> Automatic recopy on cloning for custom fields and products' lines custom fields.
+</li><li> new API function: customfields_clone_or_recopy($object, $fromobject, $action2 = null)
+</li></ul>
+<h2> <span class="mw-headline" id="Should_do"> Should do </span></h2>
+<ul><li> Add the possibility to mark a custom field to be shown in tables listings (eg: as a column in products listings) with "order by this column" buttons and stuffs. Will be difficult if the hooks are not yet implemented in listings.
+</li><li> Checkbox (multiple checkboxes, one for each possible value) and multiselect (big select and can use SHIFT to multiselect) (store in XML file) (but impossible with constrained fields, can't store multiple foreign keys ids in one single sql field, but would work for other types like enum)
+</li></ul>
+<p>use fieldset, input checkbox and label for, eg:
+</p>
+<pre>   &lt;fieldset&gt;&lt;legend&gt;&lt;label for="cf_productslist"&gt; $langs-&gt;trans('cf_productslist')&lt;/label&gt;&lt;/legend&gt;
+   &lt;input type="checkbox" name="cf_productslist_choice1" value="1" id="cf_productslist_choice1" /&gt;&lt;label for="cf_productslist_choice1"&gt; $langs-&gt;trans('cf_productslist_choice1')&lt;/label&gt;<br>
+   &lt;input type="checkbox" name="cf_productslist_choice2" value="1" id="cf_productslist_choice2" /&gt;&lt;label for="cf_productslist_choice2"&gt; $langs-&gt;trans('cf_productslist_choice2')&lt;/label&gt;<br>
+   etc...
+   &lt;/fieldset&gt;
+</pre>
+<ul><li> Add a javascript options values generator for the enum type (a hidden input that would be shown only when DropdownBox type is selected and that would permit to add options by clicking a plus button).
+</li><li> Replace triggers in customfields class by hookmanager?
+</li><li> AJAX previsualisation of the HTML custom field that will be created.
+</li><li> In ODTs, create special tags to directly access day, month or year value of a date type field independently of the rest.
+</li><li> New overloading function's action: "get", similar to view except that it works not only on Dolibarr's view but whenever someone tries to access this field's value.
+</li><li> Add Upload and Image field types (this would allow for an easier integration inside ODT and PDF templates than the current workflow of Dolibarr).
+</li></ul>
+<h2> <span class="mw-headline" id="Known_bugs"> Known bugs </span></h2>
+<ul><li> in product and service modules, if you edit a field, the proposals and other fields below won't be shown, you need to refresh the page. This problem resides in Dolibarr I think (since we are simply using a hook).
+</li><li> ficheinter (Intervention module) custom fields will stay in create mode just after create page is submitted (this is because of the $action that is not standard - $action=edit or something).
+</li></ul>
+<h2> <span class="mw-headline" id="Never.2FMaybe_one_day.C2.A0"> Never/Maybe one day&nbsp;</span></h2>
+<ul><li> Add support for repeatable (predefined) invoices (the way it is currently managed makes it very difficult to manage this without making a big exception, adding specific functions in customfields modules that would not at all will be reusable anywhere else, when customfields has been designed to be as generic as possible to support any module and any version of dolibarr, because it's managed by a totally different table while it's still managed by the same module, CustomFields work with the paradigm: one module, one table).
+</li><li> Add an AJAX select box for constrained values to automatically select the appropriate name for Smart Value Substitution&nbsp;: when a constrained type is selected and a table is selected, a hidden select box would show up with the list of the fields of this table to choose the values that will be printed as the values for this customfield (eg: for table llx_users you could select the "nom" field and then it would automatically prepend "nom_" to the field's name).
+</li><li> Fine-grained rights management: rights per group, per user, and per field.
+</li><li> Replace overloading functions (extend class) by hookmanager if possible (but how to simulate the *full switch? Plus this will force users to make their own modules to make those functions, and to disable/renable their modules everytime they will add a new function...).
+</li><li> Refactor the trigger array: merge it with the modulesarray (along with a new way to specify which customfields trigger action a trigger should correspond, eg: 'linebill_insert'=&gt;'customfields_create'). But the triggers aren't necessarily associated with a specific module...
+</li><li> AJAX autocompletion / auto population of field's content when typing the beginning of a value in a text box.
+</li></ul>
+
+<!-- 
+NewPP limit report
+Preprocessor node count: 610/1000000
+Post-expand include size: 1137/2097152 bytes
+Template argument size: 48/2097152 bytes
+Expensive parser function count: 0/100
+-->
+
+<!-- Saved in parser cache with key dolibarrwiki:pcache:idhash:4470-0!*!0!!en!2!edit=0 and timestamp 20150401132432 -->
+<div class="printfooter">
+Retrieved from "<a href="./Module CustomFields Dev - Dolibarr Wiki_files/Module CustomFields Dev - Dolibarr Wiki.html">http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev</a>"</div>
+			<div id="catlinks" class="catlinks"><div id="mw-normal-catlinks"><a href="http://wiki.dolibarr.org/index.php/Special:Categories" title="Special:Categories">Categories</a>: <span dir="ltr"><a href="http://wiki.dolibarr.org/index.php?title=Category:CustomFields&action=edit&redlink=1" class="new" title="Category:CustomFields (page does not exist)">CustomFields</a></span> | <span dir="ltr"><a href="http://wiki.dolibarr.org/index.php/Category:FAQ_EN" title="Category:FAQ EN">FAQ EN</a></span></div></div>			<!-- end content -->
+						<div class="visualClear"></div>
+		</div>
+	</div>
+	</div>
+
+
+		<div id="column-one" class="htmldoc-ignore">
+	<div id="p-cactions" class="portlet">
+		<h5>Views</h5>
+		<div class="pBody">
+			<ul>
+			
+				 <li id="ca-nstab-main" class="selected"><a href="./Module CustomFields Dev - Dolibarr Wiki_files/Module CustomFields Dev - Dolibarr Wiki.html" title="View the content page [alt-c]" accesskey="c">Page</a></li>
+				 <li id="ca-talk" class="new"><a href="http://wiki.dolibarr.org/index.php?title=Talk:Module_CustomFields_Dev&action=edit&redlink=1" title="Discussion about the content page [alt-t]" accesskey="t">Discussion</a></li>
+				 <li id="ca-viewsource"><a href="http://wiki.dolibarr.org/index.php?title=Module_CustomFields_Dev&action=edit" title="This page is protected.
+You can view its source [alt-e]" accesskey="e">View source</a></li>
+				 <li id="ca-history"><a href="http://wiki.dolibarr.org/index.php?title=Module_CustomFields_Dev&action=history" title="Past revisions of this page [alt-h]" accesskey="h">History</a></li>
+				 <li id="ca-language"><a href="http://wiki.dolibarr.org/index.php?title=Special:MultiLanguageManager&cible=Module_CustomFields_Dev">Language</a></li>			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-personal">
+		<h5>Personal tools</h5>
+		<div class="pBody">
+			<ul>
+							<li><img src="./Module CustomFields Dev - Dolibarr Wiki_files/pagemaster.png" height="24px"> <font color="#000000">Ask to contact@dolibarr.org to request an account to contribute to this documentation</font></li>
+							<li id="pt-login"><a href="http://wiki.dolibarr.org/index.php?title=Special:UserLogin&returnto=Module_CustomFields_Dev" title="You are encouraged to log in; however, it is not mandatory [alt-o]" accesskey="o">Log in</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-logo">
+		<a style="background-image: url(/skins/dolibarr/dolibarr_125x125.png);" href="http://wiki.dolibarr.org/index.php/Main_Page" title="Visit the main page [alt-z]" accesskey="z"></a>
+	</div>
+
+	<div class="generated-sidebar portlet" id="p-navigation">
+		<h5>Navigation</h5>
+		<div class="pBody">
+			<ul>
+				<li id="n-mainpage-description"><a href="http://wiki.dolibarr.org/index.php/Main_Page" title="Visit the main page [alt-z]" accesskey="z">Main page</a></li>
+				<li id="n-recentchanges"><a href="http://wiki.dolibarr.org/index.php/Special:RecentChanges" title="The list of recent changes in the wiki [alt-r]" accesskey="r">Recent changes</a></li>
+				<li id="n-randompage"><a href="http://wiki.dolibarr.org/index.php/Special:Random" title="Load a random page [alt-x]" accesskey="x">Random page</a></li>
+			</ul>
+		</div>
+	</div>
+<div class="generated-sidebar portlet" id="p-navigation"><h5>In other languages</h5><div class="pBody"><!--[if lt IE 7]><span class='popup' onMouseOver="document.getElementById('language_popup').style.visibility = 'visible';"  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><span class="popup" id="popup_anchor"><img src="./Module CustomFields Dev - Dolibarr Wiki_files/fr.png" class="languageimage" alt="French"><!--[if lt IE 7]><span  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><div class="cadre_popup" id="language_popup">No translation in French.</div><!--[if lt IE 7]></span><![endif]--></span><!--[if lt IE 7]></span><![endif]--><!--[if lt IE 7]><span class='popup' onMouseOver="document.getElementById('language_popup').style.visibility = 'visible';"  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><span class="popup" id="popup_anchor"><img src="./Module CustomFields Dev - Dolibarr Wiki_files/es.png" class="languageimage" alt="Spanish"><!--[if lt IE 7]><span  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><div class="cadre_popup" id="language_popup">No translation in Spanish.</div><!--[if lt IE 7]></span><![endif]--></span><!--[if lt IE 7]></span><![endif]--><!--[if lt IE 7]><span class='popup' onMouseOver="document.getElementById('language_popup').style.visibility = 'visible';"  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><span class="popup" id="popup_anchor"><img src="./Module CustomFields Dev - Dolibarr Wiki_files/de.png" class="languageimage" alt="Deutsch"><!--[if lt IE 7]><span  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><div class="cadre_popup" id="language_popup">No translation in Deutsch.</div><!--[if lt IE 7]></span><![endif]--></span><!--[if lt IE 7]></span><![endif]--><!--[if lt IE 7]><span class='popup' onMouseOver="document.getElementById('language_popup').style.visibility = 'visible';"  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><span class="popup" id="popup_anchor"><img src="./Module CustomFields Dev - Dolibarr Wiki_files/it.png" class="languageimage" alt="Italian"><!--[if lt IE 7]><span  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><div class="cadre_popup" id="language_popup">No translation in Italian.</div><!--[if lt IE 7]></span><![endif]--></span><!--[if lt IE 7]></span><![endif]--><!--[if lt IE 7]><span class='popup' onMouseOver="document.getElementById('language_popup').style.visibility = 'visible';"  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><span class="popup" id="popup_anchor"><img src="./Module CustomFields Dev - Dolibarr Wiki_files/el.png" class="languageimage" alt="Greek"><!--[if lt IE 7]><span  onmouseout="document.getElementById('language_popup').style.visibility = 'hidden';"><![endif]--><div class="cadre_popup" id="language_popup">No translation in Greek.</div><!--[if lt IE 7]></span><![endif]--></span><!--[if lt IE 7]></span><![endif]-->
+</div>
+</div>
+	<div id="p-search" class="portlet">
+		<h5><label for="searchInput">Search</label></h5>
+		<div id="searchBody" class="pBody">
+			<form action="http://wiki.dolibarr.org/index.php" id="searchform">
+				<input type="hidden" name="title" value="Special:Search">
+				<input id="searchInput" title="Search Dolibarr Wiki" accesskey="f" type="search" name="search">
+				<input type="submit" name="go" class="searchButton" id="searchGoButton" value="Go" title="Go to a page with this exact name if exists">
+				<div><a href="http://wiki.dolibarr.org/index.php/Special:Search" rel="search">Advanced search</a></div>
+			</form>
+		</div>
+	</div>
+	<div class="portlet" id="p-tb">
+		<h5>Toolbox</h5>
+		<div class="pBody">
+			<ul>
+				<li id="t-whatlinkshere"><a href="http://wiki.dolibarr.org/index.php/Special:WhatLinksHere/Module_CustomFields_Dev" title="List of all wiki pages that link here [alt-j]" accesskey="j">What links here</a></li>
+				<li id="t-recentchangeslinked"><a href="http://wiki.dolibarr.org/index.php/Special:RecentChangesLinked/Module_CustomFields_Dev" title="Recent changes in pages linked from this page [alt-k]" accesskey="k">Related changes</a></li>
+<li id="t-specialpages"><a href="http://wiki.dolibarr.org/index.php/Special:SpecialPages" title="List of all special pages [alt-q]" accesskey="q">Special pages</a></li>
+				<li id="t-print"><a href="http://wiki.dolibarr.org/index.php?title=Module_CustomFields_Dev&printable=yes" title="Printable version of this page [alt-p]" accesskey="p">Printable version</a></li>				<li id="t-permalink"><a href="http://wiki.dolibarr.org/index.php?title=Module_CustomFields_Dev&oldid=33180" title="Permanent link to this revision of the page">Permanent link</a></li>			</ul>
+		</div>
+	</div>
+<br><!-- <div class='generated-sidebar portlet' id='p-navigation-donation' style='text-align: center'>
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+<input type="hidden" name="cmd" value="_s-xclick">
+<input type="hidden" name="hosted_button_id" value="8978561">
+<input type="image" src="http://wiki.dolibarr.org/upload/5/5c/Paypal.png" border="0" name="submit" alt="Help Dolibarr making a donation">
+</form>
+</div>
+ -->
+<div class="generated-sidebar portlet" id="p-navigation">
+<h5>
+Social networks
+</h5>
+<div class="pBody" align="center">
+
+<!--<div style="padding: 3px">
+<g:plus href="https://plus.google.com/+DolibarrOrg" width="100" height="131"></g:plus>
+</div>-->
+
+<div style="padding: 1px">
+<center>
+<a href="https://plus.google.com/+DolibarrOrg" target="_blank" rel="nofollow"><img src="./Module CustomFields Dev - Dolibarr Wiki_files/google.png" width="24px" height="24px" alt="Follow us on Google+"></a>
+
+<a href="http://www.facebook.com/dolibarr" target="_blank" rel="nofollow"><img src="./Module CustomFields Dev - Dolibarr Wiki_files/facebook.png" width="24px" height="24px" alt="Follow us on Facebook"></a>
+
+<a href="http://www.linkedin.com/groups?gid=2743052" target="_blank" rel="nofollow"><img src="./Module CustomFields Dev - Dolibarr Wiki_files/linkedin.png" width="24px" height="24px" alt="Follow us on LinkedIn"></a>
+
+<a href="http://twitter.com/dolibarr" target="_blank" rel="nofollow"><img src="./Module CustomFields Dev - Dolibarr Wiki_files/twitter.png" width="24px" height="24px" alt="Follow us on Twitter"></a>
+</center>
+</div>
+
+</div>
+</div>
+
+<br><br>
+
+<div class="generated-sidebar portlet" id="p-navigation-adsense" style="text-align: center">
+<div class="pBody">
+<script async="" src="http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- PUBSKYDOLIBARRWIKI2 -->
+<ins class="adsbygoogle" style="display:inline-block;width:160px;height:600px" data-ad-client="ca-pub-1071905880519467" data-ad-slot="7811259314"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</div>
+</div>
+
+<!-- End LDR -->
+
+
+
+	</div><!-- end of the left (by default at least) one-column -->
+	
+	<div class="visualClear"></div>
+
+		<div id="footer" class="htmldoc-ignore">
+				
+	<ul id="f-list">
+						<li id="lastmod"> This page was last modified on 24 February 2015, at 14:15.</li>
+							<li id="viewcount">This page has been accessed 9,545 times.</li>
+							<li id="copyright">Content is available under <a href="http://creativecommons.org/licenses/by-sa/4.0/" class="external ">Creative Commons Attribution-ShareAlike 4.0 International License</a>.</li>
+			
+			<!-- LDR Add author -->
+			<li><a rel="author" href="https://plus.google.com/+LaurentDestailleur?rel=author">Created or moderated by Eldy</a></li>			<!-- End Add author -->
+
+	</ul>
+		</div>	<!-- End div footer -->
+
+</div>
+
+
+
+<script src="./Module CustomFields Dev - Dolibarr Wiki_files/load.php"></script><script src="./Module CustomFields Dev - Dolibarr Wiki_files/load(1).php"></script>
+<script>if ( window.mediaWiki ) {
+	mediaWiki.config.set({"wgCanonicalNamespace": "", "wgCanonicalSpecialPageName": false, "wgNamespaceNumber": 0, "wgPageName": "Module_CustomFields_Dev", "wgTitle": "Module CustomFields Dev", "wgAction": "view", "wgArticleId": 4470, "wgIsArticle": true, "wgUserName": null, "wgUserGroups": ["*"], "wgCurRevisionId": 33180, "wgCategories": ["CustomFields", "FAQ EN"], "wgBreakFrames": false, "wgRestrictionEdit": [], "wgRestrictionMove": []});
+}
+</script>
+<script>if ( window.mediaWiki ) {
+	mediaWiki.loader.load(["mediawiki.util", "mediawiki.legacy.wikibits", "mediawiki.legacy.ajax"]);
+	mediaWiki.loader.go();
+}
+</script><script type="text/javascript" src="./Module CustomFields Dev - Dolibarr Wiki_files/load(2).php"></script>
+
+<script>if ( window.mediaWiki ) {
+	mediaWiki.user.options.set({"quickbar":0,"underline":2,"cols":80,"rows":25,"searchlimit":20,"contextlines":5,"contextchars":50,"skin":"dolibarr","math":1,"rcdays":7,"rclimit":50,"wllimit":250,"highlightbroken":1,"stubthreshold":0,"previewontop":1,"editsection":1,"editsectiononrightclick":0,"showtoc":1,"showtoolbar":1,"date":"default","imagesize":2,"thumbsize":2,"rememberpassword":0,"enotifwatchlistpages":0,"enotifusertalkpages":1,"enotifminoredits":0,"enotifrevealaddr":0,"shownumberswatching":1,"fancysig":0,"externaleditor":0,"externaldiff":0,"showjumplinks":0,"numberheadings":0,"uselivepreview":0,"watchlistdays":3,"editfont":"default","gender":"unknown","variant":"en","language":"en","searchNs0":true,"searchNs1":false,"searchNs2":false,"searchNs3":false,"searchNs4":false,"searchNs5":false,"searchNs6":false,"searchNs7":false,"searchNs8":false,"searchNs9":false,"searchNs10":false,"searchNs11":false,"searchNs12":false,"searchNs13":false,"searchNs14":false,"searchNs15":false,"searchNs100"
+	:true,"searchNs101":false,"searchNs110":false,"searchNs111":false,"searchNs120":false,"searchNs121":false});;mediaWiki.loader.state({"user.options":"ready"});
+}
+</script><!-- Served in 0.078 secs. -->
+
+</body></html>
