@@ -135,9 +135,13 @@ class ActionsCustomFields // extends CommonObject
      *
      */
     function formObjectOptions($parameters, $object, $action) {
-        /* print_r($parameters);
-            echo "action: ".$action;
-            print_r($object); */
+        /*
+        print('<pre>');
+        print_r($parameters);
+        echo "action: ".$action;
+        print_r($object);
+        print('</pre>');
+        */
         //print('CUSTOMFIELDS ACTIONS DETECTED'); //debugline
 
         if (!isset($object->element) or $action == 'create' or $action == 'add' or $action == 'edit') { // For the special case of edit (create form but used to edit parameters), this case is handled in the customfields lib and in the customfields_print_forms() function above (see $action == 'edit').

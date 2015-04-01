@@ -144,6 +144,7 @@ if ($action == 'add' or $action == 'update') {
 
         // Duplicate from another field? (whether it's a custom field or any Dolibarr object's field)
         $extra['duplicate_from'] = isset($_POST['duplicate_from']) ? $_POST['duplicate_from'] : false;
+        $extra['duplicate_creation_from'] = isset($_POST['duplicate_creation_from']) ? $_POST['duplicate_creation_from'] : false;
 
         if (! $error) {
             // We check that the field name does not contain any special character (only alphanumeric)
@@ -472,6 +473,7 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
         $cascade_parent_join_on = GETPOST('cascade_parent_join_on');
         $cascade_parent_join_from = GETPOST('cascade_parent_join_from');
         $duplicate_from = GETPOST('duplicate_from');
+        $duplicate_creation_from = GETPOST('duplicate_creation_from');
     } elseif ($action == 'edit') {
         if (GETPOST('field')) $field_name = GETPOST('field'); else $field_name = $fieldobj->column_name;
         if (GETPOST('type')) $field_type = GETPOST('type'); else $field_type = $fieldobj->data_type;
@@ -499,6 +501,7 @@ if ($action == 'create' or ($action == 'edit' and GETPOST('fieldid')) ) {
         if (GETPOST('cascade_parent_join_on')) $cascade_parent_join_on = GETPOST('cascade_parent_join_on'); else $cascade_parent_join_on = ($fieldobj->extra['cascade_parent_join_on'] ? $cascade_parent_join_on = $fieldobj->extra['cascade_parent_join_on'] : '');
         if (GETPOST('cascade_parent_join_from')) $cascade_parent_join_from = GETPOST('cascade_parent_join_from'); else $cascade_parent_join_from = ($fieldobj->extra['cascade_parent_join_from'] ? $cascade_parent_join_from = $fieldobj->extra['cascade_parent_join_from'] : '');
         if (GETPOST('duplicate_from')) $duplicate_from = GETPOST('duplicate_from'); else $duplicate_from = ($fieldobj->extra['duplicate_from'] ? $duplicate_from = $fieldobj->extra['duplicate_from'] : '');
+        if (GETPOST('duplicate_creation_from')) $duplicate_creation_from = GETPOST('duplicate_creation_from'); else $duplicate_creation_from = ($fieldobj->extra['duplicate_creation_from'] ? $duplicate_creation_from = $fieldobj->extra['duplicate_creation_from'] : '');
     }
 
     // ** User Fields
@@ -604,10 +607,13 @@ $(document).ready(function(){ // when document is ready to be shown
     print $customfields->showInputFieldAjax("cascade_parent_field", "/customfields/admin/customfields_admin_ajax.php", "change", "get");
 
     // Duplicate from another field (whether it's a custom field or any Dolibarr standard object's field)
-    print '<tr><td class="field">'.$langs->trans("Duplicate").'<br /><br />'.$langs->trans("DuplicateDesc").'</td><td class="valeur">';
+    print '<tr><td class="field">'.$langs->trans("Duplicate").'<br /><br />'.$langs->trans("DuplicateDesc").'<br />'.$langs->trans("CascadeCompatible").'</td><td class="valeur">';
     // Field to duplicate from (may be empty to disable duplication)
     print '<br /> '.$langs->trans('DuplicateFrom').' ('.$langs->trans('LeaveEmptyToDisable').'): ';
     print '<input type="text" name="duplicate_from" size="50" value="'.$duplicate_from.'" placeholder="'.$langs->trans('DuplicateFromHelper').'">';
+    // Field to duplicate from on creation form to preload the value instead of showing a message notifying the user not to fill this field (may be empty to disable duplication)
+    print '<br /><br /> ('.$langs->trans('Optional').') '.$langs->trans('DuplicateFromToPreloadAtCreation').' ('.$langs->trans('LeaveEmptyToDisable').'): ';
+    print '<input type="text" name="duplicate_creation_from" size="50" value="'.$duplicate_creation_from.'" placeholder="'.$langs->trans('DuplicateFromHelper').'">';
     print '</td></tr>';
 
     // Other options

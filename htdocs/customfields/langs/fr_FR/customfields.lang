@@ -78,7 +78,9 @@ CascadeJoinOn= Joindre sur la colonne du champ parent
 Hide= Invisible
 Duplicate= Dupliquer
 DuplicateFrom= Dupliquer depuis le champ
+DuplicateFromToPreloadAtCreation= Précharger la valeur à la création depuis
 LeaveEmptyToDisable= laisser vide pour désactiver
+Optional= Optionnel
 
 # Fields values
 PleaseEditLangFile= Veuillez éditer le ficher de langue
@@ -111,9 +113,10 @@ CascadeJoinFromHelper= Contrainte enfant ex, fk_pays
 CascadeJoinOnHelper= Contrainte parent ex, rowid
 HideHelper= utilisez Cascade Manuelle et une fonction AJAX manuelle et de surcharge pour gérer dynamiquement la visibilité conditionnellement au parent
 SeparatorHelper= la séparation sera placée en haut
-DuplicateDesc= Duplique la valeur d'un autre champ (standard ou custom field) depuis $object (ex: client->rowid sera traduit en $object->client->rowid).
+DuplicateDesc= Duplique la valeur d'un autre champ (standard ou custom field) depuis $object (ex: client->rowid sera traduit en $object->client->rowid) ou depuis $_GET ou $_POST.
 DuplicateFromHelper= ex: client->rowid ou mycustomfield
 DuplicateCanBeEmptyHelper= Duplication activée: vous pouvez laisser ce champ vide, il sera rempli au moment de la création/modification de l'objet en cours.
+CascadeCompatible= Compatible avec les cascades.
 
 # Confirm forms
 ConfirmDeleteCustomField=Voulez-vous vraiment supprimer le champ suivant: 

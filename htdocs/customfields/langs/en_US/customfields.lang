@@ -78,7 +78,9 @@ CascadeJoinOn= Join on parent's column
 Hide= Hide
 Duplicate= Duplicate
 DuplicateFrom= Duplicate from field
+DuplicateFromToPreloadAtCreation= Preload value at creation from
 LeaveEmptyToDisable= leave empty to disable
+Optional= Optional
 
 # Fields values
 PleaseEditLangFile= Please edit the language file
@@ -111,9 +113,10 @@ CascadeJoinFromHelper= Current constraint eg, fk_pays
 CascadeJoinOnHelper= Parent's constraint eg, rowid
 HideHelper= enable cascade and use custom ajax functions and overloading functions to manage dynamic display of this field conditionally to parent field
 SeparatorHelper= will be placed above the field
-DuplicateDesc= Duplicate the value of another $object field (standard or custom field, eg: client->rowid will be translated as $object->client->rowid).
+DuplicateDesc= Duplicate the value of another $object field (standard or custom field, eg: client->rowid will be translated as $object->client->rowid) or any field in $_GET or $_POST.
 DuplicateFromHelper= eg: client->rowid or mycustomfield
 DuplicateCanBeEmptyHelper= Duplication enabled: you can leave this field empty, it will be filled upon creation/modification of this object.
+CascadeCompatible= Compatible with cascading.
 
 # Confirm forms
 ConfirmDeleteCustomField=Do you really want to delete the following custom field: 

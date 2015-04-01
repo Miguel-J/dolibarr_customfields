@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2011-2014   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2015   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -199,12 +199,8 @@ if (!function_exists('array_replace_recursive')) {
     }
 }
 
-// PHP variable variables with object's property or array value
-// Courtesy of Sam-Mauris Yong
-// Enhanced by lrq3000 to support recursive access of subproperties
-// This function is mainly used as a safer replacement of eval().
 
-// 
+
 /**
  * PHP variable variables with object's property or array value
  * Courtesy of Sam-Mauris Yong
@@ -238,8 +234,13 @@ function varvar($obj, $path){
         return $ret;
     // Just a string
     }else{
-        if (!isset($obj->$path)) return null;
-        return $obj->$path; // $obj->${$path}
+        if (is_object($obj) and isset($obj->$path)) {
+            return $obj->$path; // $obj->${$path}
+        } elseif (is_array($obj) and isset($obj[$path])) {
+            return $obj[$path];
+        } else {
+            return null;
+        }
     }
 }
 

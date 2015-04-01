@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2011-2014   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2015   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -237,6 +237,9 @@ class InterfaceSaveFields
                     $dval = varvar($object, $dkey); // varvar() will return null if the key is not set
                     // Prefix with "cf_" if it's a custom field? (we just check if $dkey isn't set, in this case we try with "cf_".$dkey)
                     if (!isset($dval)) $dval = varvar($object, $customfields->varprefix.$dkey);
+                    // If still empty (we did not find any value to duplicate in $object), try with $_GET and $_POST
+                    if (!isset($dval)) $dval = varvar($_GET, $dkey);
+                    if (!isset($dval)) $dval = varvar($_POST, $dkey);
                     // Duplicate! $object->$key will be automatically saved by CustomFields below, as long as it's set
                     if (isset($dval)) $object->$key = $dval;
 

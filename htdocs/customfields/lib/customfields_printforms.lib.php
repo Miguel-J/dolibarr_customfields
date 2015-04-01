@@ -157,7 +157,7 @@ function customfields_print_creation_form($currentmodule, $object = null, $param
             //== Print the custom field's label
             if (!empty($field->extra['separator'])) print '</table><br /><table class="border" width="100%">';
             $hidecondition = ( !empty($field->extra['hide']) and // Hiding condition: this field must have the hiding condition
-                (empty($field->extra['cascade']) or empty($field->extra['cascade_parent_field']) or empty($field->extra['show_on_cascade']) or (empty($datas->{$field->extra['cascade_parent_field']}) and empty($_REQUEST[$customfields->varprefix.$field->extra['cascade_parent_field']]) ) ) ); // and also if show_on_cascade is enabled, we check if the parent's field has a value set. If that's the case, we show the field.
+                (empty($field->extra['cascade']) or empty($field->extra['cascade_parent_field']) or empty($field->extra['show_on_cascade']) or (empty($datas->{$field->extra['cascade_parent_field']}) and empty($_REQUEST[$customfields->varprefix.$field->extra['cascade_parent_field']]) and empty($object->{$customfields->varprefix.$field->extra['cascade_parent_field']}) ) ) ); // and also if show_on_cascade is enabled, we check if the parent's field has a value set. If that's the case, we show the field.
             $hidetr = '';
             if ( $hidecondition ) $hidetr = ' style="display: none;"';
             print '<tr name="'.$customfields->varprefix.$field->column_name.'_tr" id="'.$customfields->varprefix.$field->column_name.'_tr"><td'.$fieldrequired.' width="20%">';
@@ -171,7 +171,27 @@ function customfields_print_creation_form($currentmodule, $object = null, $param
             //-- Recopy on conversion notice
             if ( $field->extra['recopy'] and $conversion ) print $langs->trans('RecopyCanBeEmptyHelper').'<br />';
             //-- Duplication notice (duplication of value cannot be done at the creation form because the path to the value is different, or even not present and only in the $_GET array)
-            if ( !empty($field->extra['duplicate_from']) ) print $langs->trans('DuplicateCanBeEmptyHelper').'<br />';
+            if ( !empty($field->extra['duplicate_from']) ) {
+                if (!$hidecondition) print $langs->trans('DuplicateCanBeEmptyHelper').'<br />';
+
+                // Duplication preloading at creation option: try to duplicate a value directly on the creation form
+                if (!empty($field->extra['duplicate_creation_from'])) {
+                    // Get the property name (or path) that we want to extract from $object (eg: $object->client->rowid)
+                    $dkey = $field->extra['duplicate_creation_from'];
+
+                    // Fetch the specified source field for the duplication
+                    $dval = varvar($object, $dkey); // varvar() will return null if the key is not set
+                    // Prefix with "cf_" if it's a custom field? (we just check if $dkey isn't set, in this case we try with "cf_".$dkey)
+                    if (!isset($dval)) $dval = varvar($object, $customfields->varprefix.$dkey);
+                    // If still empty (we did not find any value to duplicate in $object), try with $_GET and $_POST
+                    if (!isset($dval)) $dval = varvar($_GET, $dkey);
+                    if (!isset($dval)) $dval = varvar($_POST, $dkey);
+                    // Duplicate! $object->$key will be automatically saved by CustomFields below, as long as it's set
+                    if (isset($dval)) $object->{$customfields->varprefix.$field->column_name} = $dval;
+
+                    //print('<pre>'); print("DUPFIELD:\n"); print($dkey.' => '.$key."\n"); print('New val: '.$object->$key."\n"); print_r($object); print('</pre>');
+                }
+            }
 
             //== Print the custom field's value
             //-- Prepare the custom field's value
@@ -192,16 +212,26 @@ function customfields_print_creation_form($currentmodule, $object = null, $param
             } elseif (isset($datas->$name)) {
                 // Default values from database record
                 $value = $datas->$name; // if the property exists (the record is not empty), then we fill in this value
+            } elseif (!empty($field->extra['duplicate_creation_from']) and isset($object->{$customfields->varprefix.$field->column_name})) {
+                // If duplication preloading at creation is enabled and a value can be duplicated, we load this value
+                $value = $object->{$customfields->varprefix.$field->column_name};
             }
 
             // Special functions when the creation form is used to edit fields (eg: via the Modify button, this shows a form where all fields can be modified simultaneously).
-            if ($action == 'edit') { // Only when the record already exists and thus a value is already set for this field and for other customfields
-                // Automatic cascading management: search all fields to find one that has a cascaded effect on the current field. If found one, then we will limit the number of options available to the pertinent options depending on the parent field.
-                if (!empty($field->extra['cascade']) and !empty($field->extra['cascade_parent_field']) and empty($field->extra['cascade_custom'])) {
-                    $field->extra['cascade_child'] = true;
+            //if ($action == 'edit') { // Only when the record already exists and thus a value is already set for this field and for other customfields
+            // Automatic cascading management: search all fields to find one that has a cascaded effect on the current field. If found one, then we will limit the number of options available to the pertinent options depending on the parent field.
+            if (!empty($field->extra['cascade']) and !empty($field->extra['cascade_parent_field']) and empty($field->extra['cascade_custom'])) {
+                $field->extra['cascade_child'] = true;
+                $field->extra['cascade_parent_value'] = null;
+                // Try to load from database (if in fact the creation form is used as an edit form)
+                if (isset($datas->{$field->extra['cascade_parent_field']})){
                     $field->extra['cascade_parent_value'] = $datas->{$field->extra['cascade_parent_field']};
+                // Else try to load from the current object (useful for duplication preloading at creation)
+                } elseif (isset($object->{$customfields->varprefix.$field->extra['cascade_parent_field']})) {
+                    $field->extra['cascade_parent_value'] = $object->{$customfields->varprefix.$field->extra['cascade_parent_field']};
                 }
             }
+            //}
 
             //-- Calling custom user's functions or print the custom field's value if none is found
             $customfunc_create = 'customfields_field_create_'.$currentmodule.'_'.$field->column_name;

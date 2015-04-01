@@ -21,4 +21,4 @@ WARNING2: Be careful not to overwrite your overloading functions file nor your l
 
 == MORE INFORMATIONS ==
 
-You can read the README-CF.txt file that resides inside the /htdocs/customfields/ folder for more informations on the usage of the module.
+You can read the README-CF.txt file that is located inside the /htdocs/customfields/ folder for more informations on the usage of the module.

@@ -3,6 +3,9 @@ CHANGELOG
 
 2015
 -------
+* add: Duplication options now can duplicate $_GET and $_POST values in addition to $object.
+* add: duplicate_creation_from option (preload duplicate value directly on the creation form instead of waiting that the object is created for the value to be duplicated).
+* fix: Ajax when Cascade option was enabled was broken if CustomFields was placed in the htdocs/custom/ folder.
 * add: CustomFields support for Contracts Lines.
 * add: customfields tabs in various admin modules (so that customfields can be configured directly in the context of the parent module, instead of going into the customfields admin page).
 * fix: td width and td colspan has been updated with the new values for native Dolibarr forms.

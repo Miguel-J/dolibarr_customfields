@@ -1801,7 +1801,7 @@ class CustomFields extends compatClass4 // extends CommonObject
      *     @return       out                        An html string containing jQuery Javascript ready to be printed
      */
     function showInputFieldAjax($id, $php_callback_url, $on_func="change", $request_type="post") {
-        $php_callback = DOL_URL_ROOT.$php_callback_url;
+        $php_callback = dol_buildpath($php_callback_url, 1); // relative path works correctly here, but if you ever need to use an absolute path (because script is not called correctly), then use dol_buildpath type 1 for relative and construct the DOL_URL_ROOT by yourself because you need to include the port (which is not included by default in DOL_URL_ROOT).
 
         $out = '<script type="text/javascript">
 $(document).ready(function(){ // when document is ready to be shown
@@ -1816,6 +1816,7 @@ $(document).ready(function(){ // when document is ready to be shown
         '.($this->debug?'alert(JSON.stringify(serializedData, null, 4));':'').'
 
         // fire off the request
+        //alert("'.$php_callback.'"); // to check if the php callback is correctly called (path is correct), uncomment this line
         request = $.ajax({
             url: "'.$php_callback.'",
             type: "'.$request_type.'",
