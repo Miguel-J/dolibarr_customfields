@@ -124,7 +124,7 @@ class CustomFields extends compatClass4 // extends CommonObject
      */
     function __construct($db, $currentmodule)
     {
-        // Include the config file (only used for $varprefix at this moment, so this class is pretty much self contained and independent - except for triggers and translation, but these are NOT necessary for CustomFields management, only for printing fields more nicely and for logs)
+        // Include the config file (only necessary to get a few config variables at this moment, so this class is pretty much self contained and independent - except for triggers and translation, but these are NOT necessary for CustomFields management, only for printing fields more nicely and for logs)
         include(dirname(__FILE__).'/../conf/conf_customfields.lib.php');
 
         $this->db = $db;
@@ -135,6 +135,8 @@ class CustomFields extends compatClass4 // extends CommonObject
 
         if (!empty($fieldsprefix)) $this->varprefix = $fieldsprefix;
         if (!empty($svsdelimiter)) $this->svsdelimiter = $svsdelimiter;
+
+        if (!empty($constraint_links)) $this->constraint_links = $constraint_links;
 
         if (!empty($cfdebug)) $this->debug = true;
 
@@ -1964,6 +1966,12 @@ $(document).ready(function(){ // when document is ready to be shown
                 // Else we just print out the value of the field (rowid)
                 } else {
                     $out.=$value;
+                }
+                // Automatic link generation: if the linked table is a Dolibarr module (specified in customfields config file), then we will automatically create a link to the object's datasheet
+                $ctable_no_prefix = $this->stripPrefix($field->referenced_table_name, MAIN_DB_PREFIX); // first remove the database prefix to get only the table's name
+                if (isset($this->constraint_links[$ctable_no_prefix])) { // then check if this table is a Dolibarr module
+                    $constraint_url = dol_buildpath($this->constraint_links[$ctable_no_prefix], 1); // create a relative url from root /
+                    $out = '<a href="'.$constraint_url.$value.'">'.$out.'</a>'; // enclose the printed value inside an HTML link
                 }
             // Normal non-constrained field
             } else {

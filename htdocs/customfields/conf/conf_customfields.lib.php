@@ -34,7 +34,7 @@ $langs->load('customfields-user@customfields'); // customfields language support
 // **** EXPANSION VARIABLES ****
 // Here you can edit the values to expand the functionnalities of CustomFields (it will try to automatically manage the changes, if not you can add special cases by yourselves, please refer to the Readme-CF.txt)
 
-$cfversion = '3.5.1'; // version of this module, useful for other modules to discriminate what version of CustomFields you are using (may be useful in case of newer features that are necessary for other modules to properly run)
+$cfversion = '3.5.2'; // version of this module, useful for other modules to discriminate what version of CustomFields you are using (may be useful in case of newer features that are necessary for other modules to properly run)
 
 $fieldsprefix = 'cf_'; // prefix that will be prepended to the variable name of a field for accessing the field's values
 $svsdelimiter = '_'; // separator for Smart Value Substitution for Constrained Fields (a constrained field will try to find similar column names in the referenced table, and you can specify several column names when using this separator)
@@ -141,5 +141,28 @@ $sql_datatypes = array( 'varchar' => $langs->trans("Textbox"),
                                             'double' => $langs->trans("Double"),
                                              'other' => $langs->trans("Other").'/'.$langs->trans("Constraint"),
                                                 );
+
+// Allows to automatically link constrained custom fields to the datasheet of the linked object
+// This is simply an array of format: array('table_element' => 'datasheet_url_with_variable_to_complete') - eg: array( 'society' => 'society/soc.php?socid='). The variable to complete must be at the end of the URL.
+// Note that any module can be included in this array, not just modules supported by CustomFields (ie: you can include a module so that constrained fields will link to the datasheet of objects of this module, even if CustomFields cannot add custom fields for the linked module).
+$constraint_links = array( 'societe' => 'societe/soc.php?socid=',
+                                            'facture' => 'compta/facture.php?facid=',
+                                            'facture_fourn' => 'fourn/facture/fiche.php?facid=',
+                                            'don' => 'compta/dons/fiche.php?rowid=',
+                                            'propal' => 'comm/propal.php?id=',
+                                            'commande' => 'commande/fiche.php?id=',
+                                            'commande_fournisseur' => 'fourn/commande/fiche.php?id=',
+                                            'contrat' => 'contrat/fiche.php?id=',
+                                            'fichinter' => 'fichinter/fiche.php?id=',
+                                            'deplacement' => 'compta/deplacement/fiche.php?id=',
+                                            'product' => 'product/fiche.php?id=',
+                                            'categorie' => 'categories/viewcat.php?id=',
+                                            'expedition' => 'expedition/fiche.php?id=',
+                                            'socpeople' => 'contact/fiche.php?id=',
+                                            'projet' => 'projet/fiche.php?id=',
+                                            'projet_task' => 'projet/tasks/task.php?id=',
+                                            'adherent' => 'adherents/fiche.php?rowid=',
+                                            'actioncomm' => 'comm/action/fiche.php?id=', // agenda events
+                                            );
 
 ?>
