@@ -577,7 +577,12 @@ class CustomFields extends compatClass4 // extends CommonObject
         dol_syslog(get_class($this)."::".$eventname." sql=".$sql, LOG_DEBUG); // Adding an event to the log
         $resql=$this->db->query($sql); // Issuing the sql statement to the db
 
-        if (! $resql) { $error++; $this->errors[]="Error ".$this->db->lasterror(); } // Checking for errors
+        // Checking for errors and add error message
+        if (! $resql) {
+            $error++;
+            $this->addError($this->db->lasterror());
+            if ($this->debug) $this->addError('SQL request: '.$sql);
+        }
 
         // Managing trigger (if there's no error)
         if (! $error) {
@@ -588,12 +593,12 @@ class CustomFields extends compatClass4 // extends CommonObject
                 //// Call triggers
                 include_once(DOL_DOCUMENT_ROOT . "/core/class/interfaces.class.php");
                 $interface=new Interfaces($this->db);
-                if (version_compare(DOL_VERSION, '3.7.0', '>=')) {
-                    $result=$this->call_trigger($trigger,$user); // new way to call triggers starting from Dolibarr v3.7.0
-                } else {
-                    $result=$interface->run_triggers($trigger,$this,$user,$langs,$conf); // old way to call triggers for Dolibarr < v3.7.0
-                }
-                if ($result < 0) { $error++; $this->errors=$interface->errors; $this->addError('Error returned by a trigger after executeSQL()'); }
+                //if (version_compare(DOL_VERSION, '3.7.0', '>=')) {
+                    //$result=$this->call_trigger($trigger,$user); // new way to call triggers starting from Dolibarr v3.7.0
+                //} else {
+                $result=$interface->run_triggers($trigger,$this,$user,$langs,$conf); // old way to call triggers for Dolibarr < v3.7.0
+                //}
+                if ($result < 0) { $error++; $this->addError('Error returned by a trigger after executeSQL():'); $this->addError($interface->errors); }
                 //// End call triggers
             }
         }
@@ -602,8 +607,9 @@ class CustomFields extends compatClass4 // extends CommonObject
         if ($error)  {
             foreach($this->errors as $errmsg) {
                 dol_syslog(get_class($this)."::".$eventname." ".$errmsg, LOG_ERR);
-                $this->error.=($this->error?', '.$errmsg:$errmsg);
+                //$this->error.=($this->error?', '.$errmsg:$errmsg);
             }
+            $this->printErrors();
             $this->db->rollback();
             return -1*$error; // error code : we return -1 multiplied by the number of errors (so if we have 5 errors we will get -5 as a return code)
         } else {
@@ -1344,8 +1350,7 @@ class CustomFields extends compatClass4 // extends CommonObject
     function deleteCustomField($id, $notrigger = 0) {
         // Get the column_name
         if (empty($id)) {
-            $this->errors[] = 'Empty value';
-            $this->error .= 'Empty value';
+            $this->addError('Empty value');
             return -1;
         } elseif (is_numeric($id)) { // if it's an id (ordinal_position), we must fetch the column_name from db
             // Fetch the customfield object (so that we get all required informations to proceed to deletion : column_name, index and foreign key constraints if any)
@@ -1716,13 +1721,15 @@ class CustomFields extends compatClass4 // extends CommonObject
             // Printing a select with all the values and keys
             $out.='<select class="flat" name="'.$name.'" id="'.$id.'"'.($moreparam?$moreparam:'').'>';
             if (strtolower($field->is_nullable) == 'yes') $out.='<option value=""></option>'; // Empty option if null is allowed for this field
-            foreach ($refarray as $key=>$value) {
-                if ($key == $currentvalue) {
-                    $selected = 'selected="selected"';
-                } else {
-                    $selected = '';
+            if (count($refarray) > 0) {
+                foreach ($refarray as $key=>$value) {
+                    if ($key == $currentvalue) {
+                        $selected = 'selected="selected"';
+                    } else {
+                        $selected = '';
+                    }
+                    $out.='<option value="'.$key.'" '.$selected.'>'.$value.'</option>';
                 }
-                $out.='<option value="'.$key.'" '.$selected.'>'.$value.'</option>';
             }
             $out.='</select>';
 
@@ -2142,9 +2149,10 @@ $(document).ready(function(){ // when document is ready to be shown
         // either take an input error message, or use customfield's saved errors
         if (!empty($error)) {
             $mesg = $error;
-        } else {
-            //$this->error = implode(";\n", $this->errors);
+        } elseif (!empty($this->error)) {
             $mesg = $this->error;
+        } elseif (!empty($this->errors)) { // in case we filled $this->errors array directly (bypassing $this->addError())
+            $mesg = implode(";\n", $this->errors);
         }
 
         // If there is/are errors

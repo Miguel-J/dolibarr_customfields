@@ -3,6 +3,8 @@ CHANGELOG
 
 2015
 -------
+* fix: error history and printing in customfields.class.php. Main change for user is that now when there is a bug when creating/updating custom fields values, errors will be correctly displayed.
+* fix: warning for children cascade fields on update forms.
 * add: constrained custom fields will now automatically create a link to open the datasheet of the linked object (thank's to Clément Georget for the idea).
 * add: Duplication options now can duplicate $_GET and $_POST values in addition to $object.
 * add: duplicate_creation_from option (preload duplicate value directly on the creation form instead of waiting that the object is created for the value to be duplicated).
