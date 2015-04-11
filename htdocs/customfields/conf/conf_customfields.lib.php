@@ -34,7 +34,7 @@ $langs->load('customfields-user@customfields'); // customfields language support
 // **** EXPANSION VARIABLES ****
 // Here you can edit the values to expand the functionnalities of CustomFields (it will try to automatically manage the changes, if not you can add special cases by yourselves, please refer to the Readme-CF.txt)
 
-$cfversion = '3.5.3'; // version of this module, useful for other modules to discriminate what version of CustomFields you are using (may be useful in case of newer features that are necessary for other modules to properly run)
+$cfversion = '3.5.4'; // version of this module, useful for other modules to discriminate what version of CustomFields you are using (may be useful in case of newer features that are necessary for other modules to properly run)
 
 $fieldsprefix = 'cf_'; // prefix that will be prepended to the variable name of a field for accessing the field's values
 $svsdelimiter = '_'; // separator for Smart Value Substitution for Constrained Fields (a constrained field will try to find similar column names in the referenced table, and you can specify several column names when using this separator)
