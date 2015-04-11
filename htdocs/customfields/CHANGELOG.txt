@@ -3,6 +3,7 @@ CHANGELOG
 
 2015
 -------
+* fix: cascaded children custom fields with a constraint on a table with a foreign key could not be set to an empty value, else the sql query was rejected (custom fields values were not committed).
 * fix: error history and printing in customfields.class.php. Main change for user is that now when there is a bug when creating/updating custom fields values, errors will be correctly displayed.
 * fix: warning for children cascade fields on update forms.
 * add: constrained custom fields will now automatically create a link to open the datasheet of the linked object (thank's to Clément Georget for the idea).

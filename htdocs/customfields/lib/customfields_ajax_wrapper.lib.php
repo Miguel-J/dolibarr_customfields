@@ -126,7 +126,7 @@ if(!empty($_POST) and isset($_POST['customfields_ajax_current_field'])){
                     // Convert the linked records to an array(rowid=>value) so that we can easily generate an array of options
                     $linked_arr = $customfields->convertReferencedRecordsToArray($child_field, $linked_records);
                     if (empty($linked_arr)) $linked_arr = array();
-                    if (strtolower($child_field->is_nullable) == 'yes') $linked_arr = array_unshift_assoc($linked_arr, 0, '');
+                    if (strtolower($child_field->is_nullable) == 'yes') $linked_arr = array_unshift_assoc($linked_arr, '', ''); // Add default empty value if the field accepts null values. WARNING: should NOT do array_unshift_assoc($linked_arr, 0, '') because else constrained fields will supply a 0 value as a rowid key, instead of an empty value, which may violate a foreign key and prevent all custom fields (the whole customfields sql query) from being submitted!
 
                     // Store the result into "options" type of change (we will replace all options of the target constrained field by the one we just fetched and constrained)
                     $result[$customfields->varprefix.$child_field_name] = array('options'=>$linked_arr);
