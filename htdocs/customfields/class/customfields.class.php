@@ -410,8 +410,11 @@ class CustomFields extends compatClass4 // extends CommonObject
                 if (strlen($object->$key) == 0) {
                     $sqlvalues[] = 'NULL'; // special case: if the value supplied is an empty string (even 0 returns 1 length), then we put this as NULL without quotes (else, it will supply a field with '' which can be rejected even on nullable sql fields)
                } else {
-                    //We need to fetch the correct value when we update a date field
-                    if ($field->data_type == 'date') {
+                    // For numbers types, also accept commas just like dots to separate the decimals
+                    if ($field->data_type == 'float' or $field->data_type == 'double' or $field->data_type == 'decimal' or $field->data_type == 'numeric') {
+                        $object->$key = str_replace(',', '.', $object->$key);
+                    // We need to fetch the correct value when we update a date field
+                    } elseif ($field->data_type == 'date') {
                         // Fetch day, month and year
                         if (isset($object->{$key.'day'}) and isset($object->{$key.'month'}) and isset($object->{$key.'year'})) { // for date fields, Dolibarr will produce 3 more associated POST fields: myfielddate, myfieldmonth and myfieldyear
                             $dateday = trim($object->{$key.'day'});
