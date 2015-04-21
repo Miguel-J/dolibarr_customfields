@@ -3,6 +3,8 @@ CHANGELOG
 
 2015
 -------
+* add: overloading functions are now called after cloning or recopy (except view and viewfull, all the others are automatically triggered). For example, if you did a total price modification based on a coefficient (global or per product), the price update will be triggered automatically (no need to manually edit each product and save it to trigger the overloading functions).
+* add: call_overloading_function($type, $currentmodule, $fieldname, $params) in customfields_aux.lib.php, a facade function to easily call overloading functions.
 * fix: cascaded children custom fields with a constraint on a table with a foreign key could not be set to an empty value, else the sql query was rejected (custom fields values were not committed).
 * fix: error history and printing in customfields.class.php. Main change for user is that now when there is a bug when creating/updating custom fields values, errors will be correctly displayed.
 * fix: warning for children cascade fields on update forms.

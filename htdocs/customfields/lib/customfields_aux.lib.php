@@ -214,7 +214,7 @@ function customfields_fill_object_lines(&$object,$fromobject = null, $outputlang
  *  @return  Object[]   An array of two objects: $customfields and $customfields_lines, which are instances of the CustomFields class and can then be used to fetch the errors using $customfields->error.
  */
 function customfields_clone_or_recopy($object, $fromobject, $action2 = null, $store_object = false) {
-    global $db;
+    global $db, $user;
     include_once(dirname(__FILE__).'/../class/customfields.class.php');
 
     // Deduce the current action if not specified
@@ -260,7 +260,7 @@ function customfields_clone_or_recopy($object, $fromobject, $action2 = null, $st
             }
             $records_origin = $customfields_origin->fetch($originid, null, 1); // fetch only the values, we don't need the structures of the origin custom fields
 
-            // For each target custom field, we will check if it has to be recopied from another object. If true, we
+            // For each target custom field, we will check if it has to be recopied from another object. If true, we will copy over
             foreach ($columns as $field) {
                 // Get the original field to recopy from (by default and if empty, we use the same field name as the target field)
                 if (!empty($field->extra['recopy_field'])) $field_origin = $field->extra['recopy_field']; else $field_origin = $field->column_name;
@@ -273,12 +273,31 @@ function customfields_clone_or_recopy($object, $fromobject, $action2 = null, $st
                         $object->{$customfields->varprefix.$field->column_name} = $records_origin->$field_origin;
                     } else { // ... or into database
                         // Forging the new record
-                        $newrecord = new stdClass(); // initializing the cache object explicitly (to avoid php > 5.3 warnings)
+                        $newrecord = new stdClass(); // initializing the object explicitly (to avoid php > 5.3 warnings)
                         $newrecord->{$field->column_name} = $records_origin->$field_origin; // we create a new record object with the field and the id
                         $newrecord->id = $object->id;
 
                         // Commit recopied value into the database
                         $customfields->update($newrecord, 1);
+
+                        // Forcefully call all overloading functions on the target object, in case the overloading functions must refresh something like the total price
+                        $overloading_params = array(
+                                                            'action'=>GETPOST('action'),
+                                                            'currentmodule'=>$customfields->module,
+                                                            'customfields'=>$customfields,
+                                                            'object'=>$object,
+                                                            'parameters'=>array(),
+                                                            'id'=>$line->rowid,
+                                                            'field'=>$field,
+                                                            'fieldname'=>strtolower($field->column_name),
+                                                            'value'=>$newrecord->{$field->column_name},
+                                                            'fields'=>$columns,
+                                                            'user'=>$user,
+                                                            'idvar'=>'',
+                                                            'rightok'=>true,
+                                                            );
+                        $overloading_types = array('create', 'edit', 'save', 'aftersave');
+                        call_overloading_function($overloading_types, $customfields->module, $field->column_name, $overloading_params);
                     }
                 }
             }
@@ -412,12 +431,31 @@ function customfields_clone_or_recopy($object, $fromobject, $action2 = null, $st
                                     // ... or in the database
                                     } else {
                                         // Forging the new record
-                                        $newrecord = new stdClass(); // initializing the cache object explicitly (to avoid php > 5.3 warnings)
+                                        $newrecord = new stdClass(); // initializing the object explicitly (to avoid php > 5.3 warnings)
                                         $newrecord->{$field->column_name} = $records_origin[$id]->$field_origin; // we create a new record object with the field and the id
                                         $newrecord->id = $line->rowid;
 
                                         // Recopy the field value (commit into the database)
                                         $customfields_lines->update($newrecord, 1);
+
+                                        // Forcefully call all overloading functions on the target object, in case the overloading functions must refresh something like the total price
+                                        $overloading_params = array(
+                                                                            'action'=>GETPOST('action'),
+                                                                            'currentmodule'=>$customfields_lines->module,
+                                                                            'customfields'=>$customfields_lines,
+                                                                            'object'=>$object,
+                                                                            'parameters'=>array(),
+                                                                            'id'=>$line->rowid,
+                                                                            'field'=>$field,
+                                                                            'fieldname'=>strtolower($field->column_name),
+                                                                            'value'=>$newrecord->{$field->column_name},
+                                                                            'fields'=>$columns_lines,
+                                                                            'user'=>$user,
+                                                                            'idvar'=>'',
+                                                                            'rightok'=>true,
+                                                                            );
+                                        $overloading_types = array('create', 'edit', 'save', 'aftersave');
+                                        call_overloading_function($overloading_types, $customfields_lines->module, $field->column_name, $overloading_params);
                                     }
                                 }
                             }
@@ -562,6 +600,65 @@ function addPrefixArr($array, $prefix) {
     }
     if (is_object($array)) $array2 = (object)$array2;
     return $array2;
+}
+
+// Easy function to call an overloading function
+// $type can be either a string, the type of the overloading function to call, or an array of strings to call multiple overloading functions at once.
+// $currentmodule is the module on which we will call the overloading function.
+// $fieldname is the name of the field which overloading function we want to call.
+// $params is an dictionary-type/hash-type array, containing all the necessary parameters to supply to the overloading functions that you want to call. Eg: $params = array('currentmodule'=>$currentmodule, 'object'=>$object, ...);
+function call_overloading_function($type, $currentmodule, $fieldname, $params) {
+    if (file_exists(dirname(__FILE__).'/../fields/customfields_fields_extend.lib.php')) {
+        include_once(dirname(__FILE__).'/../fields/customfields_fields_extend.lib.php'); // to automatically trigger user's function overloading (ie: save and aftersave)
+    } else { // else we've got nothing to do, return
+        return;
+    }
+
+    $fieldname = strtolower($fieldname); // the name of the customfield (which is the property of the record)
+
+    if (!strcmp($type, 'view') or (is_array($type) and in_array('view', $type))) {
+        $customfunc_view = 'customfields_field_view_'.$currentmodule.'_'.$fieldname;
+        $customfunc_viewfull = 'customfields_field_viewfull_'.$currentmodule.'_'.$fieldname;
+
+        if (function_exists($customfunc_viewfull)) { // a full function just does everything, CF just stop processing the field here
+            $customfunc_viewfull($params['currentmodule'], $params['object'], $params['parameters'], $params['action'], $params['user'], $params['idvar'], $params['rightok'], $params['customfields'], $params['field'], $params['fieldname'], $params['value'], $params['fields']);
+        } elseif (function_exists($customfunc_view)) { // here the function may modify any parameter it wants (by referencing the values with a pointer like &$values), and then CF will continue to process the printing of the HTML field with these modified variables
+            $customfunc_view($params['currentmodule'], $params['object'], $params['parameters'], $params['action'], $params['user'], $params['idvar'], $params['rightok'], $params['customfields'], $params['field'], $params['fieldname'], $params['value'], $params['fields']);
+        }
+    }
+    if (!strcmp($type, 'create') or (is_array($type) and in_array('create', $type))) {
+        $customfunc_create = 'customfields_field_create_'.$currentmodule.'_'.$fieldname;
+        $customfunc_createfull = 'customfields_field_createfull_'.$currentmodule.'_'.$fieldname;
+
+        if (function_exists($customfunc_createfull)) { // a full function just does everything, CF just stop processing the field here
+            $customfunc_createfull($params['currentmodule'], $params['object'], $params['parameters'], $params['action'], $params['id'], $params['customfields'], $params['field'], $params['fieldname'], $params['value'], $params['fields']);
+        } elseif (function_exists($customfunc_create)) { // here the function may modify any parameter it wants (by referencing the values with a pointer like &$values), and then CF will continue to process the printing of the HTML field with these modified variables
+            $customfunc_create($params['currentmodule'], $params['object'], $params['parameters'], $params['action'], $params['id'], $params['customfields'], $params['field'], $params['fieldname'], $params['value'], $params['fields']);
+        }
+    }
+    if (!strcmp($type, 'edit') or (is_array($type) and in_array('edit', $type))) {
+        $customfunc_edit = 'customfields_field_editview_'.$currentmodule.'_'.$fieldname;
+        $customfunc_editviewfull = 'customfields_field_editviewfull_'.$currentmodule.'_'.$fieldname;
+        if (function_exists($customfunc_editviewfull)) { // use custom function if available, with full control (the user has to print himself, CustomFields won't do any post-processing)
+            $customfunc_editviewfull($params['currentmodule'], $params['object'], $params['parameters'], $params['action'], $params['user'], $params['idvar'], $params['rightok'], $params['customfields'], $params['field'], $params['fieldname'], $params['value'], $params['fields']);
+        } elseif (function_exists($customfunc_edit)) { // use custom function if available, with partial control (the user can control the value and field but CustomFields will manage the post-processing and printing). Can also be used to manage manually a custom cascaded field's options.
+            $customfunc_edit($params['currentmodule'], $params['object'], $params['parameters'], $params['action'], $params['user'], $params['idvar'], $params['rightok'], $params['customfields'], $params['field'], $params['fieldname'], $params['value'], $params['fields']);
+        }
+    }
+    if (!strcmp($type, 'save') or (is_array($type) and in_array('save', $type))) {
+        $customfunc_save = 'customfields_field_save_'.$currentmodule.'_'.$fieldname;
+        $customfunc_savefull = 'customfields_field_savefull_'.$currentmodule.'_'.$fieldname;
+        if (function_exists($customfunc_savefull)) { // here one can STOP CustomFields processing, and one can then do the processing by oneself
+            $customfunc_savefull($params['currentmodule'], $params['object'], $params['action'], $params['user'], $params['customfields'], $params['field'], $params['fieldname'], $params['value'], $params['fields']);
+        } elseif (function_exists($customfunc_save)) { // here the user can just modify the values and the field and then CustomFields will save them into the database
+            $customfunc_save($params['currentmodule'], $params['object'], $params['action'], $params['user'], $params['customfields'], $params['field'], $params['fieldname'], $params['value'], $params['fields']);
+        }
+    }
+    if (!strcmp($type, 'aftersave') or (is_array($type) and in_array('aftersave', $type))) {
+        // Calling custom functions after submitting the data to the database
+        $customfunc_aftersave = 'customfields_field_aftersave_'.$currentmodule.'_'.$fieldname;
+        if (function_exists($customfunc_aftersave)) $customfunc_aftersave($params['currentmodule'], $params['object'], $params['action'], $params['user'], $params['customfields'], $params['field'], $params['fieldname'], $params['value'], $params['fields']);
+    }
 }
 
 
