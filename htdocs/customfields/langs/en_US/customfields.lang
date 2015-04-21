@@ -100,7 +100,7 @@ True= True
 False= False
 
 # Attributes descriptions and notes
-SizeDesc=eg: 256 for a varchar, or "firstval","secondval","thirdval" WITH the quotes and commas for an enum/selectbox
+SizeDesc=eg: 256 for a varchar, or "firstval","secondval","thirdval" WITH the quotes and commas for an enum/selectbox, and if you want to use special characters such as ', use their html encoded form like &apos;
 SizeNote=Note: required for DropdownBox type, otherwise can generally be left empty.
 CustomSQLDefinitionDesc=custom definition of the field to be appended after the above
 CustomSQLDesc=to be triggered (only ONCE!) after the creation/edition of the field

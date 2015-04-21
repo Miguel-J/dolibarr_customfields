@@ -100,7 +100,7 @@ True= Vrai
 False= Faux
 
 # Attributes descriptions and notes
-SizeDesc=ex: 256 pour une zone de texte, <br />ou "premier","deuxio","tertio" AVEC les guillemets et virgules pour une liste déroulante
+SizeDesc=ex: 256 pour une zone de texte, <br />ou "premier","deuxio","tertio" AVEC les guillemets et virgules pour une liste déroulante,  et si vous voulez utiliser des caractères spéciaux comme ', utilisez la forme html comme &apos;
 SizeNote=Note: requis seulement pour Liste déroulante, pour les autres types vous pouvez laisser ceci vide.
 CustomSQLDefinitionDesc=la définition personnalisée du champ sera ajoutée à la suite de toutes les définitions au-dessus - Type, Taille, etc.
 CustomSQLDesc=sera executée (UNE seule fois!) après la création/modification du champ selon les paramètres au-dessus
