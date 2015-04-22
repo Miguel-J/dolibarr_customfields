@@ -151,7 +151,7 @@ if (!empty($_GET) and !empty($_GET['customfields_ajax_current_field'])) {
         } else { // if ($status == 404 or $status == 403 or $status == 520)
             // If there's a newer version, notify user
             if (version_compare($data, $cfversion, '>')) { // use version_compare and NOT just a string comparison like '3.3.9' > '3.3.10' which will be true because of string comparison, which we do not want!
-                $result['html'] = 'A new release version '.$data.' is available (<a href="'.fullpageurl().'?cf_autoupdate_check_changelog=true">see changelog here</a>). Please contact author by mail at <a href="mailto:lrq3000@gmail">lrq3000@gmail.com</a> (please send your transaction number along please) to get the update. Don\'t forget to backup your database before updating!';
+                $result['html'] = 'A new release version '.$data.' is available (<a href="'.fullpageurl().'?cf_autoupdate_check_changelog=true">see changelog here</a>). You can freely <a href="https://github.com/lrq3000/dolibarr_customfields" target="_blank">download it from the git repository</a>. Don\'t forget to backup your database before updating!';
             // Else we've got the latest version!
             } else {
                 $result['html'] = $langs->trans('AutoUpdateCheckingOK');
