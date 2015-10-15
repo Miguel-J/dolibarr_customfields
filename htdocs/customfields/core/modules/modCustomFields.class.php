@@ -109,7 +109,7 @@ if ($conf->global->MAIN_MODULE_CUSTOMFIELDS and isset($this) and is_object($this
     // -- Import injection
     elseif ( !empty($currentmodule) and (!strcmp($currentmodule, 'import') and !empty($_REQUEST['datatoimport'])) ) { // Activate the export injection only on the export module page (in any other page, we don't want to incur additional processing time when it's not needed)
         global $db;
-        include_once DOL_DOCUMENT_ROOT . '/customfields/class/customfields.class.php';
+        dol_include_once('/customfields/class/customfields.class.php');
 
         $importmod = &$this;
         $import_modules_mapping = array_flip($importmod->array_import_code);
