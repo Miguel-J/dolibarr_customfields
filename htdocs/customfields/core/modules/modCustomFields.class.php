@@ -34,7 +34,7 @@ if ($conf->global->MAIN_MODULE_CUSTOMFIELDS and isset($this) and is_object($this
     // -- Export injection
     if ( !empty($currentmodule) and (!strcmp($currentmodule, 'export') and !empty($_REQUEST['datatoexport'])) ) { // Activate the export injection only on the export module page (in any other page, we don't want to incur additional processing time when it's not needed)
         global $db;
-        include_once DOL_DOCUMENT_ROOT . '/customfields/class/customfields.class.php';
+        dol_include_once('/customfields/class/customfields.class.php');
 
         $exportmod = &$this;
         $export_modules_mapping = array_flip($exportmod->array_export_code);
