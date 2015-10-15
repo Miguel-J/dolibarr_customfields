@@ -45,6 +45,7 @@ commande_fournisseurdet=  Ligne commande fournisseur
 facture_fourn_det= Ligne facture fournisseur
 user= Utilisateur
 contratdet= Ligne contrat
+fichinterdet= Ligne intervention
 
 # Table headers
 Fieldname= Nom du champ
