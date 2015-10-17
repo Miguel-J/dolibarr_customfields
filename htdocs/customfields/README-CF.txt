@@ -38,7 +38,7 @@ Mirror: https://htmlpreview.github.io/?https://raw.githubusercontent.com/lrq3000
 
 For concrete examples of CustomFields implementations, you can find a list of tutorials here:
 http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases
-Mirror: https://htmlpreview.github.io/?https://raw.githubusercontent.com/lrq3000/dolibarr_customfields/pro/htdocs/customfields/docs/Module%20CustomFields%20Dev%20-%20Dolibarr%20Wiki.html
+Mirror: https://htmlpreview.github.io/?https://raw.githubusercontent.com/lrq3000/dolibarr_customfields/pro/htdocs/customfields/docs/Module%20CustomFields%20Cases%20-%20Dolibarr%20Wiki.html
 
 ===== INSTALL =====
 
