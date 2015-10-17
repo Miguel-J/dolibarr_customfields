@@ -30,12 +30,15 @@ Note: NO SUPPORT will be provided by email. Please post on the forum or on GitHu
 
 A full manual user guide can be found on the online Dolibarr's wiki:
 http://wiki.dolibarr.org/index.php/Module_CustomFields
+Mirror: https://htmlpreview.github.io/?https://raw.githubusercontent.com/lrq3000/dolibarr_customfields/pro/htdocs/customfields/docs/Module%20CustomFields%20-%20Dolibarr%20Wiki.html
 
 For developpers wanting to extend CustomFields or implementers wanting to use CustomFields to its fullest potential, a full description of the API can be found here:
 http://wiki.dolibarr.org/index.php/Module_CustomFields_Dev
+Mirror: https://htmlpreview.github.io/?https://raw.githubusercontent.com/lrq3000/dolibarr_customfields/pro/htdocs/customfields/docs/Module%20CustomFields%20Dev%20-%20Dolibarr%20Wiki.html
 
 For concrete examples of CustomFields implementations, you can find a list of tutorials here:
 http://wiki.dolibarr.org/index.php/Module_CustomFields_Cases
+Mirror: https://htmlpreview.github.io/?https://raw.githubusercontent.com/lrq3000/dolibarr_customfields/pro/htdocs/customfields/docs/Module%20CustomFields%20Dev%20-%20Dolibarr%20Wiki.html
 
 ===== INSTALL =====
 
