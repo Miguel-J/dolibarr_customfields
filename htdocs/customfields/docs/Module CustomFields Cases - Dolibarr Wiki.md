@@ -196,26 +196,6 @@ WARNING: foreign keys (and thus constraints) can't be used on views with MySQL, 
 * Cron job
 * CustomFields's overload functions
 
-= Cascading =
-
-A simple example of [http://wiki.dolibarr.org/index.php/Module_CustomFields#Cascade cascading to select a location] can be found in the user manual.
-
-But you can do a lot more with cascading if you combine it with other options, such as Duplication and Hide. Here is an example:
-
-Let's say that in invoices, you want to be able to select a contact of the society selected for this invoice. Of course, you want that the list of contacts show only the contacts related to the society (ie: that you added on the Third-Party datasheet of this society).
-
-To do that, you have to proceed in two steps:
-
-1- Create a custom field "soccpy_nom" constrained on llx_society that will duplicate the society's id. This is necessary because other custom fields can only be cascaded using other custom fields, not any Dolibarr fields. Using duplication allows you to duplicate any Dolibarr field (and even $_GET and $_POST), so that you can use them to cascade. Copy the parameters as shown in this image:
-
-[[File:Cf-case-cascade-contacts1.png]]
-
-2- Create a custom field "contact_firstname_lastname" with Cascade option with parent "soccpy_nom" and constrained on the table llx_socpeople (the table of the contacts), which will show the list of contacts associated only to the selected society in soccpy_nom. Copy the parameters as shown in this image:
-
-[[File:Cf-case-cascade-contacts2.png]]
-
-And voila, you're done! The field soccpy_nom should be hidden so you won't see it, but you should see the field contact_firstname_lastname and you can check that only the contacts related to the society selected for the current invoice are shown.
-
 = Overloading functions =
 
 Here are a few concrete use cases of overloading functions to achieve various goals.

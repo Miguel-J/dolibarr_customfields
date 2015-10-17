@@ -894,14 +894,18 @@ For product lines, you should anyway use the product lines template files: htdoc
 If you don't, you can still manually implement the required hooks, what is required is that you supply $line (which is the current line object being processed) in the $parameters array:
 
 <source lang="php">
-$parameters=array('line'=>$line,'fk_parent_line'=>$line->fk_parent_line);
+$parameters=array('line'=>$line);
 
-echo $hookmanager->executeHooks('formEditProductOptions',$parameters,$this,$action);
+echo $hookmanager->executeHooks('formEditProductOptions',$parameters,$object,$action);
 </source>
 
-Hooks names:
-* formEditProductOptions
-* formCreateProductOptions ($line is not required here, because we create a new product line! you can leave $parameters=array(); empty).
+The two important things here are that you supply:
+* $line: the line object, with a $line->rowid property.
+* $object: the parent object of the line, with a $object->rowid property. For example, if $line is an invoice line, then $object must be the parent invoice object. This is necessary so that CustomFields can automatically recognize the link between the twos.
+
+Possible hooks names:
+* formEditProductOptions: called when you edit a line.
+* formCreateProductOptions: called when you create a line. $line is not required here, because we create a new product line! you can leave $parameters=array(); empty.
 Note: there's no hook for viewing, because showing the customfields will clutter the visual field, but if you really want you can also do it by adding a formViewProductOptions hook.
 
 === Triggers ===

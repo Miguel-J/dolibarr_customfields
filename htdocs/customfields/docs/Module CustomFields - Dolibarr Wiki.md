@@ -959,12 +959,6 @@ A nice feature is that you will be able to filter the values out when exporting.
 
 This will allow you to keep your custom fields values in CSV format, readable by Excel. However, you should not rely only on this method to keep a backup of your database, the CSV export/import is better used when you just need to hand your records to a collaborator not using Dolibarr (for example your accountant), but for a regular backup of your Dolibarr system along with your custom fields, you should follow the other instructions below.
 
-Note: if you want to import custom fields in CSV format, you need to create a custom field named "import_key" for each module you want custom fields to be imported to. This field is required by the Dolibarr's import tool to store metadata about the import. You can safely delete the import_key custom fields after your import is completed.
-
-Note2: importing CustomFields in CSV only works for Dolibarr >= v3.7. You can however port the changes required to any version of Dolibarr below 3.7, by applying the changes in this patch (only 3 additions and 1 deletion):
-
-https://github.com/Dolibarr/dolibarr/pull/2386/files
-
 == Exporting your SQL data ==
 
 CustomFields stores all its datas and your custom fields configurations directly inside the database.
