@@ -87,8 +87,8 @@ function fill_object_with_products_fields(&$object, $fromobject=null, $outputlan
                 $product->entity = $record->entity;
 
                 // Constructing the photos directory for the current product
-                $pdir = get_exdir($product->id,2) . $product->id ."/photos/";
-		$dir = $conf->product->multidir_output[$product->entity] . '/'. $pdir;
+                $pdir = get_exdir($product->id,2,0,0,$product,'product') . $product->id ."/photos/";
+                $dir = $conf->product->multidir_output[$product->entity] . '/'. $pdir;
 
                 // Get an array list of the photos
                 $photos = $product->liste_photos($dir);
@@ -156,7 +156,7 @@ function fill_object_with_products_fields(&$object, $fromobject=null, $outputlan
         // Loading custom fields for products (if CustomFields is available)
         if ($conf->global->MAIN_MODULE_CUSTOMFIELDS) { // if the customfields module is activated...
             // Loading the CustomFields class
-            $incok = dol_include_once(DOL_DOCUMENT_ROOT.'/customfields/class/customfields.class.php');
+            $incok = dol_include_once('/customfields/class/customfields.class.php');
             if (!$incok) return 1; // Avoid errors if the module was deleted but not disabled (then the global variable is still in the database)
             $customfields = new CustomFields($db, 'product');
             // Fetch the customfields (columns names)

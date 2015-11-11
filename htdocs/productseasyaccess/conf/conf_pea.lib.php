@@ -21,7 +21,7 @@
  *	\brief          Contains all the configurable variables to expand the functionnalities of ProductsEasyAccess
  */
 
-$peaversion = '1.3.0'; // version of this module, useful for other modules to discriminate the version you are using (may be useful in case of newer features that are necessary for other modules to properly run)
+$peaversion = '1.3.1'; // version of this module, useful for other modules to discriminate the version you are using (may be useful in case of newer features that are necessary for other modules to properly run)
 
 // **** EXPANSION VARIABLES ****
 // Here you can edit the values to expand the functionnalities of ProductsEasyAccess
@@ -32,6 +32,6 @@ $peaThumbMaxWidth = 50; // Maximum width of the image, use 0 to disable pea thum
 $peaThumbMaxHeight = 50; // Same here for height
 $peaThumbExtName = '_peathumbnail'; // thumbnail extension to differenciate from Dolibarr's own thumbnails
 
-$peaBarcode = true; // Enable the barcode image substitution in ODT documents?
+$peaBarcode = false; // Enable the barcode image substitution in ODT documents?
 
 ?>
