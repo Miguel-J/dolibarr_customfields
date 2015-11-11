@@ -90,6 +90,7 @@ function customfields_print_creation_form($currentmodule, $object = null, $param
     include_once(dirname(__FILE__).'/../class/customfields.class.php');
     if (file_exists(dirname(__FILE__).'/../fields/customfields_fields_extend.lib.php')) include_once(dirname(__FILE__).'/../fields/customfields_fields_extend.lib.php'); // to allow user's function overloading (eg: at printing, at edition, etc..)
     $customfields = new CustomFields($db, $currentmodule);
+    $out = '';
 
     if ($customfields->probeTable()) { // ... and if the table for this module exists, we show the custom fields
         // Fetch custom fields' database structures
@@ -155,24 +156,24 @@ function customfields_print_creation_form($currentmodule, $object = null, $param
             }
 
             //== Print the custom field's label
-            if (!empty($field->extra['separator'])) print '</table><br /><table class="border" width="100%">';
+            if (!empty($field->extra['separator'])) $out .= '</table><br /><table class="border" width="100%">';
             $hidecondition = ( !empty($field->extra['hide']) and // Hiding condition: this field must have the hiding condition
                 (empty($field->extra['cascade']) or empty($field->extra['cascade_parent_field']) or empty($field->extra['show_on_cascade']) or (empty($datas->{$field->extra['cascade_parent_field']}) and empty($_REQUEST[$customfields->varprefix.$field->extra['cascade_parent_field']]) and empty($object->{$customfields->varprefix.$field->extra['cascade_parent_field']}) ) ) ); // and also if show_on_cascade is enabled, we check if the parent's field has a value set. If that's the case, we show the field.
             $hidetr = '';
             if ( $hidecondition ) $hidetr = ' style="display: none;"';
-            print '<tr name="'.$customfields->varprefix.$field->column_name.'_tr" id="'.$customfields->varprefix.$field->column_name.'_tr"><td'.$fieldrequired.' width="20%">';
-            print '<span name="'.$customfields->varprefix.$field->column_name.'_label" id="'.$customfields->varprefix.$field->column_name.'_label"'.$hidetr.'>'.$customfields->findLabel($name).$fieldrecopyhelper.'</span></td>';
+            $out .= '<tr name="'.$customfields->varprefix.$field->column_name.'_tr" id="'.$customfields->varprefix.$field->column_name.'_tr"><td'.$fieldrequired.' width="20%">';
+            $out .= '<span name="'.$customfields->varprefix.$field->column_name.'_label" id="'.$customfields->varprefix.$field->column_name.'_label"'.$hidetr.'>'.$customfields->findLabel($name).$fieldrecopyhelper.'</span></td>';
             //-- Output the right colspan for the table
             if(isset($parameters->colspan)) {
-                print '<td '.$parameters->colspan.'>';
+                $out .= '<td '.$parameters->colspan.'>';
             } else {
-                print '<td>';
+                $out .= '<td>';
             }
             //-- Recopy on conversion notice
-            if ( $field->extra['recopy'] and $conversion ) print $langs->trans('RecopyCanBeEmptyHelper').'<br />';
+            if ( $field->extra['recopy'] and $conversion ) $out .= $langs->trans('RecopyCanBeEmptyHelper').'<br />';
             //-- Duplication notice (duplication of value cannot be done at the creation form because the path to the value is different, or even not present and only in the $_GET array)
             if ( !empty($field->extra['duplicate_from']) ) {
-                if (!$hidecondition) print $langs->trans('DuplicateCanBeEmptyHelper').'<br />';
+                if (!$hidecondition) $out .= $langs->trans('DuplicateCanBeEmptyHelper').'<br />';
 
                 // Duplication preloading at creation option: try to duplicate a value directly on the creation form
                 if (!empty($field->extra['duplicate_creation_from'])) {
@@ -252,12 +253,13 @@ function customfields_print_creation_form($currentmodule, $object = null, $param
                     }
                     // Manage the field's input display automatically via CustomFields class
                     $moreparam = (!$hidecondition ? '' : ' style="display: none;"'); // Hide the input field if option is enabled
-                    print $customfields->showInputField($field, $value, $moreparam, $ajax_callback);
+                    $out .= $customfields->showInputField($field, $value, $moreparam, $ajax_callback);
                 } // TODO: else, print value for products lines if field is not editable (is this even possible? since the field may not yet be saved in db. Maybe just allow for customviewfull func)
             }
-            print '</td></tr>';
+            $out .= '</td></tr>';
         }
     }
+    return $out;
 }
 
 /**
@@ -280,9 +282,10 @@ function customfields_print_datasheet_form($currentmodule, $object, $parameters,
     if (file_exists(dirname(__FILE__).'/../fields/customfields_fields_extend.lib.php')) include_once(dirname(__FILE__).'/../fields/customfields_fields_extend.lib.php'); // to allow user's function overloading (eg: at printing, at edition, etc..)
     include_once(DOL_DOCUMENT_ROOT.'/core/lib/functions.lib.php'); // for images img_edit()
     $customfields = new CustomFields($db, $currentmodule);
+    $out = '';
 
     if ($customfields->probeTable()) { // ... and if the table for this module exists, we show the custom fields
-        //print '<table class="border" width="100%">';
+        //$out .= '<table class="border" width="100%">';
 
         if (!empty($object->rowid)) {
             $objid = $object->rowid;
@@ -375,21 +378,21 @@ function customfields_print_datasheet_form($currentmodule, $object, $parameters,
                 }
 
                 // == Print the record
-                if (!empty($field->extra['separator'])) print '</table><br /><table class="border" width="100%">';
+                if (!empty($field->extra['separator'])) $out .= '</table><br /><table class="border" width="100%">';
                 $hidecondition = ( !empty($field->extra['hide']) and // Hiding condition: this field must have the hiding condition
                     (empty($field->extra['cascade']) or empty($field->extra['cascade_parent_field']) or empty($field->extra['show_on_cascade']) or (empty($datas->{$field->extra['cascade_parent_field']}) and empty($_REQUEST[$customfields->varprefix.$field->extra['cascade_parent_field']]) ) ) ); // and also if show_on_cascade is enabled, we check if the parent's field has a value set. If that's the case, we show the field.
                 $hidetr = '';
                 if ( $hidecondition ) $hidetr = ' style="display: none;"';
-                print '<tr name="'.$customfields->varprefix.$field->column_name.'_tr" id="'.$customfields->varprefix.$field->column_name.'_tr"><td width="30%">';
+                $out .= '<tr name="'.$customfields->varprefix.$field->column_name.'_tr" id="'.$customfields->varprefix.$field->column_name.'_tr"><td width="30%">';
                 // print the customfield's label
-                print '<span name="'.$customfields->varprefix.$field->column_name.'_label" id="'.$customfields->varprefix.$field->column_name.'_label"'.$hidetr.'>'.$customfields->findLabel($name).'</span>';
+                $out .= '<span name="'.$customfields->varprefix.$field->column_name.'_label" id="'.$customfields->varprefix.$field->column_name.'_label"'.$hidetr.'>'.$customfields->findLabel($name).'</span>';
                 // print the edit button only if authorized
-                if (!($action == 'editcustomfields' && strtolower(GETPOST('field')) == $name) && !(isset($objet->brouillon) and $object->brouillon == false) && $rightok && !$field->extra['noteditable'] && !$hidecondition) print '<span align="right"><a href="'.$_SERVER["PHP_SELF"].'?'.$idvar.'='.$objid.'&amp;action=editcustomfields&amp;field='.$field->column_name.'">'.img_edit("default",1).'</a></td>';
-                print '</td>';
+                if (!($action == 'editcustomfields' && strtolower(GETPOST('field')) == $name) && !(isset($objet->brouillon) and $object->brouillon == false) && $rightok && !$field->extra['noteditable'] && !$hidecondition) $out .= '<span align="right"><a href="'.$_SERVER["PHP_SELF"].'?'.$idvar.'='.$objid.'&amp;action=editcustomfields&amp;field='.$field->column_name.'">'.img_edit("default",1).'</a></td>';
+                $out .= '</td>';
                 if (isset($parameters->colspan)) { // sometimes the colspan is provided in $parameters, we use it if available
-                    print '<td '.$parameters->colspan.'>';
+                    $out .= '<td '.$parameters->colspan.'>';
                 } else { // if not, by default it's generally a colspan=3
-                    print '<td>';
+                    $out .= '<td>';
                 }
                 // print the editing form...
                 if ($action == 'editcustomfields' && strtolower(GETPOST('field')) == $name && $rightok) {
@@ -425,7 +428,7 @@ function customfields_print_datasheet_form($currentmodule, $object, $parameters,
                             */
                         }
                         // Print the customfield edit form
-                        print $customfields->showInputForm($objid, $field, $value, $idvar, $_SERVER["PHP_SELF"].'?'.$idvar.'='.$objid); // note: we also submit the ID as a GET variable, so that the user can just refresh the page and it will correctly show the right page (else the URL will be something like 'fiche.php' instead of 'fiche.php?id=xx')
+                        $out .= $customfields->showInputForm($objid, $field, $value, $idvar, $_SERVER["PHP_SELF"].'?'.$idvar.'='.$objid); // note: we also submit the ID as a GET variable, so that the user can just refresh the page and it will correctly show the right page (else the URL will be something like 'fiche.php' instead of 'fiche.php?id=xx')
                     }
                 } else { // ... or print the customfield's value
                     // Calling custom user's functions
@@ -442,15 +445,16 @@ function customfields_print_datasheet_form($currentmodule, $object, $parameters,
                             $value = $field->column_default;
                         }
                         // Finally, print the field's value
-                        if (!$hidecondition) print $customfields->printField($field, $value);
+                        if (!$hidecondition) $out .= $customfields->printField($field, $value);
                     }
                 }
-                print '</td></tr>';
+                $out .= '</td></tr>';
             }
         }
 
-        //print '</table><br />';
+        //$out .= '</table><br />';
     }
+    return $out;
 }
 
 ?>

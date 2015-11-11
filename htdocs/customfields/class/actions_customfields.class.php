@@ -107,7 +107,6 @@ class ActionsCustomFields // extends CommonObject
             }
 
             include_once(dirname(__FILE__).'/../lib/customfields_printforms.lib.php');
-            print '<br />';
 
             // Print the customfields forms
             if ($printtype == 'create') { // Creation page: all customfields are editable at once
@@ -123,10 +122,11 @@ class ActionsCustomFields // extends CommonObject
                 } else {
                     $id = null; // else it's a normal first-time create form, so we don't want to fetch any past value (since there should be none)
                 }
-                customfields_print_creation_form($currentmodule, $object, $parameters, $action, $id);
+                return '<br />'.customfields_print_creation_form($currentmodule, $object, $parameters, $action, $id);
             } else { // Datasheet page: customfields are either not editable, or only one is editable at a time
-                customfields_print_datasheet_form($currentmodule, $object, $parameters, $action, $user, $idvar, $rights);
+                return '<br />'.customfields_print_datasheet_form($currentmodule, $object, $parameters, $action, $user, $idvar, $rights);
             }
+            return '';
         }
     }
 
@@ -149,7 +149,15 @@ class ActionsCustomFields // extends CommonObject
         } else {
             $printtype = 'datasheet'; // show datasheet form: either the customfields aren't edited and we just show their values and an edit button, either we are editing ONE customfield at a time
         }
-        $this->customfields_print_forms($printtype, $parameters, $object, $action);
+
+        # Printing the custom fields
+        if (version_compare(DOL_VERSION, '3.8.0', '>=')) {
+            $this->resprints = $this->customfields_print_forms($printtype, $parameters, $object, $action);
+            print $this->resprints; // TODO: this should not be necessary according to Dolibarr's documentation, but as of v3.8.1 we still need to manually print...
+        } else {
+            print $this->customfields_print_forms($printtype, $parameters, $object, $action);
+        }
+        return 0;
     }
 
     // Add customfields in forms that adds new lines (eg: products/services lines in invoices, etc..)
@@ -161,9 +169,18 @@ class ActionsCustomFields // extends CommonObject
         $printtype = 'create';
 
         // Printing the customfields
-        print('<table>'); // need to pre-create a table here since the hook is contained inside a div instead of table
-        $this->customfields_print_forms($printtype, $parameters, $object, $action);
-        print('</table>');
+        if (version_compare(DOL_VERSION, '3.8.0', '>=')) {
+            $this->resprints = '';
+            $this->resprints .= '<table>';
+            $this->resprints .= $this->customfields_print_forms($printtype, $parameters, $object, $action);
+            $this->resprints .= '</table>';
+            print $this->resprints; // TODO: this should not be necessary according to Dolibarr's documentation, but as of v3.8.1 we still need to manually print...
+        } else {
+            print('<table>'); // need to pre-create a table here since the hook is contained inside a div instead of table
+            print $this->customfields_print_forms($printtype, $parameters, $object, $action);
+            print('</table>');
+        }
+        return 0;
     }
     // Special case: when enabling HTML field for supplier order line, another hook is called, but it is totally equivalent to formCreateProductOptions, thus we just redirect
     function formCreateProductSupplierOptions($parameters, $object, $action) {
@@ -191,9 +208,18 @@ class ActionsCustomFields // extends CommonObject
         $printtype = 'create';
 
         // Printing the customfields
-        print('<table>'); // need to pre-create a table here since the hook is contained inside a div instead of table
-        $this->customfields_print_forms($printtype, $parameters, $object2, $action);
-        print('</table>');
+        if (version_compare(DOL_VERSION, '3.8.0', '>=')) {
+            $this->resprints = '';
+            $this->resprints .= '<table>';
+            $this->resprints .= $this->customfields_print_forms($printtype, $parameters, $object2, $action);
+            $this->resprints .= '</table>';
+            print $this->resprints; // TODO: this should not be necessary according to Dolibarr's documentation, but as of v3.8.1 we still need to manually print...
+        } else {
+            print('<table>'); // need to pre-create a table here since the hook is contained inside a div instead of table
+            print $this->customfields_print_forms($printtype, $parameters, $object2, $action);
+            print('</table>');
+        }
+        return 0;
     }
 
     /* Add customfields as options in forms that adds new lines for modules that supports it (eg: supplier's orders, etc.)
@@ -218,6 +244,7 @@ class ActionsCustomFields // extends CommonObject
         }
 
         customfields_clone_or_recopy($object, $srcobject, $action2);
+        return 0;
     }
 
 }
