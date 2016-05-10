@@ -151,12 +151,14 @@ class ActionsCustomFields // extends CommonObject
         }
 
         # Printing the custom fields
-        if (version_compare(DOL_VERSION, '3.8.0', '>=')) {
-            $this->resprints = $this->customfields_print_forms($printtype, $parameters, $object, $action);
-            print $this->resprints; // TODO: this should not be necessary according to Dolibarr's documentation, but as of v3.8.1 we still need to manually print...
-        } else {
-            print $this->customfields_print_forms($printtype, $parameters, $object, $action);
-        }
+        $out = $this->customfields_print_forms($printtype, $parameters, $object, $action);
+        //if (version_compare(DOL_VERSION, '3.9.0', '>=')) {
+            // Beginning with Dolibarr v3.9.0, we don't need to manually print anymore, just return the output in a class variable
+            // Only implemented in Third-Party module, not yet ready!
+            //$this->resprints = $out;
+        //} else {
+            print($out);
+        //}
         return 0;
     }
 
@@ -169,17 +171,15 @@ class ActionsCustomFields // extends CommonObject
         $printtype = 'create';
 
         // Printing the customfields
-        if (version_compare(DOL_VERSION, '3.8.0', '>=')) {
-            $this->resprints = '';
-            $this->resprints .= '<table>';
-            $this->resprints .= $this->customfields_print_forms($printtype, $parameters, $object, $action);
-            $this->resprints .= '</table>';
-            print $this->resprints; // TODO: this should not be necessary according to Dolibarr's documentation, but as of v3.8.1 we still need to manually print...
-        } else {
-            print('<table>'); // need to pre-create a table here since the hook is contained inside a div instead of table
-            print $this->customfields_print_forms($printtype, $parameters, $object, $action);
-            print('</table>');
-        }
+        $out = '';
+        $out .= '<table>'; // need to pre-create a table here since the hook is contained inside a div instead of table
+        $out .= $this->customfields_print_forms($printtype, $parameters, $object, $action);
+        $out .= '</table>';
+        //if (version_compare(DOL_VERSION, '3.9.0', '>=')) {
+            //$this->resprints = $out;
+        //} else {
+            print($out);
+        //}
         return 0;
     }
     // Special case: when enabling HTML field for supplier order line, another hook is called, but it is totally equivalent to formCreateProductOptions, thus we just redirect
@@ -208,17 +208,15 @@ class ActionsCustomFields // extends CommonObject
         $printtype = 'create';
 
         // Printing the customfields
-        if (version_compare(DOL_VERSION, '3.8.0', '>=')) {
-            $this->resprints = '';
-            $this->resprints .= '<table>';
-            $this->resprints .= $this->customfields_print_forms($printtype, $parameters, $object2, $action);
-            $this->resprints .= '</table>';
-            print $this->resprints; // TODO: this should not be necessary according to Dolibarr's documentation, but as of v3.8.1 we still need to manually print...
-        } else {
-            print('<table>'); // need to pre-create a table here since the hook is contained inside a div instead of table
-            print $this->customfields_print_forms($printtype, $parameters, $object2, $action);
-            print('</table>');
-        }
+        $out = '';
+        $out .= '<table>'; // need to pre-create a table here since the hook is contained inside a div instead of table
+        $out .= $this->customfields_print_forms($printtype, $parameters, $object2, $action);
+        $out .= '</table>';
+        //if (version_compare(DOL_VERSION, '3.9.0', '>=')) {
+            //$this->resprints = $out;
+        //} else {
+            print($out);
+        //}
         return 0;
     }
 

@@ -1,8 +1,8 @@
 =================================================
 *               CUSTOMFIELDS MODULE             *
 *           by Stephen Larroque (lrq3000)       *
-*                  version 3.5.13                *
-*             release date 2015/11/11           *
+*                  version 3.5.14                *
+*             release date 2016/05/10           *
 =================================================
 
 ===== DESCRIPTION =====
@@ -10,6 +10,8 @@
 This module will enable the user to create custom fields for the supported modules. You can choose the datatype, the size, the label(s), the possible values, the value by default, and even constraints (links to other tables) and custom sql definitions and custom sql statements!
 
 CustomFields has been made with the intention of being as portable, flexible, modular and reusable as possible, so that it can be adapted to any Dolibarr's module, and to (almost) any user's need (even if something isn't implemented, you can most probably just use a custom sql statement, the rest will be managed automatically, even with custom statements!).
+
+This module has been tested from Dolibarr 3.3 to 3.9.1.
 
 ===== DOWNLOAD =====
 
