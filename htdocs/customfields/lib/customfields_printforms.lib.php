@@ -287,9 +287,12 @@ function customfields_print_datasheet_form($currentmodule, $object, $parameters,
     if ($customfields->probeTable()) { // ... and if the table for this module exists, we show the custom fields
         //$out .= '<table class="border" width="100%">';
 
+        $objid = null;
         if (!empty($object->rowid)) {
             $objid = $object->rowid;
-        } else {
+        }
+        if (empty($objid) or $objid != $object->id) {
+            // Workaround bug in CommandeFournisseur which sets rowid = CommandeFournisseurDet (line) after adding a product line instead of CommandeFournisseur object's id
             $objid = $object->id;
         }
         if (empty($objid)) return; // if the object's id is empty, it's probably an error (eg: when creating a new task, project_update trigger will be called because of an internal call to edit a project to append the new task, but then this trigger is not silented and will call this function, which will have absolutely nothing to do.)
