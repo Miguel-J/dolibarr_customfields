@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2012-2015   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2012-2016   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,9 +70,9 @@ function fill_object_with_products_fields(&$object, $fromobject=null, $outputlan
             // necessary for get_exdir()
             $incok = include_once(DOL_DOCUMENT_ROOT.'/core/lib/functions.lib.php'); // for Dolibarr v3.2.0 and above
             if (!$incok) include_once(DOL_DOCUMENT_ROOT.'/lib/functions.lib.php'); // for Dolibarr v3.1.x
-            $product = new Product($db);
 
             if (!isset($object->productslines)) $object->productslines = new stdClass();
+            $product = new Product($db);
             foreach($products as $record) {
                 if (!isset($object->productslines->{$record->$prifieldproduct})) $object->productslines->{$record->$prifieldproduct} = new Product($db);
 
@@ -81,14 +81,21 @@ function fill_object_with_products_fields(&$object, $fromobject=null, $outputlan
                     $object->productslines->{$record->$prifieldproduct}->$key = $value;
                 }
 
+                // Skip if this is not a predefined product
+                //if (empty($object->productslines->{$record->$prifieldproduct}->fk_product)) continue;
+
                 // Loading photos if available
                 // Forging an artificial product object
+                //$product->fetch($record->$prifieldproduct); // Normal way: load full product fields from db, but this is slower than crafting an artificial product object with just the required fields
                 $product->id = $record->$prifieldproduct;
+                $product->ref = $record->ref;
                 $product->entity = $record->entity;
 
                 // Constructing the photos directory for the current product
                 $pdir = get_exdir($product->id,2,0,0,$product,'product') . $product->id ."/photos/";
-                $dir = $conf->product->multidir_output[$product->entity] . '/'. $pdir;
+                if (!is_dir($pdir)) $pdir = get_exdir($product->id,2,0,0,$product,'product') . dol_sanitizeFileName($product->ref); // in Dolibarr > 3.9, the path is now using the product's ref instead of id
+                //$dir = $conf->product->multidir_output[$product->entity] . '/'. $pdir . '/';
+                $dir = $conf->product->dir_output . '/'. $pdir . '/'; // IMPORTANT: always append / at the end of $pdir, else the liste_photos() method won't generate the filepaths correctly!
 
                 // Get an array list of the photos
                 $photos = $product->liste_photos($dir);

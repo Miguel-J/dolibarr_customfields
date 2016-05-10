@@ -1,8 +1,8 @@
 PRODUCTSEASYACCESS MODULE
 =========================
 by Stephen Larroque (lrq3000)
-version 1.3.1
-release date 2015/11/11
+version 1.4.0
+release date 2016/05/10
 *************************
 
 

@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2012-2015   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2012-2016   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
  *	\brief          Contains all the configurable variables to expand the functionnalities of ProductsEasyAccess
  */
 
-$peaversion = '1.3.1'; // version of this module, useful for other modules to discriminate the version you are using (may be useful in case of newer features that are necessary for other modules to properly run)
+$peaversion = '1.4.0'; // version of this module, useful for other modules to discriminate the version you are using (may be useful in case of newer features that are necessary for other modules to properly run)
 
 // **** EXPANSION VARIABLES ****
 // Here you can edit the values to expand the functionnalities of ProductsEasyAccess
