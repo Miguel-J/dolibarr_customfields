@@ -1,6 +1,10 @@
 CHANGELOG
 ==========
 
+2016
+-------
+=> Read commits log on the github: https://github.com/LRQ3000/dolibarr_customfields
+
 2015
 -------
 * fix: number types now also accepts values with a comma instead of a dot to separate the decimals.

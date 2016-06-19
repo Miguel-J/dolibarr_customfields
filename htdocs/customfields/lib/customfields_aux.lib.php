@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2011-2015   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2016   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -276,6 +276,7 @@ function customfields_clone_or_recopy($object, $fromobject, $action2 = null, $st
                         $newrecord = new stdClass(); // initializing the object explicitly (to avoid php > 5.3 warnings)
                         $newrecord->{$field->column_name} = $records_origin->$field_origin; // we create a new record object with the field and the id
                         $newrecord->id = $object->id;
+                        $newrecord->recopy = True; // special flag to notify CustomFields->update() to avoid preprocessing of value (just copy it as-is because it's directly recopied from database anyway!
 
                         // Commit recopied value into the database
                         $customfields->update($newrecord, 1);

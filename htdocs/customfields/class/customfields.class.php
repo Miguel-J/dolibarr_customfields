@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2011-2015   Stephen Larroque <lrq3000@gmail.com>
+/* Copyright (C) 2011-2016   Stephen Larroque <lrq3000@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -406,44 +406,48 @@ class CustomFields extends compatClass4 // extends CommonObject
                 // Insert field's column_name
                 $sqlfields[] = $field->column_name;
 
-                // Insert field's value
+                // Insert field's value (preprocess it)
                 if (strlen($object->$key) == 0) {
                     $sqlvalues[] = 'NULL'; // special case: if the value supplied is an empty string (even 0 returns 1 length), then we put this as NULL without quotes (else, it will supply a field with '' which can be rejected even on nullable sql fields)
                } else {
-                    // For numbers types, also accept commas just like dots to separate the decimals
-                    if ($field->data_type == 'float' or $field->data_type == 'double' or $field->data_type == 'decimal' or $field->data_type == 'numeric') {
-                        $object->$key = str_replace(',', '.', $object->$key);
-                    // We need to fetch the correct value when we update a date field
-                    } elseif ($field->data_type == 'date') {
-                        // Fetch day, month and year
-                        if (isset($object->{$key.'day'}) and isset($object->{$key.'month'}) and isset($object->{$key.'year'})) { // for date fields, Dolibarr will produce 3 more associated POST fields: myfielddate, myfieldmonth and myfieldyear
-                            $dateday = trim($object->{$key.'day'});
-                            $datemonth = trim($object->{$key.'month'});
-                            $dateyear = trim($object->{$key.'year'});
-                        } else { // else if they are not submitted (or if they weren't assigned inside $object), we try to split the date into 3 values
-                            list($dateday, $datemonth, $dateyear) = explode('/',$object->$key);
-                        }
-                        // Format the correct timestamp from the date for the database
-                        $object->$key = $this->db->idate(dol_mktime(0, 0, 0, $datemonth, $dateday, $dateyear));
+                    // Preprocessing of value depending on sql data type (only if not recopied, because then it was already preprocessed)
+                    if (empty($object->recopy)) {
+                        // For numbers types, also accept commas just like dots to separate the decimals
+                        if ($field->data_type == 'float' or $field->data_type == 'double' or $field->data_type == 'decimal' or $field->data_type == 'numeric') {
+                            $object->$key = str_replace(',', '.', $object->$key);
+                        // We need to fetch the correct value when we update a date field
+                        } elseif ($field->data_type == 'date') {
+                            // Fetch day, month and year
+                            if (isset($object->{$key.'day'}) and isset($object->{$key.'month'}) and isset($object->{$key.'year'})) { // for date fields, Dolibarr will produce 3 more associated POST fields: myfielddate, myfieldmonth and myfieldyear
+                                $dateday = trim($object->{$key.'day'});
+                                $datemonth = trim($object->{$key.'month'});
+                                $dateyear = trim($object->{$key.'year'});
+                            } else { // else if they are not submitted (or if they weren't assigned inside $object), we try to split the date into 3 values
+                                list($dateday, $datemonth, $dateyear) = explode('/',$object->$key);
+                            }
+                            // Format the correct timestamp from the date for the database
+                            $object->$key = $this->db->idate(dol_mktime(0, 0, 0, $datemonth, $dateday, $dateyear));
 
-                   } elseif ($field->data_type == 'datetime') {
-                        // Fetch day, month and year
-                        if (isset($object->{$key.'min'}) and isset($object->{$key.'hour'}) and isset($object->{$key.'day'}) and isset($object->{$key.'month'}) and isset($object->{$key.'year'})) { // for date fields, Dolibarr will produce 3 more associated POST fields: myfielddate, myfieldmonth and myfieldyear
-                            $datemin = trim($object->{$key.'min'});
-                            $datehour = trim($object->{$key.'hour'});
-                            $dateday = trim($object->{$key.'day'});
-                            $datemonth = trim($object->{$key.'month'});
-                            $dateyear = trim($object->{$key.'year'});
-                        } else { // else if they are not submitted (or if they weren't assigned inside $object), we try to split the date into 3 values. But the hour/minute isn't stored in the same field anyway...
-                            list($dateday, $datemonth, $dateyear) = explode('/',$object->$key);
-                            $datemin = 0;
-                            $datehour = 0;
+                       } elseif ($field->data_type == 'datetime') {
+                            // Fetch day, month and year
+                            if (isset($object->{$key.'min'}) and isset($object->{$key.'hour'}) and isset($object->{$key.'day'}) and isset($object->{$key.'month'}) and isset($object->{$key.'year'})) { // for date fields, Dolibarr will produce 3 more associated POST fields: myfielddate, myfieldmonth and myfieldyear
+                                $datemin = trim($object->{$key.'min'});
+                                $datehour = trim($object->{$key.'hour'});
+                                $dateday = trim($object->{$key.'day'});
+                                $datemonth = trim($object->{$key.'month'});
+                                $dateyear = trim($object->{$key.'year'});
+                            } else { // else if they are not submitted (or if they weren't assigned inside $object), we try to split the date into 3 values. But the hour/minute isn't stored in the same field anyway...
+                                list($dateday, $datemonth, $dateyear) = explode('/',$object->$key);
+                                $datemin = 0;
+                                $datehour = 0;
+                            }
+                            // Format the correct timestamp from the date for the database
+                            $object->$key = $this->db->idate(dol_mktime($datehour, $datemin, 0, $datemonth, $dateday, $dateyear));
                         }
-                        // Format the correct timestamp from the date for the database
-                        $object->$key = $this->db->idate(dol_mktime($datehour, $datemin, 0, $datemonth, $dateday, $dateyear));
                     }
 
-                    $sqlvalues[] = "'".$this->escape($object->$key)."'"; // escape and single-quote values (even if they are not strings, the database will automatically correct that depending on the column_type)
+                    // Escape and single-quote values (even if they are not strings, the database will automatically correct that depending on the column_type)
+                    $sqlvalues[] = "'".$this->escape($object->$key)."'";
                 }
             }
         }
