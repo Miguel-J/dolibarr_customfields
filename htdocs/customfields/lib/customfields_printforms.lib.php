@@ -111,6 +111,7 @@ function customfields_print_creation_form($currentmodule, $object = null, $param
             if (empty($object->origin) and !empty($origin)) {
                 $object->origin = $origin;
                 $object->origin_id = GETPOST('origin_id');
+                if (empty($object->origin_id)) $object->origin_id = GETPOST('originid'); // sometimes (eg, propal -> invoice), the origin id is stored inside originid instead of origin_id
             }
             // Construct the $fromobject from which we will recopy the fields
             $fromobject = new stdClass();
