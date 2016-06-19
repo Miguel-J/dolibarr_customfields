@@ -1755,8 +1755,16 @@ class CustomFields extends compatClass4 // extends CommonObject
                 $id.=$randid; // append random unique id
             } elseif ($type == 'date') {
                 //$out.=' (YYYY-MM-DD)';
+                // convert to timestamp if in another format
+                if (strpos($currentvalue, '-') != false) {
+                    include_once(DOL_DOCUMENT_ROOT."/core/lib/date.lib.php");
+                    $currentvalue = dol_stringtotime($currentvalue);
+                }
+                // prepare html widget
                 $html=new Form($this->db);
                 $randid = '_rand'.uniqid($key.rand(1,10000)); // Important to make sure that this field gets an unique ID, else the Javascript widget won't be able to locate the correct field if multiple fields have the same id (which is not correct anyway in X/HTML)
+                include_once(DOL_DOCUMENT_ROOT."/core/lib/date.lib.php");
+                $currentvalue = dol_stringtotime($currentvalue); // DEBUG
                 $out.=$html->select_date($currentvalue,$name.$randid,0,0,1,$name.$randid,1,1,1); // TODO: fix $currentvalue when it is in format day/month/year (when an error happens and we want to remember the field, for example in products lines)
                 $out = str_replace('name="'.$name.$randid, ($moreparam?$moreparam:'').'name="'.$name, $out); // Finally, replace the name by removing the random id part (because we need the name to be exactly the same as the field's name so that we can detect it and save it in customfields_printforms.lib.php). We replace all occurrences, meaning that we also fix the names of the day, month and year fields that are created automatically in addition of our field (useful to correctly separate these fields because in the final field we can't know which is the day or month, which change according to the locale, eg: english month is first, french day is first).
                 $id.=$randid; // append random unique id
@@ -1764,6 +1772,12 @@ class CustomFields extends compatClass4 // extends CommonObject
                 //$out.=' (YYYY-MM-DD HH:MM:SS)';
                 if (empty($currentvalue)) { $currentvalue = 'YYYY-MM-DD HH:MM'; }
                 //$out.='<input type="text" name="'.$name.'" size="'.$showsize.'" maxlength="'.$size.'" value="'.$currentvalue.'"'.($moreparam?$moreparam:'').'>';
+                // convert to timestamp if in another format
+                if (strpos($currentvalue, '-') != false) {
+                    include_once(DOL_DOCUMENT_ROOT."/core/lib/date.lib.php");
+                    $currentvalue = dol_stringtotime($currentvalue);
+                }
+                // prepare html widget
                 $html=new Form($this->db);
                 $randid = '_rand'.uniqid($key.rand(1,10000)); // Important to make sure that this field gets an unique ID, else the Javascript widget won't be able to locate the correct field if multiple fields have the same id (which is not correct anyway in X/HTML)
                 $out.=$html->select_date($currentvalue,$name.$randid,1,1,1,$name.$randid,1,1,1);
