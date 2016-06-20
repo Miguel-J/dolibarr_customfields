@@ -219,9 +219,13 @@ function customfields_print_creation_form($currentmodule, $object = null, $param
                 $value = $object->{$customfields->varprefix.$field->column_name};
             }
             if ($field->column_type == 'datetime') {  // special case for datetime, we need to also pickup the time (hour and minutes) boxes
-                include_once(DOL_DOCUMENT_ROOT."/core/lib/date.lib.php");
-                $value = strftime('%Y%m%d', dol_stringtotime($value)).$post_noconflict[$customfields->varprefix.$name.'hour'].$post_noconflict[$customfields->varprefix.$name.'min'].'00';
-                $value = dol_stringtotime($value, 0); // convert back to a local php server timestamp to avoid shift of hours because of different client/server timezone
+                // Fetch hour and minutes from the separate POST values if not already in the $value
+                if (!empty($post_noconflict[$customfields->varprefix.$name.'hour']) and strpos($value, ':') == false) {
+                    include_once(DOL_DOCUMENT_ROOT."/core/lib/date.lib.php");
+                    $value = strftime('%Y%m%d', dol_stringtotime($value)).$post_noconflict[$customfields->varprefix.$name.'hour'].$post_noconflict[$customfields->varprefix.$name.'min'].'00';
+                }
+                // Convert back to a local php server timestamp to avoid shift of hours because of different client/server timezone
+                $value = dol_stringtotime($value, 0);
             }
 
             // Special functions when the creation form is used to edit fields (eg: via the Modify button, this shows a form where all fields can be modified simultaneously).
