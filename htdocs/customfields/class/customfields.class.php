@@ -426,7 +426,9 @@ class CustomFields extends compatClass4 // extends CommonObject
                                 list($dateday, $datemonth, $dateyear) = explode('/',$object->$key);
                             }
                             // Format the correct timestamp from the date for the database
-                            $object->$key = $this->db->idate(dol_mktime(0, 0, 0, $datemonth, $dateday, $dateyear));
+                            $object->$key = dol_mktime(0, 0, 0, $datemonth, $dateday, $dateyear, 'gmt');
+                            $object->$key = dol_print_date($object->$key, '%Y%m%d', 'gmt');
+                            //$object->$key = $this->db->idate($object->$key); // more interoperable (ie, works on postgresql), but will wrongly offset on some computers and dates (eg, 1946-07-23)
 
                        } elseif ($field->data_type == 'datetime') {
                             // Fetch day, month and year
@@ -442,7 +444,9 @@ class CustomFields extends compatClass4 // extends CommonObject
                                 $datehour = 0;
                             }
                             // Format the correct timestamp from the date for the database
-                            $object->$key = $this->db->idate(dol_mktime($datehour, $datemin, 0, $datemonth, $dateday, $dateyear));
+                            $object->$key = dol_mktime($datehour, $datemin, 0, $datemonth, $dateday, $dateyear, 'gmt');
+                            $object->$key = dol_print_date($object->$key, '%Y%m%d%H%M%S', 'gmt');
+                            //$object->$key = $this->db->idate($object->$key); // more interoperable (ie, works on postgresql), but will wrongly offset on some computers and dates (eg, 1946-07-23)
                         }
                     }
 
@@ -1759,6 +1763,7 @@ class CustomFields extends compatClass4 // extends CommonObject
                 if (strpos($currentvalue, '/') != false or strpos($currentvalue, '-') != false) {
                     include_once(DOL_DOCUMENT_ROOT."/core/lib/date.lib.php");
                     $currentvalue = dol_stringtotime($currentvalue, 0);
+                    $currentvalue = strftime('%Y-%m-%d', $currentvalue);
                 }
                 // prepare html widget
                 $html=new Form($this->db);
@@ -1774,6 +1779,7 @@ class CustomFields extends compatClass4 // extends CommonObject
                 if (strpos($currentvalue, '/') != false or strpos($currentvalue, '-') != false) {
                     include_once(DOL_DOCUMENT_ROOT."/core/lib/date.lib.php");
                     $currentvalue = dol_stringtotime($currentvalue, 0);
+                    $currentvalue = strftime('%Y-%m-%d %H:%M', $currentvalue);
                 }
                 // prepare html widget
                 $html=new Form($this->db);
