@@ -1195,7 +1195,7 @@ class CustomFields extends compatClass4 // extends CommonObject
                 $where_arr[] = $field->referenced_column_name.'='.$id;
             }
             if (!empty($where)) $where_arr[] = $where;
-            if (!empty($field->extra['constraint_where'])) $where_arr[] = $field->extra['constraint_where'];
+            if (!empty($field->extra['constraint_where'])) $where_arr[] = '('.$field->extra['constraint_where'].')'; // enclose in parenthesis in case the user supplied several terms (eg, with an OR) in its WHERE custom clause (eg, fk_typent="235" OR fk_typent="239"), because we use an AND to combine internal WHERE terms and user's WHERE terms, so if there is an OR it must be enclosed in parenthesis to work as expected
 
             if (count($where_arr) > 0) {
                 $where_sql = ' WHERE '.implode(' AND ', $where_arr);
